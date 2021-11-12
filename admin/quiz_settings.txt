@@ -1,3 +1,4 @@
-ftime: 60
+time: 60
 no_of_question: 5
 no_of_attempt: 2
+something: something

@@ -1,4 +1,6 @@
 import os
+import re
+
 
 # ==================================================================
 #   Initialize Variables
@@ -130,38 +132,40 @@ def PrintMain(inputList: list):
 # "menuList" is for 
 def MainLogic(menuList: list, content: str):
     while True:
-        stored_value = input(content)
-        if stored_value.upper() == "X":
-            os.system("cls")
-            while True:
-                userConfirm = input(f"{divider}\n\033[1;37;40m\t\tAre you sure want to quit?\033[0;37;40m\n{divider}\n[ Y ] Yes\t\t[ N ] No\n{divider}\n")
-                if userConfirm.upper() == "Y":
-                    print("\033[0;32;40mGoodbye\033[0;37;40m")
-                    global loop
-                    loop = False
-                    break
-                elif userConfirm.upper() == "N":
-                    break
-                else:
-                    print("\033[1;37;41mPlease select a valid option.\033[0;37;40m")
+        try:
+            stored_value = input(content)
+            if stored_value.upper() == "X":
                 os.system("cls")
-            return
-        if int(stored_value) in range(len(menuList)):
-            if stored_value == "1":
-                input("Register User")
-            elif stored_value == "2":
-                QuestionPool()
-            elif stored_value == "3":
-                QuizSetting()
-            elif stored_value == "4":
-                print("Generate Report")
-        else:
-            print("\033[1;37;41mPlease select a valid option.\033[0;37;40m")   
+                while True:
+                    userConfirm = input(f"{divider}\n\033[1;37;40m\t\tAre you sure want to quit?\033[0;37;40m\n{divider}\n[ Y ] Yes\t\t[ N ] No\n{divider}\n")
+                    if userConfirm.upper() == "Y":
+                        print("\033[0;32;40mGoodbye\033[0;37;40m")
+                        global loop
+                        loop = False
+                        break
+                    elif userConfirm.upper() == "N":
+                        break
+                    else:
+                        print("\033[1;37;41mPlease select a valid option.\033[0;37;40m")
+                    os.system("cls")
+                return
+            if int(stored_value) in range(len(menuList) + 1):
+                if stored_value == "1":
+                    RegisterUser()
+                elif stored_value == "2":
+                    QuestionPool()
+                elif stored_value == "3":
+                    QuizSetting()
+                elif stored_value == "4":
+                    Report()
+            else:
+                print("\033[1;37;41mPlease select a valid option.\033[0;37;40m")   
+        except ValueError:
+            print("\033[1;37;41mPlease select a valid option.\033[0;37;40m")
 
-# Checks for user input 
-def CheckUserInput(userInput):
+# Logicial system for quiz setting
+def SettingLogic(userInput: str):
     valueCap = str(userInput).upper()
-
     # Logical Circuit
     if valueCap == "X": # Close App
         global loop
@@ -181,37 +185,31 @@ def CheckUserInput(userInput):
 # 
 def AddSetting(): 
     while True:
-        loop2 = True
-
-        # Variable name check loop
-        while loop2:
+        
+        while True:
             os.system("cls")
             new_setting_name = input(f"{divider}\n\t\t\tAdding Setting\n{divider}\nSetting Name: \nSetting Value: \n{divider}\n[ X ] Back to Menu\n{divider}\nSetting Name: ")
 
             # Exit out of loop
             if new_setting_name.upper() == "X":
-                loop2 = False
                 break
-
             if not new_setting_name.isalnum():
                 input(f"\n\033[1;37;41mInput value can't contain special characters!\033[0;37;40m\n")
                 continue
             elif new_setting_name[0].isdigit():
                 input(f"\n\033[1;37;41mPlease start with a letter!\033[0;37;40m\n")
                 continue
-            
+        
             # Exit loop once all checks return no errors
             break
 
         # Variable value check loop
-        while loop2:
+        while True:
             os.system("cls")
             new_setting_value = input(f"{divider}\n\t\t\tAdding Setting\n{divider}\nSetting Name: {new_setting_name}\nSetting Value: \n{divider}\n[ X ] Back to Menu\n{divider}\nSetting Value: ")
 
             if new_setting_value.upper() == "X":
-                loop2 = False
                 break
-
             if new_setting_name == "":
                 input(f"\n\033[1;37;41mPlease enter a valid into the input\033[0;37;40m\n")
                 continue            
@@ -223,22 +221,21 @@ def AddSetting():
             break
 
         # Check if the user wants to confirm the setting
-        while loop2:
+        while True:
             os.system("cls")
             finalCheck = input(f"{divider}\n\t\t\tAdding Setting\n{divider}\nSetting Name: {new_setting_name}\nSetting Value: {new_setting_value}\n{divider}\n[ C ] Confirm?\t\t[ X ] Exit\n{divider}\n")
             
             if finalCheck.upper() == "X":
-                loop2 = False
                 break
-
-            if finalCheck.upper() == "C":
-                input("\033[0;32;40mYour changes have been saved!\033[0;37;40m\nPress Enter to Continue")
+            elif finalCheck.upper() == "C":
+                input("\033[0;32;40mYour changes have been saved!\033[0;37;40m\nPress Enter to Continue\n")
             else:
                 input("\n\033[1;37;41mPlease input one of the options\033[0;37;40m\n")
+            input(f"loop2: {True}")
             break
         break
     # Checks if the program aborted at any point 
-    if loop2:
+    if True:
         with open(quiz_setting_text, "a") as f:
             f.write(f"{new_setting_name}: {new_setting_value}")
 
@@ -263,18 +260,33 @@ def EditSetting():
 
 # Issue: Just deletes everything in the file [Solved]
 def DeleteSetting(): 
-    deleting_index = SelectSetting("Delete Setting")
+    while True:
+        os.system("cls")
 
-    if deleting_index == "X":
-        return
-    
-    with open(quiz_setting_text, "r") as f:
-        lines = f.read().splitlines()
-    
-    with open(quiz_setting_text, "w") as f:
-        for number, line in enumerate(lines):
-            if number != deleting_index:
-                f.write(line + '\n')
+        deleting_index = SelectSetting("Delete Setting")
+
+        if deleting_index == "X":
+            return
+
+        while True:
+            os.system("cls")
+            finalCheck = input(f"{divider}\n{ViewFileContent(1)}\n{divider}\n[ C ] Confirm?\t\t[ X ] Back to Menu\n{divider}\n")
+            
+            if finalCheck.upper() == "X":
+                break
+            elif finalCheck.upper() == "C":
+                with open(quiz_setting_text, "r") as f:
+                    lines = f.read().splitlines()
+                
+                with open(quiz_setting_text, "w") as f:
+                    for number, line in enumerate(lines):
+                        if number != deleting_index:
+                            f.write(line + '\n')   
+                input("\033[0;31;40mOption has been deleted!\033[0;37;40m\nPress Enter to Continue\n")  
+                break     
+            else:
+                print(f"{divider}\n\033[1;37;41mPlease select an option.\033[0;37;40m") 
+        break
 
 # Returns index value for menu navigation
 # "title" parameter needs to be a string for the printing
@@ -288,7 +300,6 @@ def SelectSetting(title: str):
             if setting_no.upper() == "X": 
                 return "X"
             else:
-
                 print(f"{divider}\n\033[1;37;41mPlease select an option.\033[0;37;40m")
         else:
             if int(setting_no) > len(dictionary) or int(setting_no) <= 0:
@@ -299,16 +310,23 @@ def SelectSetting(title: str):
 # ========================================================================
 #   Sub Program Loops
 # ========================================================================
+def RegisterUser():
+    input("Register User")
+
 def QuizSetting():
     while loop:
         os.system("cls")
         ReadFileContent(quiz_setting_text, "settings")
         quizSettings = PrintFile()    
         adminInput = input(quizSettings)
-        CheckUserInput(adminInput)
+        SettingLogic(adminInput)
 
 def QuestionPool():
-    print("Question Pool")
+    ReadFileContent(quiz_question_text, "")
+    input("Question Pool")
+
+def Report():
+    input("Generate Report")
 # ========================================================================
 #   Main Program Loop
 # ========================================================================
