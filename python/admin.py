@@ -16,7 +16,7 @@ dictionary = {}
 loop = True
 
 # ==================================================================
-#   Functions
+#   General Functions
 # ==================================================================
 
 # Reads and empties value into "dictionary" variable
@@ -61,7 +61,7 @@ def ReadFileContent(file: str, option):
         
     except FileNotFoundError:
         print("File Doesn't Exist")
-        # # Hard code setting values
+        # Hard code setting values
         # with open(file, "w") as f:
         #     f.write("time: 60\nno_of_attempts: 2\nno_of_questions: 5")
 
@@ -162,6 +162,10 @@ def MainLogic(menuList: list, content: str):
                 print("\033[1;37;41mPlease select a valid option.\033[0;37;40m")   
         except ValueError:
             print("\033[1;37;41mPlease select a valid option.\033[0;37;40m")
+
+# ===================================================================================================
+#   Quiz Settings Functions
+# ===================================================================================================
 
 # Logicial system for quiz setting
 def SettingLogic(userInput: str):
@@ -313,6 +317,11 @@ def SelectSetting(title: str):
 def RegisterUser():
     input("Register User")
 
+def QuestionPool():
+    ReadFileContent(quiz_question_text, "question")
+    questPool = PrintFile()
+    input(questPool)
+
 def QuizSetting():
     while loop:
         os.system("cls")
@@ -320,10 +329,6 @@ def QuizSetting():
         quizSettings = PrintFile()    
         adminInput = input(quizSettings)
         SettingLogic(adminInput)
-
-def QuestionPool():
-    ReadFileContent(quiz_question_text, "")
-    input("Question Pool")
 
 def Report():
     input("Generate Report")
