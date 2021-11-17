@@ -123,9 +123,10 @@ def PrintFile():
 # If the input is a digit, return True
 # if the input is a string, return False
 def CheckIsDigit(input):
-    if input.strip().isdigit():
+    try:
+        int(input)
         return True
-    else:
+    except ValueError:
         return False
 
 # ============================================================================================
@@ -147,9 +148,19 @@ def MainLogic(menuList: list, content: str):
     while True:
 
         stored_value = input(content)
-        CheckIsDigit(stored_value)
-
-        if stored_value.upper() == "X":
+        if CheckIsDigit(stored_value):
+            if int(stored_value) in range(1, len(menuList) + 1):
+                if stored_value == "1":
+                    RegisterUser()
+                elif stored_value == "2":
+                    QuestionPool()
+                elif stored_value == "3":
+                    QuizSetting()
+                elif stored_value == "4":
+                    Report()
+            else:
+                input("\033[1;37;41mPlease select a valid option.\033[0;37;40m")               
+        elif stored_value.upper() == "X":
             os.system("cls")
             while True:
                 userConfirm = input(f"{divider}\n\033[1;37;40m\t\tAre you sure want to quit?\033[0;37;40m\n{divider}\n[ Y ] Yes\t\t[ N ] No\n{divider}\n")
@@ -164,17 +175,7 @@ def MainLogic(menuList: list, content: str):
                     print("\033[1;37;41mPlease select a valid option.\033[0;37;40m")
                 os.system("cls")
             return
-        if int(stored_value) in range(len(menuList) + 1):
-            if stored_value == "1":
-                RegisterUser()
-            elif stored_value == "2":
-                QuestionPool()
-            elif stored_value == "3":
-                QuizSetting()
-            elif stored_value == "4":
-                Report()
-        else:
-            print("\033[1;37;41mPlease select a valid option.\033[0;37;40m")   
+
 
 
 # ===================================================================================================
@@ -199,8 +200,7 @@ def SettingLogic(userInput: str):
         print("\033[1;37;41mPlease select a valid option.\033[0;37;40m")
 
 # Issue: Need to implement validation [Almost Complete]
-# Need to write additional function in order to implement function into program
-# 
+# [ Note ] Need to write additional function in order to implement functionality to setting
 def AddSetting(): 
     while True:
         
@@ -326,6 +326,10 @@ def SelectSetting(title: str):
                 print(f"{divider}\n\033[1;37;41mPlease enter a value within the range.\033[0;37;40m")
             else:
                 return (value - 1)
+
+# ========================================================================
+#   Generate Report Functions
+# ========================================================================
 
 # ========================================================================
 #   Sub Program Loops
