@@ -119,6 +119,19 @@ def PrintFile():
 
     return content
 
+# Checks whether the input is an integer or string
+# If the input is a digit, return True
+# if the input is a string, return False
+def CheckIsDigit(input):
+    if input.strip().isdigit():
+        return True
+    else:
+        return False
+
+# ============================================================================================
+#   Main Page Functions
+# ============================================================================================
+
 # prints page with a list, checks whether is input is in range of list
 # "inputList" parameter is for dynamic changing of the menu
 def PrintMain(inputList: list):
@@ -132,36 +145,37 @@ def PrintMain(inputList: list):
 # "menuList" is for 
 def MainLogic(menuList: list, content: str):
     while True:
-        try:
-            stored_value = input(content)
-            if stored_value.upper() == "X":
+
+        stored_value = input(content)
+        CheckIsDigit(stored_value)
+
+        if stored_value.upper() == "X":
+            os.system("cls")
+            while True:
+                userConfirm = input(f"{divider}\n\033[1;37;40m\t\tAre you sure want to quit?\033[0;37;40m\n{divider}\n[ Y ] Yes\t\t[ N ] No\n{divider}\n")
+                if userConfirm.upper() == "Y":
+                    print("\033[0;32;40mGoodbye\033[0;37;40m")
+                    global loop
+                    loop = False
+                    break
+                elif userConfirm.upper() == "N":
+                    break
+                else:
+                    print("\033[1;37;41mPlease select a valid option.\033[0;37;40m")
                 os.system("cls")
-                while True:
-                    userConfirm = input(f"{divider}\n\033[1;37;40m\t\tAre you sure want to quit?\033[0;37;40m\n{divider}\n[ Y ] Yes\t\t[ N ] No\n{divider}\n")
-                    if userConfirm.upper() == "Y":
-                        print("\033[0;32;40mGoodbye\033[0;37;40m")
-                        global loop
-                        loop = False
-                        break
-                    elif userConfirm.upper() == "N":
-                        break
-                    else:
-                        print("\033[1;37;41mPlease select a valid option.\033[0;37;40m")
-                    os.system("cls")
-                return
-            if int(stored_value) in range(len(menuList) + 1):
-                if stored_value == "1":
-                    RegisterUser()
-                elif stored_value == "2":
-                    QuestionPool()
-                elif stored_value == "3":
-                    QuizSetting()
-                elif stored_value == "4":
-                    Report()
-            else:
-                print("\033[1;37;41mPlease select a valid option.\033[0;37;40m")   
-        except ValueError:
-            print("\033[1;37;41mPlease select a valid option.\033[0;37;40m")
+            return
+        if int(stored_value) in range(len(menuList) + 1):
+            if stored_value == "1":
+                RegisterUser()
+            elif stored_value == "2":
+                QuestionPool()
+            elif stored_value == "3":
+                QuizSetting()
+            elif stored_value == "4":
+                Report()
+        else:
+            print("\033[1;37;41mPlease select a valid option.\033[0;37;40m")   
+
 
 # ===================================================================================================
 #   Quiz Settings Functions
@@ -246,19 +260,21 @@ def AddSetting():
 # Issue: Still need to Implement!!
 def EditSetting():
     key_list = list(dictionary.keys())
-
-    edit_index = SelectSetting("Editing Settings")
-    
-    selector = input(f"{divider}\nWhat do you want to change?\n{divider}\n")
-    
-    input(f"edit_index: {edit_index}, settings: {dictionary}")
-    # Changing dictionary key
-    dictionary["example"] = dictionary.pop(key_list[edit_index])
-    input(f"edit_index: {edit_index}, settings: {dictionary}")
-    
-    # Changing dictionary value
-    dictionary[key_list[edit_index]] = "example"
-    input(f"edit_index: {edit_index}, settings: {dictionary}")
+    while True:
+        edit_index = SelectSetting("Editing Settings")
+        
+        if edit_index.upper == "X":
+            break
+        selector = input(f"{divider}\nWhat do you want to change?\n{divider}\n")
+        
+        input(f"edit_index: {edit_index}, settings: {dictionary}")
+        # Changing dictionary key
+        dictionary["example"] = dictionary.pop(key_list[edit_index])
+        input(f"edit_index: {edit_index}, settings: {dictionary}")
+        
+        # Changing dictionary value
+        dictionary[key_list[edit_index]] = "example"
+        input(f"edit_index: {edit_index}, settings: {dictionary}")
 
 
 
