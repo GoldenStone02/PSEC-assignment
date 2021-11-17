@@ -9,6 +9,8 @@ import re
 empty = ""
 divider = f"{empty:=^60}"
 
+reg = re.compile("^[\w]+$")
+
 quiz_setting_text = "./admin/quiz_settings.txt"
 quiz_question_text = "./admin/question_pool.txt"
 main_menu = ["Register User", "Question Pool", "Quiz Settings", "Generate Report"]
@@ -146,7 +148,6 @@ def PrintMain(inputList: list):
 # "menuList" is for 
 def MainLogic(menuList: list, content: str):
     while True:
-
         stored_value = input(content)
         if CheckIsDigit(stored_value):
             if int(stored_value) in range(1, len(menuList) + 1):
@@ -175,7 +176,12 @@ def MainLogic(menuList: list, content: str):
                     print("\033[1;37;41mPlease select a valid option.\033[0;37;40m")
                 os.system("cls")
             return
+        else:
+            input("\033[1;37;41mPlease select a valid option.\033[0;37;40m") 
 
+# ========================================================================
+#   Register User Functions
+# ========================================================================
 
 
 # ===================================================================================================
@@ -197,13 +203,12 @@ def SettingLogic(userInput: str):
     elif valueCap == "D": # Delete Setting
         DeleteSetting()
     else:
-        print("\033[1;37;41mPlease select a valid option.\033[0;37;40m")
+        input("\033[1;37;41mPlease select a valid option.\033[0;37;40m")
 
 # Issue: Need to implement validation [Almost Complete]
-# [ Note ] Need to write additional function in order to implement functionality to setting
+# [Note] Need to write additional function in order to implement functionality to setting
 def AddSetting(): 
     while True:
-        
         while True:
             os.system("cls")
             new_setting_name = input(f"{divider}\n\t\t\tAdding Setting\n{divider}\nSetting Name: \nSetting Value: \n{divider}\n[ X ] Back to Menu\n{divider}\nSetting Name: ")
@@ -228,7 +233,7 @@ def AddSetting():
 
             if new_setting_value.upper() == "X":
                 break
-            if new_setting_name == "":
+            if new_setting_value == "":
                 input(f"\n\033[1;37;41mPlease enter a valid into the input\033[0;37;40m\n")
                 continue            
             elif not new_setting_value.isalnum():
@@ -262,20 +267,62 @@ def EditSetting():
     key_list = list(dictionary.keys())
     while True:
         edit_index = SelectSetting("Editing Settings")
-        
-        if edit_index.upper == "X":
-            break
-        selector = input(f"{divider}\nWhat do you want to change?\n{divider}\n")
-        
-        input(f"edit_index: {edit_index}, settings: {dictionary}")
-        # Changing dictionary key
-        dictionary["example"] = dictionary.pop(key_list[edit_index])
-        input(f"edit_index: {edit_index}, settings: {dictionary}")
-        
-        # Changing dictionary value
-        dictionary[key_list[edit_index]] = "example"
-        input(f"edit_index: {edit_index}, settings: {dictionary}")
 
+        if not CheckIsDigit(edit_index): # execute if its not an integer
+            if edit_index.upper() == "X":
+                break        
+        elif CheckIsDigit(edit_index): # execute if its an integer
+            while True:
+                selector = input(f"{divider}\nWhat do you want to change?\n{divider}\n[ 1 ] Setting Name\n[ 2 ] Setting Value\n{divider}\n[ X ] Back to Menu\n{divider}\n")
+                if CheckIsDigit(selector):
+                    if selector == "1":
+                        while True:
+                            os.system("cls")
+                            new_name = input(f"{divider}\nSetting Name: \033[1;37;40m{key_list[edit_index]}\033[0;37;40m\nSetting Value: {dictionary[key_list[edit_index]]}\n{divider}\n[ X ] Back to Menu\n{divider}\nInput new name: ")
+                            # Exit out of loop
+                            if new_name.upper() == "X":
+                                break
+                            if not new_name.isalnum():
+                                input(f"\n\033[1;37;41mInput value can't contain special characters!\033[0;37;40m\n")
+                                continue
+                            elif new_name[0].isdigit():
+                                input(f"\n\033[1;37;41mPlease start with a letter!\033[0;37;40m")
+                                continue    
+
+                            break
+                        while True:
+                            os.system("cls")
+                            confirm_change = input(f"{divider}\n\t\tConfirm Changes?\n{divider}\nSetting Name: \033[1;37;40m{new_name}\033[0;37;40m\nSetting Value: {dictionary[key_list[edit_index]]}\n{divider}\n[ C ] Confirm \n[ X ] Cancel Changes\n{divider}\n")
+                            if confirm_change.upper() == "X":
+                                break
+                            if confirm_change == "":
+                                input(f"\n\033[1;37;41mPlease enter a valid into the input\033[0;37;40m\n")
+                                continue            
+                            elif not confirm_change.isalnum():
+                                input(f"\n\033[1;37;41mInput value can't contain special characters!\033[0;37;40m\n")
+                                continue                            
+                            break                 
+                    elif selector == "2":
+                        input("option 2")
+                    else:
+                        input(f"{divider}\n\033[1;37;41mPlease enter a value within the range.\033[0;37;40m")
+                else:
+                    if selector.upper() == "X":
+                        break
+                    input(f"edit_index: {edit_index}, settings: {dictionary}")
+                    # Changing dictionary key
+                    dictionary["example"] = dictionary.pop(key_list[edit_index])
+                    input(f"edit_index: {edit_index}, settings: {dictionary}")
+                    
+                    # Changing dictionary value
+                    dictionary[key_list[edit_index]] = "example"
+                    input(f"edit_index: {edit_index}, settings: {dictionary}")
+        else:
+            input("\n\033[1;37;41mPlease input one of the options\033[0;37;40m\n")
+        
+        
+        
+        
 
 
 # Issue: Just deletes everything in the file [Solved]
@@ -305,24 +352,24 @@ def DeleteSetting():
                 input("\033[0;31;40mOption has been deleted!\033[0;37;40m\nPress Enter to Continue\n")  
                 break     
             else:
-                print(f"{divider}\n\033[1;37;41mPlease select an option.\033[0;37;40m") 
+                input(f"{divider}\n\033[1;37;41mPlease select an option.\033[0;37;40m") 
         break
 
 # Returns index value for menu navigation
 # "title" parameter needs to be a string for the printing
 def SelectSetting(title: str): 
     while True:
-        setting_no = input(f"{divider}\n\t\t\t{title}\n{divider}\n{ViewFileContent(1)}{divider}\n[ X ] Back to Menu\n{divider}\n")
+        value_number = input(f"{divider}\n\t\t\t{title}\n{divider}\n{ViewFileContent(1)}{divider}\n[ X ] Back to Menu\n{divider}\n")
         os.system("cls")
         try:
-            value = int(setting_no)
+            value = int(value_number)
         except ValueError:
-            if setting_no.upper() == "X": 
+            if value_number.upper() == "X": 
                 return "X"
             else:
                 print(f"{divider}\n\033[1;37;41mPlease select an option.\033[0;37;40m")
         else:
-            if int(setting_no) > len(dictionary) or int(setting_no) <= 0:
+            if int(value_number) > len(dictionary) or int(value_number) <= 0:
                 print(f"{divider}\n\033[1;37;41mPlease enter a value within the range.\033[0;37;40m")
             else:
                 return (value - 1)
