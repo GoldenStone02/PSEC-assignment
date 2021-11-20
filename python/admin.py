@@ -55,7 +55,7 @@ def read_file_content(file: str, option):
                 current_line_list = stripped_lines.split("||")
 
                 # Pushes each line into a dictionary
-                dictionary[f"question 1"] = [
+                dictionary[f"question {i+1}"] = [
                     current_line_list[0],   # Question Content
                     current_line_list[1:5], # Question Options
                     current_line_list[5]    # Question Answer
@@ -65,21 +65,22 @@ def read_file_content(file: str, option):
         print("File Doesn't Exist")
 
 def write_file(file: str):
-    with open(file,"r") as f:
-    # This method of reading file removes newlines or "\n"
-        file_content = f.read().splitlines()
-        input(file_content)
+    value_list = list(dictionary.values())
+
+    with open(file, "w") as f:
+        for line in value_list:
+            f.write(f"{line[0]}: {line[1]}\n")
 
 # Removes linefeed that is in between lines in the file
 def remove_linefeed(file: str):
     temp = []
     with open(file, "r") as f:
-        lines = f.readlines()
+        file_lines = f.readlines()
     
     # Remove linefeed
     # Ensures that if there is a linefeed in between variables
     # It will get removed, preventing any fatal errors in the system
-    for line in lines:
+    for line in file_lines:
         if line == "\n":
             continue
         temp.append(line.strip())
@@ -95,7 +96,7 @@ def remove_linefeed(file: str):
 # 
 # "0" prints out file content without numbering
 # "1" prints out with sequence numbering
-def view_file_content(show_numbers: int):
+def view_file_content(show_numbers: int, option: str):
     content = ""
 
     value_list = list(dictionary.values())
@@ -107,25 +108,46 @@ def view_file_content(show_numbers: int):
         #     "option 2": ["no_of_question", "5"],
         #     "option 3": ["no_of_attempt", "2"],
         # } 
-        for i, item in enumerate(value_list): 
-            content += f"[ {i + 1} ] {value_list[i][0]}: {value_list[i][1]}\n"
+        if option == "settings":
+            for i, item in enumerate(value_list): 
+                content += f"[ {i + 1} ] {value_list[i][0]}: {value_list[i][1]}\n"
+        elif option == "question":
+            for i, item in enumerate(value_list): 
+                sample = ""
+                for j, option in enumerate(value_list[i][1]):
+                    sample += f"\n{chr(97 + j)}) {option}"
+                content += f"[ {i + 1} ] {value_list[i][0]}: {sample}\n"
+
     elif show_numbers == 0:
-        for i, item in enumerate(value_list):
-            content += f"[ - ] {value_list[i][0]}: {value_list[i][1]}\n"
+        if option == "settings":
+            for i, item in enumerate(value_list):
+                content += f"[ - ] {value_list[i][0]}: {value_list[i][1]}\n"
+        elif option == "question":
+            for i, item in enumerate(value_list):
+                sample = ""
+                for j, option in enumerate(value_list[i][1]):
+                    sample += f"\n{chr(97 + j)}) {option}"
+                content += f"{value_list[i][0]}: {sample}\n\n"
     
     return content
 
 # Prints the text file with some UI.
 # Needs to happen after "ReadFileContent()" has been executed
 def print_file(name: str): 
+
+    option_name = ""
+
+    if name == "Question Pool":
+        option_name = "question"
+    elif name == "Quiz Settings":
+        option_name = "settings"
+
     content = f"{DIVIDER}\n\t\t\t\033[1;37;40m {name}\033[0;37;40m\n{DIVIDER}\n"
 
-    content += view_file_content(0)
+    content += view_file_content(0, option_name)
 
     content += f"{DIVIDER}\n\t\tSelect one of the options\n{DIVIDER}\n"
-    content += f"[ A ] Add New {name}  [ D ] Delete {name}\n"
-    content += f"[ E ] Edit {name}     [ X ] Back to Main\n"
-    content += f"{DIVIDER}\n"
+    content += f"[ 1 ] Add New {name}\n[ 2 ] Edit {name}\n[ 3 ] Delete {name}\n[ X ] Back to Main\n{DIVIDER}\n"
 
     return content
 
@@ -192,6 +214,11 @@ def main_logic(menuList: list, content: str):
 #   Register User Functions
 # ========================================================================
 
+def register_logic():
+    return
+
+def add_user():
+    return
 
 # ===================================================================================================
 #   Question Pool Functions
@@ -203,8 +230,30 @@ def question_logic(userInput: str):
     if valueCap == "X":
         global LOOP
         LOOP = False
+    elif valueCap == "1":
+        add_question()
+    elif valueCap == "2":
+        edit_question()
+    elif valueCap == "3":
+        delete_question()
+    else:
+        input("\033[1;37;41mPlease select a valid option.\033[0;37;40m")
 
 def add_question():
+    while True:
+        options_output = ""
+        no_of_options = input("How many options do you want? ")
+        if no_of_options.isdigit():
+            if int(no_of_options) < 0 or int(no_of_options) > 5:
+                input("\033[1;37;41mPlease enter a value within the range.\033[0;37;40m")
+            else:
+                for i in range(int(no_of_options)):
+                    options_output += f"{chr(97 + i)})\n"
+        else:
+            input("\033[1;37;41mPlease select a valid option.\033[0;37;40m")
+
+        input(f"{DIVIDER}\n\t\t\tAdding Question\n{DIVIDER}\nQuestion: \n\nOptions: \n{options_output}{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nQuestion")
+        break
     return
 
 def edit_question():
@@ -225,18 +274,16 @@ def setting_logic(userInput: str):
         global LOOP
         os.system("cls")
         LOOP = False
-    elif valueCap == "A": # Add Setting
+    elif valueCap == "1": # Add Setting
         add_setting()
-    elif valueCap == "E": # Edit Setting
+    elif valueCap == "2": # Edit Setting
         edit_setting()
-    elif valueCap == "D": # Delete Setting
+    elif valueCap == "3": # Delete Setting
         delete_setting()
     else:
         input("\033[1;37;41mPlease select a valid option.\033[0;37;40m")
 
 
-# Issue: Need to implement validation [Almost Complete]
-# [Note] Need to write additional function in order to implement functionality to setting
 def add_setting(): 
     while True:
         # Name check
@@ -246,7 +293,7 @@ def add_setting():
 
             if new_setting_name.upper() == "X":
                 break
-            if not new_setting_name.isalnum():
+            if not re.search(PATTERN, new_setting_name):
                 input(f"\n\033[1;37;41mInput value can't contain special characters!\033[0;37;40m\n")
                 continue
             elif new_setting_name[0].isdigit():
@@ -266,7 +313,7 @@ def add_setting():
             if new_setting_value == "":
                 input(f"\n\033[1;37;41mPlease enter a valid into the input\033[0;37;40m\n")
                 continue            
-            elif not new_setting_value.isalnum():
+            elif not re.search(PATTERN, new_setting_value):
                 input(f"\n\033[1;37;41mInput value can't contain special characters!\033[0;37;40m\n")
                 continue
 
@@ -291,12 +338,12 @@ def add_setting():
         with open(_QUIZ_SETTING_TEXT, "a") as f:
             f.write(f"{new_setting_name}: {new_setting_value}")
 
-# Issue: Still need to Implement!!
+# Issue: Need to implement to writing to file
 def edit_setting():
     value_list = list(dictionary.values())
 
     while True:
-        edit_index = select_setting("Editing Settings")
+        edit_index = select_setting("Settings")
 
         if not check_if_digit(edit_index): # execute if its not an integer
             if edit_index.upper() == "X":
@@ -333,15 +380,14 @@ def edit_setting():
                             if confirm_change == "":
                                 input(f"\n\033[1;37;41mPlease enter a valid into the input\033[0;37;40m\n")
                                 continue            
-                            elif not confirm_change.isalnum():
+                            elif not re.search(PATTERN, confirm_change):
                                 input(f"\n\033[1;37;41mInput value can't contain special characters!\033[0;37;40m\n")
                                 continue                               
                             break
-
-                        # Change the name of item
-                        value_list[edit_index][0] = new_name
-                        input(f"value_list: {value_list}, settings: {dictionary}")  
-                        write_file(_QUIZ_SETTING_TEXT)   
+                        if loop2:
+                            # Change the name of item
+                            value_list[edit_index][0] = new_name
+                            write_file(_QUIZ_SETTING_TEXT)   
 
                     # Used to change the setting value             
                     elif selector == "2":
@@ -363,14 +409,14 @@ def edit_setting():
                             if confirm_change == "":
                                 input(f"\n\033[1;37;41mPlease enter a valid into the input\033[0;37;40m\n")
                                 continue            
-                            elif not confirm_change.isalnum():
+                            elif not re.search(PATTERN, confirm_change):
                                 input(f"\n\033[1;37;41mInput value can't contain special characters!\033[0;37;40m\n")
                                 continue                            
                             break    
                         if loop2:
                             # Changes the value of the item
                             value_list[edit_index][1] = new_value
-                        input(f"edit_index: {edit_index}\nsettings: {dictionary}")                        
+                            write_file(_QUIZ_SETTING_TEXT)                       
                     else:
                         input(f"{DIVIDER}\n\033[1;37;41mPlease enter a value within the range.\033[0;37;40m")
                 else:
@@ -392,7 +438,7 @@ def delete_setting():
 
         while True:
             os.system("cls")
-            finalCheck = input(f"{DIVIDER}\n{view_file_content(1)}\n{DIVIDER}\n[ C ] Confirm?\t\t[ X ] Back to Menu\n{DIVIDER}\n")
+            finalCheck = input(f"{DIVIDER}\n{view_file_content(1, 'settings')}\n{DIVIDER}\n[ C ] Confirm?\t\t[ X ] Back to Menu\n{DIVIDER}\n")
             
             if finalCheck.upper() == "X":
                 break
@@ -414,7 +460,7 @@ def delete_setting():
 # "title" parameter needs to be a string for the printing
 def select_setting(title: str): 
     while True:
-        value_number = input(f"{DIVIDER}\n\t\t\t{title}\n{DIVIDER}\n{view_file_content(1)}{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\n")
+        value_number = input(f"{DIVIDER}\n\t\t\t{title}\n{DIVIDER}\n{view_file_content(1, 'settings')}{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\n")
         os.system("cls")
         try:
             value = int(value_number)
