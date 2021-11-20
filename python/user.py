@@ -1,3 +1,10 @@
+import os 
+import re
+
+# ==================================================================
+#   Initialize variables
+# ==================================================================
+
 dictionary = {}
 
 # ==================================================================
@@ -6,10 +13,10 @@ dictionary = {}
 
 # Reads and empties value into "dictionary" variable
 # "option" parameter used to define what format it should print in
-def ReadFileContent(file: str, option):
+def read_file_content(file: str, option):
     try:
         # Ensures that the file has been formatted correctly
-        RemoveLineFeed(file)
+        remove_linefeed(file)
 
         with open(file,"r") as f:
             # This method of reading file removes newlines or "\n"
@@ -51,7 +58,7 @@ def ReadFileContent(file: str, option):
         #     f.write("time: 60\nno_of_attempts: 2\nno_of_questions: 5")
 
 # Removes linefeed that is in between lines in the file
-def RemoveLineFeed(file: str):
+def remove_linefeed(file: str):
     temp = []
     with open(file, "r") as f:
         lines = f.readlines()
@@ -72,8 +79,15 @@ def RemoveLineFeed(file: str):
 # Checks whether the input is an integer or string
 # If the input is a digit, return True
 # if the input is a string, return False
-def CheckIsDigit(input):
+def check_if_digit(input):
     if input.strip().isdigit():
         return True
     else:
         return False
+
+def login_user():
+    return
+
+# ==================================================================
+#   Main Program Loop
+# ==================================================================

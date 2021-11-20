@@ -10,7 +10,7 @@ dictionary = {}
 EMPTY = ""
 DIVIDER = f"{EMPTY:=^60}"
 
-PATTERN = "^[\w]+$"
+PATTERN = r"^[\w]+$"
 _QUIZ_SETTING_TEXT = "./admin/quiz_settings.txt"
 _QUIZ_QUESTION_TEXT = "./admin/question_pool.txt"
 MAIN_MENU = ["Register User", "Question Pool", "Quiz Settings", "Generate Report"]
@@ -63,6 +63,12 @@ def read_file_content(file: str, option):
 
     except FileNotFoundError:
         print("File Doesn't Exist")
+
+def write_file(file: str):
+    with open(file,"r") as f:
+    # This method of reading file removes newlines or "\n"
+        file_content = f.read().splitlines()
+        input(file_content)
 
 # Removes linefeed that is in between lines in the file
 def remove_linefeed(file: str):
@@ -287,7 +293,6 @@ def add_setting():
 
 # Issue: Still need to Implement!!
 def edit_setting():
-    key_list = list(dictionary.keys())
     value_list = list(dictionary.values())
 
     while True:
@@ -300,54 +305,59 @@ def edit_setting():
             while True:
                 selector = input(f"{DIVIDER}\nWhat do you want to change?\n{DIVIDER}\nName: {value_list[edit_index][0]}\nValue: {value_list[edit_index][1]}\n{DIVIDER}\n[ 1 ] Setting Name\n[ 2 ] Setting Value\n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\n")
                 if check_if_digit(selector):
+                    loop2 = True
                     # Used to change setting name
                     if selector == "1":
-                        while True:
+                        while loop2:
                             os.system("cls")
-                            new_name = input(f"{DIVIDER}\nName: \033[1;37;40m>>>{value_list[edit_index][0]}<<<\033[0;37;40m\nValue: {value_list[edit_index][1]}\n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nPlease input a new value: ")
+                            new_name = input(f"{DIVIDER}\nName: \033[1;37;40m>>> {value_list[edit_index][0]} <<<\033[0;37;40m\nValue: {value_list[edit_index][1]}\n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nPlease input a new name: ")
                             if new_name.upper() == "X":
+                                loop2 = False
                                 break
                             if new_name == "":
                                 input(f"\n\033[1;37;41mPlease enter a valid into the input\033[0;37;40m\n")
                                 continue 
-                            elif not new_name.isalnum():
+                            elif not re.search(PATTERN, new_name):
                                 input(f"\n\033[1;37;41mInput value can't contain special characters!\033[0;37;40m\n")
                                 continue
                             elif new_name[0].isdigit():
                                 input(f"\n\033[1;37;41mPlease start with a letter!\033[0;37;40m")
                                 continue    
                             break
-                        while True:
+                        while loop2:
                             os.system("cls")
-                            confirm_change = input(f"{DIVIDER}\n\t\tConfirm Changes?\n{DIVIDER}\nName: \033[1;37;40m>>>{new_name}<<<\033[0;37;40m\nValue: {value_list[edit_index][0]}\n{DIVIDER}\n[ C ] Confirm \n[ X ] Cancel Changes\n{DIVIDER}\n")
+                            confirm_change = input(f"{DIVIDER}\n\t\tConfirm Changes?\n{DIVIDER}\nName: \033[1;37;40m>>> {new_name} <<<\033[0;37;40m\nValue: {value_list[edit_index][1]}\n{DIVIDER}\n[ C ] Confirm \n[ X ] Cancel Changes\n{DIVIDER}\n")
                             if confirm_change.upper() == "X":
+                                loop2 = False
                                 break
                             if confirm_change == "":
                                 input(f"\n\033[1;37;41mPlease enter a valid into the input\033[0;37;40m\n")
                                 continue            
                             elif not confirm_change.isalnum():
                                 input(f"\n\033[1;37;41mInput value can't contain special characters!\033[0;37;40m\n")
-                                continue                            
+                                continue                               
                             break
 
                         # Change the name of item
-                        dictionary[new_name] = dictionary.pop(key_list[edit_index])
-                        input(f"edit_index: {edit_index}, settings: {dictionary}")     
+                        value_list[edit_index][0] = new_name
+                        input(f"value_list: {value_list}, settings: {dictionary}")  
+                        write_file(_QUIZ_SETTING_TEXT)   
 
                     # Used to change the setting value             
                     elif selector == "2":
-                        while True:
+                        while loop2:
                             os.system("cls")
-                            new_value = input(f"{DIVIDER}\nName: {value_list[edit_index][0]}\nValue: \033[1;37;40m{value_list[edit_index][1]}\033[0;37;40m\n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nPlease input new value: ")
+                            new_value = input(f"{DIVIDER}\nName: {value_list[edit_index][0]}\nValue: \033[1;37;40m>>> {value_list[edit_index][1]} <<<\033[0;37;40m\n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nPlease input new value: ")
                             if new_value.upper() == "X":
+                                loop2 = False
                                 break
-                            if not new_value.isalnum():
+                            if not re.search(PATTERN, new_value):
                                 input(f"\n\033[1;37;41mInput value can't contain special characters!\033[0;37;40m\n")
                                 continue
                             break
-                        while True:
+                        while loop2:
                             os.system("cls")
-                            confirm_change = input(f"{DIVIDER}\n\t\tConfirm Changes?\n{DIVIDER}\nSetting Name: {value_list[edit_index][0]}\nSetting Value: \033[1;37;40m{new_value}\033[0;37;40m\n{DIVIDER}\n[ C ] Confirm \n[ X ] Cancel Changes\n{DIVIDER}\n")
+                            confirm_change = input(f"{DIVIDER}\n\t\tConfirm Changes?\n{DIVIDER}\nSetting Name: {value_list[edit_index][0]}\nSetting Value: \033[1;37;40m>>> {new_value} <<<\033[0;37;40m\n{DIVIDER}\n[ C ] Confirm \n[ X ] Cancel Changes\n{DIVIDER}\n")
                             if confirm_change.upper() == "X":
                                 break
                             if confirm_change == "":
@@ -357,10 +367,10 @@ def edit_setting():
                                 input(f"\n\033[1;37;41mInput value can't contain special characters!\033[0;37;40m\n")
                                 continue                            
                             break    
-                        
-                        # Changes the value of the item
-                        value_list[edit_index][1] = new_value
-                        input(f"edit_index: {edit_index}, settings: {dictionary}")                        
+                        if loop2:
+                            # Changes the value of the item
+                            value_list[edit_index][1] = new_value
+                        input(f"edit_index: {edit_index}\nsettings: {dictionary}")                        
                     else:
                         input(f"{DIVIDER}\n\033[1;37;41mPlease enter a value within the range.\033[0;37;40m")
                 else:
