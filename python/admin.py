@@ -5,17 +5,16 @@ import re
 # ==================================================================
 #   Initialize Variables
 # ==================================================================
-
-empty = ""
-divider = f"{empty:=^60}"
-
-reg = re.compile("^[\w]+$")
-
-quiz_setting_text = "./admin/quiz_settings.txt"
-quiz_question_text = "./admin/question_pool.txt"
-main_menu = ["Register User", "Question Pool", "Quiz Settings", "Generate Report"]
 dictionary = {}
-loop = True
+
+EMPTY = ""
+DIVIDER = f"{EMPTY:=^60}"
+
+PATTERN = "^[\w]+$"
+_QUIZ_SETTING_TEXT = "./admin/quiz_settings.txt"
+_QUIZ_QUESTION_TEXT = "./admin/question_pool.txt"
+MAIN_MENU = ["Register User", "Question Pool", "Quiz Settings", "Generate Report"]
+LOOP = True
 
 # ==================================================================
 #   General Functions
@@ -23,10 +22,10 @@ loop = True
 
 # Reads and empties value into "dictionary" variable
 # "option" parameter used to define what format it should print in
-def ReadFileContent(file: str, option):
+def read_file_content(file: str, option):
     try:
         # Ensures that the file has been formatted correctly
-        RemoveLineFeed(file)
+        remove_linefeed(file)
 
         with open(file,"r") as f:
             # This method of reading file removes newlines or "\n"
@@ -37,7 +36,7 @@ def ReadFileContent(file: str, option):
 
         # Format used for quiz settings dictionary
         if option == "settings":
-            for line in file_content:
+            for i, line in enumerate(file_content):
                 stripped_lines = line.strip()
 
                 # Skips line if the line is empty
@@ -45,10 +44,10 @@ def ReadFileContent(file: str, option):
                     continue
 
                 current_line_list = stripped_lines.split(": ")
-                dictionary[current_line_list[0]] = current_line_list[1]
+                dictionary[f"option {i + 1}"] = [current_line_list[0],current_line_list[1]]
         # Format used for question pool dictionary
         elif option == "question":
-            for line in file_content:
+            for i, line in enumerate(file_content):
                 stripped_lines = line.strip()
                 if stripped_lines == "":
                     continue
@@ -56,19 +55,17 @@ def ReadFileContent(file: str, option):
                 current_line_list = stripped_lines.split("||")
 
                 # Pushes each line into a dictionary
-                dictionary[current_line_list[0]] = {
-                    "options": current_line_list[1:5],
-                    "answer": current_line_list[5]
-                }
-        
+                dictionary[f"question 1"] = [
+                    current_line_list[0],   # Question Content
+                    current_line_list[1:5], # Question Options
+                    current_line_list[5]    # Question Answer
+                ]
+
     except FileNotFoundError:
         print("File Doesn't Exist")
-        # Hard code setting values
-        # with open(file, "w") as f:
-        #     f.write("time: 60\nno_of_attempts: 2\nno_of_questions: 5")
 
 # Removes linefeed that is in between lines in the file
-def RemoveLineFeed(file: str):
+def remove_linefeed(file: str):
     temp = []
     with open(file, "r") as f:
         lines = f.readlines()
@@ -92,39 +89,44 @@ def RemoveLineFeed(file: str):
 # 
 # "0" prints out file content without numbering
 # "1" prints out with sequence numbering
-def ViewFileContent(show_numbers: int):
+def view_file_content(show_numbers: int):
     content = ""
 
-    key_list = list(dictionary.keys())
     value_list = list(dictionary.values())
-    
+
     if show_numbers == 1:
-        for i, item in enumerate(key_list): 
-            content += f"[ {i + 1} ] {item}: {value_list[i]}\n"
+        #   How the dictionary would look like:
+        # {
+        #     "option 1": ["time", "60"],
+        #     "option 2": ["no_of_question", "5"],
+        #     "option 3": ["no_of_attempt", "2"],
+        # } 
+        for i, item in enumerate(value_list): 
+            content += f"[ {i + 1} ] {value_list[i][0]}: {value_list[i][1]}\n"
     elif show_numbers == 0:
-        for i, item in enumerate(key_list):
-            content += f"[ - ] {item}: {value_list[i]}\n"
+        for i, item in enumerate(value_list):
+            content += f"[ - ] {value_list[i][0]}: {value_list[i][1]}\n"
     
     return content
 
 # Prints the text file with some UI.
 # Needs to happen after "ReadFileContent()" has been executed
-def PrintFile(): 
-    content = f"{divider}\n\t\t\t\033[1;37;40m Quiz Settings\033[0;37;40m\n{divider}\n"
+def print_file(name: str): 
+    content = f"{DIVIDER}\n\t\t\t\033[1;37;40m {name}\033[0;37;40m\n{DIVIDER}\n"
 
-    content += ViewFileContent(0)
+    content += view_file_content(0)
 
-    content += f"{divider}\n\t\tSelect one of the options\n{divider}\n"
-    content += "[ A ] Add New Quiz Setting  [ D ] Delete Quiz Setting\n"
-    content += "[ E ] Edit Quiz Setting     [ X ] Back to Main\n"
-    content += f"{divider}\n"
+    content += f"{DIVIDER}\n\t\tSelect one of the options\n{DIVIDER}\n"
+    content += f"[ A ] Add New {name}  [ D ] Delete {name}\n"
+    content += f"[ E ] Edit {name}     [ X ] Back to Main\n"
+    content += f"{DIVIDER}\n"
 
     return content
 
 # Checks whether the input is an integer or string
 # If the input is a digit, return True
 # if the input is a string, return False
-def CheckIsDigit(input):
+def check_if_digit(input):
     try:
         int(input)
         return True
@@ -137,38 +139,39 @@ def CheckIsDigit(input):
 
 # prints page with a list, checks whether is input is in range of list
 # "inputList" parameter is for dynamic changing of the menu
-def PrintMain(inputList: list):
-    content = f"{divider}\n\t\t\t\033[1;37;40m Main \033[0;37;40m\n{divider}\n"
+def print_main(inputList: list):
+    content = f"{DIVIDER}\n\t\t\t\033[1;37;40m Main \033[0;37;40m\n{DIVIDER}\n"
     for i, element in enumerate(inputList):
         content += f"[ {i+1} ] {element}\n"
-    content += f"[ X ] Exit Application\n{divider}\n"
+    content += f"[ X ] Exit Application\n{DIVIDER}\n"
     return content
 
 # main logical system for selection page
-# "menuList" is for 
-def MainLogic(menuList: list, content: str):
+# "menuList" is meant for easily change within the UI.
+def main_logic(menuList: list, content: str):
     while True:
+        global LOOP
+        LOOP = True
         stored_value = input(content)
-        if CheckIsDigit(stored_value):
+        if check_if_digit(stored_value):
             if int(stored_value) in range(1, len(menuList) + 1):
                 if stored_value == "1":
-                    RegisterUser()
+                    register_user()
                 elif stored_value == "2":
-                    QuestionPool()
+                    question_pool()
                 elif stored_value == "3":
-                    QuizSetting()
+                    quiz_setting()
                 elif stored_value == "4":
-                    Report()
+                    generate_report()
             else:
-                input("\033[1;37;41mPlease select a valid option.\033[0;37;40m")               
+                input("\033[1;37;41mPlease select a valid option.\033[0;37;40m")
         elif stored_value.upper() == "X":
             os.system("cls")
             while True:
-                userConfirm = input(f"{divider}\n\033[1;37;40m\t\tAre you sure want to quit?\033[0;37;40m\n{divider}\n[ Y ] Yes\t\t[ N ] No\n{divider}\n")
+                userConfirm = input(f"{DIVIDER}\n\033[1;37;40m\t\tAre you sure want to quit?\033[0;37;40m\n{DIVIDER}\n[ Y ] Yes\t\t[ N ] No\n{DIVIDER}\n")
                 if userConfirm.upper() == "Y":
                     print("\033[0;32;40mGoodbye\033[0;37;40m")
-                    global loop
-                    loop = False
+                    LOOP = False
                     break
                 elif userConfirm.upper() == "N":
                     break
@@ -185,35 +188,56 @@ def MainLogic(menuList: list, content: str):
 
 
 # ===================================================================================================
+#   Question Pool Functions
+# ===================================================================================================
+
+# Logicial system for question pool
+def question_logic(userInput: str):
+    valueCap = str(userInput).upper()
+    if valueCap == "X":
+        global LOOP
+        LOOP = False
+
+def add_question():
+    return
+
+def edit_question():
+    return
+
+def delete_question():
+    return
+
+# ===================================================================================================
 #   Quiz Settings Functions
 # ===================================================================================================
 
 # Logicial system for quiz setting
-def SettingLogic(userInput: str):
+def setting_logic(userInput: str):
     valueCap = str(userInput).upper()
     # Logical Circuit
     if valueCap == "X": # Close App
-        global loop
+        global LOOP
         os.system("cls")
-        loop = False
+        LOOP = False
     elif valueCap == "A": # Add Setting
-        AddSetting()
+        add_setting()
     elif valueCap == "E": # Edit Setting
-        EditSetting()
+        edit_setting()
     elif valueCap == "D": # Delete Setting
-        DeleteSetting()
+        delete_setting()
     else:
         input("\033[1;37;41mPlease select a valid option.\033[0;37;40m")
 
+
 # Issue: Need to implement validation [Almost Complete]
 # [Note] Need to write additional function in order to implement functionality to setting
-def AddSetting(): 
+def add_setting(): 
     while True:
+        # Name check
         while True:
             os.system("cls")
-            new_setting_name = input(f"{divider}\n\t\t\tAdding Setting\n{divider}\nSetting Name: \nSetting Value: \n{divider}\n[ X ] Back to Menu\n{divider}\nSetting Name: ")
+            new_setting_name = input(f"{DIVIDER}\n\t\t\tAdding Setting\n{DIVIDER}\nSetting Name: \nSetting Value: \n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nSetting Name: ")
 
-            # Exit out of loop
             if new_setting_name.upper() == "X":
                 break
             if not new_setting_name.isalnum():
@@ -226,10 +250,10 @@ def AddSetting():
             # Exit loop once all checks return no errors
             break
 
-        # Variable value check loop
+        # Value check
         while True:
             os.system("cls")
-            new_setting_value = input(f"{divider}\n\t\t\tAdding Setting\n{divider}\nSetting Name: {new_setting_name}\nSetting Value: \n{divider}\n[ X ] Back to Menu\n{divider}\nSetting Value: ")
+            new_setting_value = input(f"{DIVIDER}\n\t\t\tAdding Setting\n{DIVIDER}\nSetting Name: {new_setting_name}\nSetting Value: \n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nSetting Value: ")
 
             if new_setting_value.upper() == "X":
                 break
@@ -246,7 +270,7 @@ def AddSetting():
         # Check if the user wants to confirm the setting
         while True:
             os.system("cls")
-            finalCheck = input(f"{divider}\n\t\t\tAdding Setting\n{divider}\nSetting Name: {new_setting_name}\nSetting Value: {new_setting_value}\n{divider}\n[ C ] Confirm?\t\t[ X ] Exit\n{divider}\n")
+            finalCheck = input(f"{DIVIDER}\n\t\t\tAdding Setting\n{DIVIDER}\nSetting Name: {new_setting_name}\nSetting Value: {new_setting_value}\n{DIVIDER}\n[ C ] Confirm?\t\t[ X ] Exit\n{DIVIDER}\n")
             
             if finalCheck.upper() == "X":
                 break
@@ -254,45 +278,48 @@ def AddSetting():
                 input("\033[0;32;40mYour changes have been saved!\033[0;37;40m\nPress Enter to Continue\n")
             else:
                 input("\n\033[1;37;41mPlease input one of the options\033[0;37;40m\n")
-            input(f"loop2: {True}")
             break
         break
     # Checks if the program aborted at any point 
     if True:
-        with open(quiz_setting_text, "a") as f:
+        with open(_QUIZ_SETTING_TEXT, "a") as f:
             f.write(f"{new_setting_name}: {new_setting_value}")
 
 # Issue: Still need to Implement!!
-def EditSetting():
+def edit_setting():
     key_list = list(dictionary.keys())
-    while True:
-        edit_index = SelectSetting("Editing Settings")
+    value_list = list(dictionary.values())
 
-        if not CheckIsDigit(edit_index): # execute if its not an integer
+    while True:
+        edit_index = select_setting("Editing Settings")
+
+        if not check_if_digit(edit_index): # execute if its not an integer
             if edit_index.upper() == "X":
                 break        
-        elif CheckIsDigit(edit_index): # execute if its an integer
+        elif check_if_digit(edit_index): # execute if its an integer
             while True:
-                selector = input(f"{divider}\nWhat do you want to change?\n{divider}\n[ 1 ] Setting Name\n[ 2 ] Setting Value\n{divider}\n[ X ] Back to Menu\n{divider}\n")
-                if CheckIsDigit(selector):
+                selector = input(f"{DIVIDER}\nWhat do you want to change?\n{DIVIDER}\nName: {value_list[edit_index][0]}\nValue: {value_list[edit_index][1]}\n{DIVIDER}\n[ 1 ] Setting Name\n[ 2 ] Setting Value\n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\n")
+                if check_if_digit(selector):
+                    # Used to change setting name
                     if selector == "1":
                         while True:
                             os.system("cls")
-                            new_name = input(f"{divider}\nSetting Name: \033[1;37;40m{key_list[edit_index]}\033[0;37;40m\nSetting Value: {dictionary[key_list[edit_index]]}\n{divider}\n[ X ] Back to Menu\n{divider}\nInput new name: ")
-                            # Exit out of loop
+                            new_name = input(f"{DIVIDER}\nName: \033[1;37;40m>>>{value_list[edit_index][0]}<<<\033[0;37;40m\nValue: {value_list[edit_index][1]}\n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nPlease input a new value: ")
                             if new_name.upper() == "X":
                                 break
-                            if not new_name.isalnum():
+                            if new_name == "":
+                                input(f"\n\033[1;37;41mPlease enter a valid into the input\033[0;37;40m\n")
+                                continue 
+                            elif not new_name.isalnum():
                                 input(f"\n\033[1;37;41mInput value can't contain special characters!\033[0;37;40m\n")
                                 continue
                             elif new_name[0].isdigit():
                                 input(f"\n\033[1;37;41mPlease start with a letter!\033[0;37;40m")
                                 continue    
-
                             break
                         while True:
                             os.system("cls")
-                            confirm_change = input(f"{divider}\n\t\tConfirm Changes?\n{divider}\nSetting Name: \033[1;37;40m{new_name}\033[0;37;40m\nSetting Value: {dictionary[key_list[edit_index]]}\n{divider}\n[ C ] Confirm \n[ X ] Cancel Changes\n{divider}\n")
+                            confirm_change = input(f"{DIVIDER}\n\t\tConfirm Changes?\n{DIVIDER}\nName: \033[1;37;40m>>>{new_name}<<<\033[0;37;40m\nValue: {value_list[edit_index][0]}\n{DIVIDER}\n[ C ] Confirm \n[ X ] Cancel Changes\n{DIVIDER}\n")
                             if confirm_change.upper() == "X":
                                 break
                             if confirm_change == "":
@@ -301,65 +328,83 @@ def EditSetting():
                             elif not confirm_change.isalnum():
                                 input(f"\n\033[1;37;41mInput value can't contain special characters!\033[0;37;40m\n")
                                 continue                            
-                            break                 
+                            break
+
+                        # Change the name of item
+                        dictionary[new_name] = dictionary.pop(key_list[edit_index])
+                        input(f"edit_index: {edit_index}, settings: {dictionary}")     
+
+                    # Used to change the setting value             
                     elif selector == "2":
-                        input("option 2")
+                        while True:
+                            os.system("cls")
+                            new_value = input(f"{DIVIDER}\nName: {value_list[edit_index][0]}\nValue: \033[1;37;40m{value_list[edit_index][1]}\033[0;37;40m\n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nPlease input new value: ")
+                            if new_value.upper() == "X":
+                                break
+                            if not new_value.isalnum():
+                                input(f"\n\033[1;37;41mInput value can't contain special characters!\033[0;37;40m\n")
+                                continue
+                            break
+                        while True:
+                            os.system("cls")
+                            confirm_change = input(f"{DIVIDER}\n\t\tConfirm Changes?\n{DIVIDER}\nSetting Name: {value_list[edit_index][0]}\nSetting Value: \033[1;37;40m{new_value}\033[0;37;40m\n{DIVIDER}\n[ C ] Confirm \n[ X ] Cancel Changes\n{DIVIDER}\n")
+                            if confirm_change.upper() == "X":
+                                break
+                            if confirm_change == "":
+                                input(f"\n\033[1;37;41mPlease enter a valid into the input\033[0;37;40m\n")
+                                continue            
+                            elif not confirm_change.isalnum():
+                                input(f"\n\033[1;37;41mInput value can't contain special characters!\033[0;37;40m\n")
+                                continue                            
+                            break    
+                        
+                        # Changes the value of the item
+                        value_list[edit_index][1] = new_value
+                        input(f"edit_index: {edit_index}, settings: {dictionary}")                        
                     else:
-                        input(f"{divider}\n\033[1;37;41mPlease enter a value within the range.\033[0;37;40m")
+                        input(f"{DIVIDER}\n\033[1;37;41mPlease enter a value within the range.\033[0;37;40m")
                 else:
                     if selector.upper() == "X":
-                        break
-                    input(f"edit_index: {edit_index}, settings: {dictionary}")
-                    # Changing dictionary key
-                    dictionary["example"] = dictionary.pop(key_list[edit_index])
-                    input(f"edit_index: {edit_index}, settings: {dictionary}")
-                    
-                    # Changing dictionary value
-                    dictionary[key_list[edit_index]] = "example"
-                    input(f"edit_index: {edit_index}, settings: {dictionary}")
+                        break         
         else:
             input("\n\033[1;37;41mPlease input one of the options\033[0;37;40m\n")
-        
-        
-        
-        
 
 
 # Issue: Just deletes everything in the file [Solved]
-def DeleteSetting(): 
+def delete_setting(): 
     while True:
         os.system("cls")
 
-        deleting_index = SelectSetting("Delete Setting")
+        deleting_index = select_setting("Delete Setting")
 
         if deleting_index == "X":
             return
 
         while True:
             os.system("cls")
-            finalCheck = input(f"{divider}\n{ViewFileContent(1)}\n{divider}\n[ C ] Confirm?\t\t[ X ] Back to Menu\n{divider}\n")
+            finalCheck = input(f"{DIVIDER}\n{view_file_content(1)}\n{DIVIDER}\n[ C ] Confirm?\t\t[ X ] Back to Menu\n{DIVIDER}\n")
             
             if finalCheck.upper() == "X":
                 break
             elif finalCheck.upper() == "C":
-                with open(quiz_setting_text, "r") as f:
+                with open(_QUIZ_SETTING_TEXT, "r") as f:
                     lines = f.read().splitlines()
                 
-                with open(quiz_setting_text, "w") as f:
+                with open(_QUIZ_SETTING_TEXT, "w") as f:
                     for number, line in enumerate(lines):
                         if number != deleting_index:
                             f.write(line + '\n')   
                 input("\033[0;31;40mOption has been deleted!\033[0;37;40m\nPress Enter to Continue\n")  
                 break     
             else:
-                input(f"{divider}\n\033[1;37;41mPlease select an option.\033[0;37;40m") 
+                input(f"{DIVIDER}\n\033[1;37;41mPlease select an option.\033[0;37;40m") 
         break
 
 # Returns index value for menu navigation
 # "title" parameter needs to be a string for the printing
-def SelectSetting(title: str): 
+def select_setting(title: str): 
     while True:
-        value_number = input(f"{divider}\n\t\t\t{title}\n{divider}\n{ViewFileContent(1)}{divider}\n[ X ] Back to Menu\n{divider}\n")
+        value_number = input(f"{DIVIDER}\n\t\t\t{title}\n{DIVIDER}\n{view_file_content(1)}{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\n")
         os.system("cls")
         try:
             value = int(value_number)
@@ -367,10 +412,10 @@ def SelectSetting(title: str):
             if value_number.upper() == "X": 
                 return "X"
             else:
-                print(f"{divider}\n\033[1;37;41mPlease select an option.\033[0;37;40m")
+                print(f"{DIVIDER}\n\033[1;37;41mPlease select an option.\033[0;37;40m")
         else:
             if int(value_number) > len(dictionary) or int(value_number) <= 0:
-                print(f"{divider}\n\033[1;37;41mPlease enter a value within the range.\033[0;37;40m")
+                print(f"{DIVIDER}\n\033[1;37;41mPlease enter a value within the range.\033[0;37;40m")
             else:
                 return (value - 1)
 
@@ -381,28 +426,30 @@ def SelectSetting(title: str):
 # ========================================================================
 #   Sub Program Loops
 # ========================================================================
-def RegisterUser():
+def register_user():
     input("Register User")
 
-def QuestionPool():
-    ReadFileContent(quiz_question_text, "question")
-    questPool = PrintFile()
-    input(questPool)
+def question_pool():
+    while LOOP:
+        read_file_content(_QUIZ_QUESTION_TEXT, option="question")
+        questPool = print_file("Question Pool")
+        adminInput = input(questPool)
+        question_logic(adminInput)
 
-def QuizSetting():
-    while loop:
+def quiz_setting():
+    while LOOP:
         os.system("cls")
-        ReadFileContent(quiz_setting_text, "settings")
-        quizSettings = PrintFile()    
+        read_file_content(_QUIZ_SETTING_TEXT, option="settings")
+        quizSettings = print_file("Quiz Settings")    
         adminInput = input(quizSettings)
-        SettingLogic(adminInput)
+        setting_logic(adminInput)
 
-def Report():
+def generate_report():
     input("Generate Report")
 # ========================================================================
 #   Main Program Loop
 # ========================================================================
 
-while loop:
-    string = PrintMain(main_menu)
-    MainLogic(main_menu, string)
+while LOOP:
+    string = print_main(MAIN_MENU)
+    main_logic(MAIN_MENU, string)
