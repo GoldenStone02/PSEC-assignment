@@ -1,6 +1,5 @@
-import os
-import re
-
+import os, re, csv
+import hashlib
 
 # ==================================================================
 #   Initialize Variables
@@ -163,6 +162,19 @@ def check_if_digit(input):
     except ValueError:
         return False
 
+# Used for easy maintainence of error outputs
+def error_output(error_message: str):
+    if error_message == "option":
+        input("\033[1;37;41mPlease select a valid option.\033[0;37;40m")
+    elif error_message == "input":
+        input(f"\n\033[1;37;41mPlease enter a valid input\033[0;37;40m\n")
+    elif error_message == "range":
+        input("\033[1;37;41mPlease enter a value within the range.\033[0;37;40m")
+    elif error_message == "special":
+        input(f"\n\033[1;37;41mInput value can't contain special characters!\033[0;37;40m\n")
+
+
+
 # ============================================================================================
 #   Main Page Functions
 # ============================================================================================
@@ -194,7 +206,7 @@ def main_logic(menuList: list, content: str):
                 elif stored_value == "4":
                     generate_report()
             else:
-                input("\033[1;37;41mPlease select a valid option.\033[0;37;40m")
+                error_output("option")
         elif stored_value.upper() == "X":
             os.system("cls")
             while True:
@@ -206,11 +218,11 @@ def main_logic(menuList: list, content: str):
                 elif userConfirm.upper() == "N":
                     break
                 else:
-                    print("\033[1;37;41mPlease select a valid option.\033[0;37;40m")
+                    error_output("option")
                 os.system("cls")
             return
         else:
-            input("\033[1;37;41mPlease select a valid option.\033[0;37;40m") 
+            error_output("option")
 
 # ========================================================================
 #   Register User Functions
@@ -220,6 +232,9 @@ def register_logic():
     return
 
 def add_user():
+    return
+
+def user_password_hashing():
     return
 
 # ===================================================================================================
@@ -239,31 +254,44 @@ def question_logic(userInput: str):
     elif valueCap == "3":
         delete_question()
     else:
-        input("\033[1;37;41mPlease select a valid option.\033[0;37;40m")
+        error_output("option")
 
 def add_question():
     while True:
-        options_output = ""
-        while options_output == "":
+        loop2 = True
+        while loop2:
             os.system("cls")
-            no_of_options = input("How many options do you want? ")
+            options_output = ""
+            no_of_options = input(f"How many options do you want? [ 3 - 6 options ]\n{DIVIDER}\n[ X ] Back to Menu")
+            if no_of_options.upper() == "X":
+                loop2 = False
+                break
             if no_of_options.isdigit():
-                if int(no_of_options) < 0 or int(no_of_options) > 5:
-                    input("\033[1;37;41mPlease enter a value within the range.\033[0;37;40m")
+                if int(no_of_options) <= 2 or int(no_of_options) > 6:
+                    error_output("range")
                 else:
                     for i in range(int(no_of_options)):
                         options_output += f"{chr(97 + i)})\n"
             else:
-                input("\033[1;37;41mPlease select a valid option.\033[0;37;40m")
-
-        input(f"{DIVIDER}\n\t\t\tAdding Question\n{DIVIDER}\nQuestion: \n\nOptions: \n{options_output}{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nInput Question: ")
+                error_output("input")
+        while loop2:
+            question = input(f"{DIVIDER}\n\t\t\tAdding Question\n{DIVIDER}\nQuestion: \n\nOptions: \n{options_output}{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nInput Question: ")
+            
+            break
         break
     return
 
-def edit_question():
+def edit_question(): 
     return
 
+import json # For testing, remove after done
+import time
+
 def delete_question():
+    input(f"dictionary: \n{json.dumps(dictionary, sort_keys=True, indent=4)}")
+    time.sleep(5)
+    while True:
+        input(f"What ")
     return
 
 # ===================================================================================================
@@ -285,7 +313,7 @@ def setting_logic(userInput: str):
     elif valueCap == "3": # Delete Setting
         delete_setting()
     else:
-        input("\033[1;37;41mPlease select a valid option.\033[0;37;40m")
+        error_output("option")
 
 
 def add_setting(): 
@@ -300,10 +328,7 @@ def add_setting():
                 local_loop = False
                 break
             if not re.search(PATTERN, new_setting_name):
-                input(f"\n\033[1;37;41mInput value can't contain special characters!\033[0;37;40m\n")
-                continue
-            elif new_setting_name[0].isdigit():
-                input(f"\n\033[1;37;41mPlease start with a letter!\033[0;37;40m\n")
+                error_output("special")
                 continue
             break
 
@@ -316,10 +341,10 @@ def add_setting():
                 local_loop = False
                 break
             if new_setting_value == "":
-                input(f"\n\033[1;37;41mPlease enter a valid into the input\033[0;37;40m\n")
+                error_output("option")
                 continue            
             elif not re.search(PATTERN, new_setting_value):
-                input(f"\n\033[1;37;41mInput value can't contain special characters!\033[0;37;40m\n")
+                error_output("special")
                 continue
             break
 
@@ -334,7 +359,7 @@ def add_setting():
             elif finalCheck.upper() == "C":
                 input("\033[0;32;40mYour changes have been saved!\033[0;37;40m\nPress Enter to Continue\n")
             else:
-                input("\n\033[1;37;41mPlease input one of the options\033[0;37;40m\n")
+                error_output("option")
             break
 
         # Checks if the program aborted at any point 
@@ -370,14 +395,11 @@ def edit_setting():
                                 loop2 = False
                                 break
                             if new_name == "":
-                                input(f"\n\033[1;37;41mPlease enter a valid into the input\033[0;37;40m\n")
+                                error_output("input")
                                 continue 
                             elif not re.search(PATTERN, new_name):
-                                input(f"\n\033[1;37;41mInput value can't contain special characters!\033[0;37;40m\n")
-                                continue
-                            elif new_name[0].isdigit():
-                                input(f"\n\033[1;37;41mPlease start with a letter!\033[0;37;40m")
-                                continue    
+                                error_output("special")
+                                continue 
                             break
                         while loop2:
                             os.system("cls")
@@ -386,10 +408,10 @@ def edit_setting():
                                 loop2 = False
                                 break
                             if confirm_change == "":
-                                input(f"\n\033[1;37;41mPlease enter a valid into the input\033[0;37;40m\n")
+                                error_output("input")
                                 continue            
                             elif not re.search(PATTERN, confirm_change):
-                                input(f"\n\033[1;37;41mInput value can't contain special characters!\033[0;37;40m\n")
+                                error_output("special")
                                 continue 
                             elif confirm_change.upper() == "C":
                                 input("\033[0;32;40mYour changes have been saved!\033[0;37;40m\nPress Enter to Continue\n")                              
@@ -408,7 +430,7 @@ def edit_setting():
                                 loop2 = False
                                 break
                             if not re.search(PATTERN, new_value):
-                                input(f"\n\033[1;37;41mInput value can't contain special characters!\033[0;37;40m\n")
+                                error_output("special")
                                 continue
                             break
                         while loop2:
@@ -417,10 +439,10 @@ def edit_setting():
                             if confirm_change.upper() == "X":
                                 break
                             if confirm_change == "":
-                                input(f"\n\033[1;37;41mPlease enter a valid into the input\033[0;37;40m\n")
+                                error_output("input")
                                 continue            
                             elif not re.search(PATTERN, confirm_change):
-                                input(f"\n\033[1;37;41mInput value can't contain special characters!\033[0;37;40m\n")
+                                error_output("special")
                                 continue     
                             elif confirm_change.upper() == "C":
                                 input("\033[0;32;40mYour changes have been saved!\033[0;37;40m\nPress Enter to Continue\n")                       
@@ -430,12 +452,12 @@ def edit_setting():
                             value_list[edit_index][1] = new_value
                             write_file(_QUIZ_SETTING_TEXT)                       
                     else:
-                        input(f"{DIVIDER}\n\033[1;37;41mPlease enter a value within the range.\033[0;37;40m")
+                        error_output("option")
                 else:
                     if selector.upper() == "X":
                         break         
         else:
-            input("\n\033[1;37;41mPlease input one of the options\033[0;37;40m\n")
+            error_output("option")
 
 
 # Issue: Just deletes everything in the file [Solved]
@@ -466,7 +488,7 @@ def delete_setting():
                 input("\033[0;31;40mOption has been deleted!\033[0;37;40m\nPress Enter to Continue\n")  
                 break     
             else:
-                input(f"{DIVIDER}\n\033[1;37;41mPlease select an option.\033[0;37;40m") 
+                error_output("option")
         break
 
 # Returns index value for menu navigation
@@ -481,16 +503,18 @@ def select_setting(title: str):
             if value_number.upper() == "X": 
                 return "X"
             else:
-                print(f"{DIVIDER}\n\033[1;37;41mPlease select an option.\033[0;37;40m")
+                error_output("option")
         else:
             if int(value_number) > len(dictionary) or int(value_number) <= 0:
-                print(f"{DIVIDER}\n\033[1;37;41mPlease enter a value within the range.\033[0;37;40m")
+                error_output("range")
             else:
                 return (value - 1)
 
 # ========================================================================
 #   Generate Report Functions
 # ========================================================================
+
+
 
 # ========================================================================
 #   Sub Program Loops

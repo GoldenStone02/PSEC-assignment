@@ -6,6 +6,14 @@ import re
 # ==================================================================
 
 dictionary = {}
+
+EMPTY = ""
+DIVIDER = f"{EMPTY:=^60}"
+
+MAIN_USER_MENU = ["Log In", "Register User"]
+START_MENU = ["Begin Quiz"]
+_QUIZ_SETTING_TEXT = "./admin/quiz_settings.txt"
+_QUIZ_QUESTION_TEXT = "./admin/question_pool.txt"
 LOOP = True
 
 # ==================================================================
@@ -16,7 +24,7 @@ LOOP = True
 # "option" parameter used to define what format it should print in
 def read_file_content(file: str, option):
     try:
-        # Ensures that the file has been formatted correctly
+        # Ensures that the file has been formatted correctly before reading the file.
         remove_linefeed(file)
 
         with open(file,"r") as f:
@@ -54,9 +62,6 @@ def read_file_content(file: str, option):
         
     except FileNotFoundError:
         print("File Doesn't Exist")
-        # Hard code setting values
-        # with open(file, "w") as f:
-        #     f.write("time: 60\nno_of_attempts: 2\nno_of_questions: 5")
 
 # Removes linefeed that is in between lines in the file
 def remove_linefeed(file: str):
@@ -94,11 +99,24 @@ def login_user():
 #   Main Page Function
 # ==================================================================
 
-def print_main():
-    return
-
+def print_main(inputList: list):
+    content = f"{DIVIDER}\n\t\t\t\033[1;37;40m Main \033[0;37;40m\n{DIVIDER}\n"
+    for i, element in enumerate(inputList):
+        content += f"[ {i+1} ] {element}\n"
+    content += f"[ X ] Exit Application\n{DIVIDER}\n"
+    return content
 def main_logic():
     return
+
+# ==================================================================
+#   Question Function
+# ==================================================================
+
+def quiz_timer():
+    return
+
 # ==================================================================
 #   Main Program Loop
 # ==================================================================
+while LOOP:
+    string = print_main(MAIN_USER_MENU)
