@@ -11,6 +11,8 @@ EMPTY = ""
 DIVIDER = f"{EMPTY:=^60}"
 
 PATTERN = r"^[\w]+$"
+PASSWORD_PATTERN = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%]).+$"
+
 _QUIZ_SETTING_TEXT = "./admin/quiz_settings.txt"
 _QUIZ_QUESTION_TEXT = "./admin/question_pool.txt"
 MAIN_MENU = ["Register User", "Question Pool", "Quiz Settings", "Generate Report"]
@@ -120,14 +122,14 @@ def view_file_content(show_numbers: int, option: str):
 
     elif show_numbers == 0:
         if option == "settings":
-            for i, item in enumerate(value_list):
-                content += f"[ - ] {value_list[i][0]}: {value_list[i][1]}\n"
+            for item in value_list:
+                content += f"[ - ] {item[0]}: {item[1]}\n"
         elif option == "question":
-            for i, item in enumerate(value_list):
+            for item in value_list:
                 sample = ""
-                for j, option in enumerate(value_list[i][1]):
+                for j, option in enumerate(item[1]):
                     sample += f"\n{chr(97 + j)}) {option}"
-                content += f"{value_list[i][0]}: {sample}\n\n"
+                content += f"{item[0]}: {sample}\n\n"
     
     return content
 
@@ -242,17 +244,19 @@ def question_logic(userInput: str):
 def add_question():
     while True:
         options_output = ""
-        no_of_options = input("How many options do you want? ")
-        if no_of_options.isdigit():
-            if int(no_of_options) < 0 or int(no_of_options) > 5:
-                input("\033[1;37;41mPlease enter a value within the range.\033[0;37;40m")
+        while options_output == "":
+            os.system("cls")
+            no_of_options = input("How many options do you want? ")
+            if no_of_options.isdigit():
+                if int(no_of_options) < 0 or int(no_of_options) > 5:
+                    input("\033[1;37;41mPlease enter a value within the range.\033[0;37;40m")
+                else:
+                    for i in range(int(no_of_options)):
+                        options_output += f"{chr(97 + i)})\n"
             else:
-                for i in range(int(no_of_options)):
-                    options_output += f"{chr(97 + i)})\n"
-        else:
-            input("\033[1;37;41mPlease select a valid option.\033[0;37;40m")
+                input("\033[1;37;41mPlease select a valid option.\033[0;37;40m")
 
-        input(f"{DIVIDER}\n\t\t\tAdding Question\n{DIVIDER}\nQuestion: \n\nOptions: \n{options_output}{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nQuestion")
+        input(f"{DIVIDER}\n\t\t\tAdding Question\n{DIVIDER}\nQuestion: \n\nOptions: \n{options_output}{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nInput Question: ")
         break
     return
 
@@ -286,12 +290,14 @@ def setting_logic(userInput: str):
 
 def add_setting(): 
     while True:
+        local_loop = True
         # Name check
-        while True:
+        while local_loop:
             os.system("cls")
             new_setting_name = input(f"{DIVIDER}\n\t\t\tAdding Setting\n{DIVIDER}\nSetting Name: \nSetting Value: \n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nSetting Name: ")
 
             if new_setting_name.upper() == "X":
+                local_loop = False
                 break
             if not re.search(PATTERN, new_setting_name):
                 input(f"\n\033[1;37;41mInput value can't contain special characters!\033[0;37;40m\n")
@@ -299,16 +305,15 @@ def add_setting():
             elif new_setting_name[0].isdigit():
                 input(f"\n\033[1;37;41mPlease start with a letter!\033[0;37;40m\n")
                 continue
-        
-            # Exit loop once all checks return no errors
             break
 
         # Value check
-        while True:
+        while local_loop:
             os.system("cls")
             new_setting_value = input(f"{DIVIDER}\n\t\t\tAdding Setting\n{DIVIDER}\nSetting Name: {new_setting_name}\nSetting Value: \n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nSetting Value: ")
 
             if new_setting_value.upper() == "X":
+                local_loop = False
                 break
             if new_setting_value == "":
                 input(f"\n\033[1;37;41mPlease enter a valid into the input\033[0;37;40m\n")
@@ -316,33 +321,35 @@ def add_setting():
             elif not re.search(PATTERN, new_setting_value):
                 input(f"\n\033[1;37;41mInput value can't contain special characters!\033[0;37;40m\n")
                 continue
-
-            # Exit loop once all checks return no errors
             break
 
         # Check if the user wants to confirm the setting
-        while True:
+        while local_loop:
             os.system("cls")
             finalCheck = input(f"{DIVIDER}\n\t\t\tAdding Setting\n{DIVIDER}\nSetting Name: {new_setting_name}\nSetting Value: {new_setting_value}\n{DIVIDER}\n[ C ] Confirm?\t\t[ X ] Exit\n{DIVIDER}\n")
             
             if finalCheck.upper() == "X":
+                local_loop = False
                 break
             elif finalCheck.upper() == "C":
                 input("\033[0;32;40mYour changes have been saved!\033[0;37;40m\nPress Enter to Continue\n")
             else:
                 input("\n\033[1;37;41mPlease input one of the options\033[0;37;40m\n")
             break
-        break
-    # Checks if the program aborted at any point 
-    if True:
-        with open(_QUIZ_SETTING_TEXT, "a") as f:
-            f.write(f"{new_setting_name}: {new_setting_value}")
+
+        # Checks if the program aborted at any point 
+        if local_loop:
+            with open(_QUIZ_SETTING_TEXT, "a") as f:
+                f.write(f"{new_setting_name}: {new_setting_value}")
+        else:
+            break
 
 # Issue: Need to implement to writing to file
 def edit_setting():
     value_list = list(dictionary.values())
 
     while True:
+        os.system("cls")
         edit_index = select_setting("Settings")
 
         if not check_if_digit(edit_index): # execute if its not an integer
@@ -350,6 +357,7 @@ def edit_setting():
                 break        
         elif check_if_digit(edit_index): # execute if its an integer
             while True:
+                os.system("cls")
                 selector = input(f"{DIVIDER}\nWhat do you want to change?\n{DIVIDER}\nName: {value_list[edit_index][0]}\nValue: {value_list[edit_index][1]}\n{DIVIDER}\n[ 1 ] Setting Name\n[ 2 ] Setting Value\n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\n")
                 if check_if_digit(selector):
                     loop2 = True
@@ -382,7 +390,9 @@ def edit_setting():
                                 continue            
                             elif not re.search(PATTERN, confirm_change):
                                 input(f"\n\033[1;37;41mInput value can't contain special characters!\033[0;37;40m\n")
-                                continue                               
+                                continue 
+                            elif confirm_change.upper() == "C":
+                                input("\033[0;32;40mYour changes have been saved!\033[0;37;40m\nPress Enter to Continue\n")                              
                             break
                         if loop2:
                             # Change the name of item
@@ -411,7 +421,9 @@ def edit_setting():
                                 continue            
                             elif not re.search(PATTERN, confirm_change):
                                 input(f"\n\033[1;37;41mInput value can't contain special characters!\033[0;37;40m\n")
-                                continue                            
+                                continue     
+                            elif confirm_change.upper() == "C":
+                                input("\033[0;32;40mYour changes have been saved!\033[0;37;40m\nPress Enter to Continue\n")                       
                             break    
                         if loop2:
                             # Changes the value of the item
@@ -428,6 +440,7 @@ def edit_setting():
 
 # Issue: Just deletes everything in the file [Solved]
 def delete_setting(): 
+    value_list = list(dictionary.values())
     while True:
         os.system("cls")
 
@@ -438,7 +451,7 @@ def delete_setting():
 
         while True:
             os.system("cls")
-            finalCheck = input(f"{DIVIDER}\n{view_file_content(1, 'settings')}\n{DIVIDER}\n[ C ] Confirm?\t\t[ X ] Back to Menu\n{DIVIDER}\n")
+            finalCheck = input(f"{DIVIDER}\n\t\tPlease confirm your selection\n{DIVIDER}\n[ - ] {value_list[deleting_index][0]}: {value_list[deleting_index][1]}\n{DIVIDER}\n[ C ] Confirm\t\t[ X ] Back to Menu\n{DIVIDER}\n")
             
             if finalCheck.upper() == "X":
                 break
