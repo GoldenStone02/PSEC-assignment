@@ -1,5 +1,6 @@
 import os 
 import re
+import time
 
 # ==================================================================
 #   Initialize variables
@@ -91,22 +92,67 @@ def check_if_digit(input):
     else:
         return False
 
+# Used for easy maintainence of error outputs
+def error_output(error_message: str):
+    if error_message == "option":
+        input("\033[1;37;41mPlease select a valid option.\033[0;37;40m")
+    elif error_message == "input":
+        input(f"\n\033[1;37;41mPlease enter a valid input\033[0;37;40m\n")
+    elif error_message == "range":
+        input("\033[1;37;41mPlease enter a value within the range.\033[0;37;40m")
+    elif error_message == "special":
+        input(f"\n\033[1;37;41mInput value can't contain special characters!\033[0;37;40m\n")
+
+
+# ==================================================================
+#   Login Functions
+# ==================================================================
 
 def login_user():
-    return
+    input("Login User")
+
+
 
 # ==================================================================
-#   Main Page Function
+#   User Page Function
 # ==================================================================
 
-def print_main(inputList: list):
+def print_user(inputList: list):
     content = f"{DIVIDER}\n\t\t\t\033[1;37;40m Main \033[0;37;40m\n{DIVIDER}\n"
     for i, element in enumerate(inputList):
         content += f"[ {i+1} ] {element}\n"
     content += f"[ X ] Exit Application\n{DIVIDER}\n"
     return content
-def main_logic():
-    return
+
+def user_logic(userpage_list,content: str):
+    while True:
+        global LOOP
+        LOOP = True
+        stored_value = input(content)
+        if check_if_digit(stored_value):
+            if int(stored_value) in range(1, len(userpage_list) + 1):
+                if stored_value == "1":
+                    login_user()
+                elif stored_value == "2":
+                    input("Register User")
+            else:
+                error_output("option")
+        elif stored_value.upper() == "X":
+            os.system("cls")
+            while True:
+                userConfirm = input(f"{DIVIDER}\n\033[1;37;40m\t\tAre you sure want to quit?\033[0;37;40m\n{DIVIDER}\n[ Y ] Yes\t\t[ N ] No\n{DIVIDER}\n")
+                if userConfirm.upper() == "Y":
+                    print("\033[0;32;40mGoodbye\033[0;37;40m")
+                    LOOP = False
+                    break
+                elif userConfirm.upper() == "N":
+                    break
+                else:
+                    error_output("option")
+                os.system("cls")
+            return
+        else:
+            error_output("option")
 
 # ==================================================================
 #   Question Function
@@ -119,4 +165,5 @@ def quiz_timer():
 #   Main Program Loop
 # ==================================================================
 while LOOP:
-    string = print_main(MAIN_USER_MENU)
+    string = print_user(MAIN_USER_MENU)
+    user_logic(MAIN_USER_MENU, string)
