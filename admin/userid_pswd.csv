@@ -1,3 +1,5 @@
-user	password
-test1	somepassword
-test2	rainbow123
+user,password
+test1,somepassword
+test2,rainbow123
+something,1!qqQ
+testuser,6524d39132de417b8915d6d26d0b73759cc6292b95ca5652b2fbc797392cd1a7

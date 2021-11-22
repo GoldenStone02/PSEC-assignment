@@ -18,7 +18,7 @@
 # Python ver:	Python 3
 #
 # Reference:	This program is adapted from the following:
-#
+#               https://www.geeksforgeeks.org/check-if-a-string-contains-uppercase-lowercase-special-characters-and-numeric-values/
 #
 # Library/
 # package/	
@@ -39,7 +39,7 @@ EMPTY = ""
 DIVIDER = f"{EMPTY:=^60}"
 
 PATTERN = r"^[\w]+$"
-PASSWORD_PATTERN = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%]).+$"
+PASSWORD_PATTERN = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%]).+$'
 
 _USERNAME_AND_PASSWORD = "./admin/userid_pswd.csv"
 _QUIZ_SETTING_TEXT = "./admin/quiz_settings.txt"
@@ -60,12 +60,10 @@ def read_file_content(file: str, option):
         if option == "csv":
             with open(file, 'r') as csvfile:
                 csvreader = csv.reader(csvfile)
-                fields = next(csvreader)
+                next(csvreader)
                 for i, element in enumerate(csvreader):
-                    element = element[0].split("\t")    # Format it into a string, then a list.
                     dictionary[f"user {i + 1}"] = element
-            
-            input(dictionary) 
+                
         else:
             # Ensures that the file has been formatted correctly
             remove_linefeed(file)
@@ -214,6 +212,12 @@ def error_output(error_message: str):
 
     elif error_message == "long":
         input(f"\n\033[1;37;41mLength of input was too long\033[0;37;40m\n")
+    
+    elif error_message == "letter":
+        input(f"\n\033[1;37;41mMust have at least one uppercase and lowercase character\033[0;37;40m\n")
+
+    elif error_message == "password":
+        input(f"\n\033[1;37;41mMissing one of the criteria, please try again\033[0;37;40m\n")
 
 
 # ============================================================================================
@@ -269,14 +273,107 @@ def main_logic(menu_list: list, content: str):
 #   Register User Functions
 # ===================================================================================================
 
-def register_logic():
-    return
+def register_logic(userInput: str):
+    valueCap = str(userInput).upper()
+    if valueCap == "X":
+        global SUB_LOOP
+        SUB_LOOP = False
+        return
+    elif valueCap == "1":
+        add_user()
+    elif valueCap == "2":
+        change_password()
+    elif valueCap == "3":
+        delete_user()
+    else:
+        error_output("input")
+        return
 
 def add_user():
+    while True:
+        # Username check
+        while True:
+            os.system("cls")
+            username = input(f"{DIVIDER}\n\t\t\tAdding User\n{DIVIDER}\nUsername: \nPassword: \n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nUsername: ")
+
+            if username.upper() == "X":
+                return
+            elif not re.search(PATTERN, username):
+                error_output("special")
+                continue
+            break
+
+        while True:
+            # Password check
+            while True:
+                os.system("cls")
+                password = input(f"{DIVIDER}\n\t\t\tAdding User\n{DIVIDER}\nUsername: {username}\nPassword: \n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nAt least one number\nAt least one uppercase and one lowercase character\nAt least one special symbol !@#$%\nShould be 4 - 20 characters long\nPassword: ")
+
+                if password.upper() == "X":
+                    return
+                elif password == "":
+                    error_output("option")
+                    continue            
+                elif len(password) < 4:
+                    error_output("short")
+                    continue
+                elif len(password) > 20:
+                    error_output("long")
+                    continue
+                # elif not re.search(ALPHABET_PATTERN, password):
+                #     error_output("password")
+                #     continue
+                # elif not re.search(NUMBER_PATTERN, password):
+                #     error_output("password")
+                #     continue
+                elif not re.search(PASSWORD_PATTERN, password):
+                    error_output("password")
+                    continue
+                break
+
+            # Password double check
+            while True:
+                os.system("cls")
+                password2 = input(f"{DIVIDER}\n\t\t\tAdding User\n{DIVIDER}\nUsername: {username}\nPassword: \n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nPlease reenter your password: ")
+
+                if password2.upper() == "X":
+                    return
+                elif password2 == "":
+                    error_output("option")
+                    continue
+                elif password == password2:
+                    # Check if the user wants to confirm the setting
+                    while True:
+                        os.system("cls")
+                        finalCheck = input(f"{DIVIDER}\n\t\t\tAdding User\n{DIVIDER}\nUsername: {username}\nPassword: {password}\n{DIVIDER}\n[ C ] Confirm\t\t[ X ] Exit\n{DIVIDER}\n")
+                        
+                        if finalCheck.upper() == "X":
+                            return
+                        elif finalCheck.upper() == "C":
+                            input("\033[0;32;40mYour changes have been saved!\033[0;37;40m\nPress Enter to Continue\n")
+                        else:
+                            error_output("option")
+                        break
+
+                    # Checks if the program aborted at any point 
+                    with open(_USERNAME_AND_PASSWORD, "a", newline="") as csvfile:
+                        csvwriter = csv.writer(csvfile)
+                        csvwriter.writerow([username, user_password_hashing(password)])
+                    return
+                else: 
+                    error_output("input")
+                    continue
+
+def change_password():
     return
 
-def user_password_hashing():
+def delete_user():
     return
+
+def user_password_hashing(userInput: str): 
+    output = hashlib.sha256(userInput.encode())
+    input(output.hexdigest())
+    return output.hexdigest()
 
 # ===================================================================================================
 #   Question Pool Functions
@@ -648,8 +745,9 @@ def select_setting(title: str):
 def register_user():
     while SUB_LOOP:
         read_file_content(_USERNAME_AND_PASSWORD, option="csv")
-        user = print("User")
+        user = print_file("User")
         adminInput = input(user)
+        register_logic(adminInput)
 
 def question_pool():
     while SUB_LOOP:
