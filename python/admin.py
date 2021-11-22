@@ -421,6 +421,7 @@ def delete_question():
                 break 
             else:
                 error_output("option")
+                continue
         return
 
 # ===================================================================================================
@@ -613,6 +614,7 @@ def delete_setting():
                 break
             else:
                 error_output("option")
+                continue
         return
 
 # Returns index value for menu navigation
