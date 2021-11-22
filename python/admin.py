@@ -1,3 +1,32 @@
+# StudentID:	p2008493
+# Name:	        Ng Jun Han
+# Class:		DISM/FT/1B/05   
+# Assessment:	CA1 
+# 
+# Script name:	admin.py
+# 
+# Purpose:	Describe purpose of script
+#
+# Usage syntax:	Run with play button / command line, eg. py read-cmd-line 1 2 3
+# 
+# Input file:   d:/PSEC/admin/userid_pswd.csv
+#               d:/PSEC/admin/quiz_settings.txt
+#               d:/PSEC/admin/question_pool.txt
+# 
+# Output file:	Specify full path, eg. console for d:/psec/p01/students.out
+# 
+# Python ver:	Python 3
+#
+# Reference:	This program is adapted from the following:
+#
+#
+# Library/
+# package/	
+# Module /      os, re, csv, hashlib
+#
+# Known issues:	eg. no validation of input value
+#
+
 import os, re, csv
 import hashlib
 
@@ -12,8 +41,10 @@ DIVIDER = f"{EMPTY:=^60}"
 PATTERN = r"^[\w]+$"
 PASSWORD_PATTERN = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%]).+$"
 
+_USERNAME_AND_PASSWORD = "./admin/userid_pswd.csv"
 _QUIZ_SETTING_TEXT = "./admin/quiz_settings.txt"
 _QUIZ_QUESTION_TEXT = "./admin/question_pool.txt"
+_QUIZ_RESULTS = "./admin/quiz_results.txt"
 MAIN_MENU = ["Register User", "Question Pool", "Quiz Settings", "Generate Report"]
 MAIN_LOOP = True
 SUB_LOOP = True
@@ -26,43 +57,52 @@ SUB_LOOP = True
 # "option" parameter used to define what format it should print in
 def read_file_content(file: str, option):
     try:
-        # Ensures that the file has been formatted correctly
-        remove_linefeed(file)
+        if option == "csv":
+            with open(file, 'r') as csvfile:
+                csvreader = csv.reader(csvfile)
+                fields = next(csvreader)
+                for i, element in enumerate(csvreader):
+                    element = element[0].split("\t")    # Format it into a string, then a list.
+                    dictionary[f"user {i + 1}"] = element
+            
+            input(dictionary) 
+        else:
+            # Ensures that the file has been formatted correctly
+            remove_linefeed(file)
 
-        with open(file,"r") as f:
-            # This method of reading file removes newlines or "\n"
-            file_content = f.read().splitlines()
+            with open(file,"r") as f:
+                # This method of reading file removes newlines or "\n"
+                file_content = f.read().splitlines()
 
-        # Clears to update the dictionary.
-        dictionary.clear()
+            # Clears to update the dictionary.
+            dictionary.clear()
 
-        # Format used for quiz settings dictionary
-        if option == "settings":
-            for i, line in enumerate(file_content):
-                stripped_lines = line.strip()
+            # Format used for quiz settings dictionary
+            if option == "settings":
+                for i, line in enumerate(file_content):
+                    stripped_lines = line.strip()
 
-                # Skips line if the line is empty
-                if stripped_lines == "":
-                    continue
+                    # Skips line if the line is empty
+                    if stripped_lines == "":
+                        continue
 
-                current_line_list = stripped_lines.split(": ")
-                dictionary[f"option {i + 1}"] = [current_line_list[0],current_line_list[1]]
-        # Format used for question pool dictionary
-        elif option == "question":
-            for i, line in enumerate(file_content):
-                stripped_lines = line.strip()
-                if stripped_lines == "":
-                    continue
-                
-                current_line_list = stripped_lines.split("||")
+                    current_line_list = stripped_lines.split(": ")
+                    dictionary[f"option {i + 1}"] = [current_line_list[0],current_line_list[1]]
+            # Format used for question pool dictionary
+            elif option == "question":
+                for i, line in enumerate(file_content):
+                    stripped_lines = line.strip()
+                    if stripped_lines == "":
+                        continue
+                    
+                    current_line_list = stripped_lines.split("||")
 
-                # Pushes each line into a dictionary
-                dictionary[f"question {i+1}"] = [
-                    current_line_list[0],   # Question Content
-                    current_line_list[1:5], # Question Options
-                    current_line_list[5]    # Question Answer
-                ]
-
+                    # Pushes each line into a dictionary
+                    dictionary[f"question {i+1}"] = [
+                        current_line_list[0],                               # Question Content
+                        current_line_list[1:len(current_line_list) - 1],    # Question Options
+                        current_line_list[len(current_line_list) - 1]       # Question Answer
+                    ]
     except FileNotFoundError:
         print("File Doesn't Exist")
 
@@ -81,7 +121,6 @@ def remove_linefeed(file: str):
     
     # Remove linefeed
     # Ensures that if there is a linefeed in between variables
-    # It will get removed, preventing any fatal errors in the system
     for line in file_lines:
         if line == "\n":
             continue
@@ -93,9 +132,7 @@ def remove_linefeed(file: str):
             f.write(line + "\n")
 
 # returns the file content using "dictionary"
-# 
 # "show_number" parameter is used to define the format of returning string.
-# 
 # "0" prints out file content without numbering
 # "1" prints out with sequence numbering
 def view_file_content(show_numbers: int, option: str):
@@ -104,13 +141,7 @@ def view_file_content(show_numbers: int, option: str):
     value_list = list(dictionary.values())
 
     if show_numbers == 1:
-        #   How the dictionary would look like:
-        # {
-        #     "option 1": ["time", "60"],
-        #     "option 2": ["no_of_question", "5"],
-        #     "option 3": ["no_of_attempt", "2"],
-        # } 
-        if option == "settings":
+        if option == "settings" or option == "csv":
             for i, item in enumerate(value_list): 
                 content += f"[ {i + 1} ] {value_list[i][0]}: {value_list[i][1]}\n"
         elif option == "question":
@@ -121,7 +152,7 @@ def view_file_content(show_numbers: int, option: str):
                 content += f"[ {i + 1} ] {value_list[i][0]}: {sample}\n\n"
 
     elif show_numbers == 0:
-        if option == "settings":
+        if option == "settings" or option == "csv":
             for item in value_list:
                 content += f"[ - ] {item[0]}: {item[1]}\n"
         elif option == "question":
@@ -143,7 +174,8 @@ def print_file(name: str):
         option_name = "question"
     elif name == "Quiz Settings":
         option_name = "settings"
-
+    elif name == "User":
+        option_name = "csv"
     content = f"{DIVIDER}\n\t\t\t\033[1;37;40m {name}\033[0;37;40m\n{DIVIDER}\n"
 
     content += view_file_content(0, option_name)
@@ -268,30 +300,25 @@ def question_logic(userInput: str):
 
 def add_question():
     while True:
-        # # Possible Advance feature: different number of options
+        # Possible Advance feature: different number of options
 
-        # while local_loop:
-        #     os.system("cls")
-        #     print_option = ""
-        #     no_of_options = input(f"{DIVIDER}\nHow many options do you want? [ 3 - 5 options ]\n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\n")
-        #     if no_of_options.upper() == "X":
-        #         return
-        #     if no_of_options.isdigit():
-        #         if int(no_of_options) <= 2 or int(no_of_options) > 6:
-        #             error_output("range")
-        #             continue
-        #         else:
-        #             for i in range(int(no_of_options)):
-        #                 print_option += f"{chr(97 + i)})\n"
-        #     else:
-        #         error_output("input")
-        #         continue
-        #     break
-
-        print_option = ""
-        no_of_options = 4
-        for i in range(int(no_of_options)):
-            print_option += f"{chr(97 + i)})\n"
+        while True:
+            os.system("cls")
+            print_option = ""
+            no_of_options = input(f"{DIVIDER}\nHow many options do you want? [ 3 - 5 options ]\n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\n")
+            if no_of_options.upper() == "X":
+                return
+            if no_of_options.isdigit():
+                if int(no_of_options) <= 2 or int(no_of_options) > 6:
+                    error_output("range")
+                    continue
+                else:
+                    for i in range(int(no_of_options)):
+                        print_option += f"{chr(97 + i)})\n"
+            else:
+                error_output("input")
+                continue
+            break
         
         # Question input check
         while True:
@@ -617,7 +644,10 @@ def select_setting(title: str):
 #   Sub Program Loops
 # ========================================================================
 def register_user():
-    input("Register User")
+    while SUB_LOOP:
+        read_file_content(_USERNAME_AND_PASSWORD, option="csv")
+        user = print("User")
+        adminInput = input(user)
 
 def question_pool():
     while SUB_LOOP:

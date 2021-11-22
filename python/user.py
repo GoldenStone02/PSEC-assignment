@@ -1,3 +1,29 @@
+# StudentID:	p2008493
+# Name:	        Ng Jun Han
+# Class:		DISM/FT/1B/05   
+# Assessment:	CA1 
+# 
+# Script name:	user.py
+# 
+# Purpose:	Describe purpose of script
+#
+# Usage syntax:	Run with play button / command line, eg. py read-cmd-line 1 2 3
+# 
+# Input file:	Specify full path, eg. d:/psec/p01/students.txt
+# 
+# Output file:	Specify full path, eg. console for d:/psec/p01/students.out
+# 
+# Python ver:	Python 3
+#
+# Reference:	This program is adapted from the following:
+#
+#
+# Library/
+# package/	
+# Module /      os, re, csv, time
+#
+# Known issues:	eg. no validation of input value
+#
 import os 
 import re
 import time
@@ -96,10 +122,13 @@ def check_if_digit(input):
 def error_output(error_message: str):
     if error_message == "option":
         input("\033[1;37;41mPlease select a valid option.\033[0;37;40m")
+
     elif error_message == "input":
         input(f"\n\033[1;37;41mPlease enter a valid input\033[0;37;40m\n")
+
     elif error_message == "range":
         input("\033[1;37;41mPlease enter a value within the range.\033[0;37;40m")
+
     elif error_message == "special":
         input(f"\n\033[1;37;41mInput value can't contain special characters!\033[0;37;40m\n")
 
@@ -158,12 +187,15 @@ def user_logic(userpage_list,content: str):
 #   Question Function
 # ==================================================================
 
+def start_quiz():
+    return
+
 def quiz_timer():
     return
 
 # ==================================================================
 #   Main Program Loop
-# ==================================================================
+# ================================================================== 
 while LOOP:
     string = print_user(MAIN_USER_MENU)
     user_logic(MAIN_USER_MENU, string)
