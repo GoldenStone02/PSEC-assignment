@@ -104,12 +104,28 @@ def read_file_content(file: str, option):
     except FileNotFoundError:
         print("File Doesn't Exist")
 
-def write_file(file: str):
+def write_file(file: str, option: str, index=None):
     value_list = list(dictionary.values())
 
-    with open(file, "w") as f:
-        for line in value_list:
-            f.write(f"{line[0]}: {line[1]}\n")
+    if option == "delete":
+        with open(file, "r") as f:
+            lines = f.read().splitlines()
+        
+        with open(file, "w") as f:
+            for number, line in enumerate(lines):
+                if number != index:
+                    f.write(line + '\n')  
+    elif option == "edit_setting":
+        with open(file, "w") as f:
+            for line in value_list:
+                f.write(f"{line[0]}: {line[1]}\n")
+
+        
+
+def write_csv(file: str, usernameInput, passwordInput):
+    with open(file, "a", newline="") as csvfile:
+        csvwriter = csv.writer(csvfile)
+        csvwriter.writerow([usernameInput, user_password_hashing(passwordInput)])
 
 # Removes linefeed that is in between lines in the file
 def remove_linefeed(file: str):
@@ -294,7 +310,7 @@ def add_user():
         # Username check
         while True:
             os.system("cls")
-            username = input(f"{DIVIDER}\n\t\t\tAdding User\n{DIVIDER}\nUsername: \nPassword: \n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nUsername: ")
+            username = input(f"{DIVIDER}\n\t\t\tRegistering User\n{DIVIDER}\nUsername: \nPassword: \n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nUsername: ")
 
             if username.upper() == "X":
                 return
@@ -307,7 +323,7 @@ def add_user():
             # Password check
             while True:
                 os.system("cls")
-                password = input(f"{DIVIDER}\n\t\t\tAdding User\n{DIVIDER}\nUsername: {username}\nPassword: \n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nAt least one number\nAt least one uppercase and one lowercase character\nAt least one special symbol !@#$%\nShould be 4 - 20 characters long\nPassword: ")
+                password = input(f"{DIVIDER}\n\t\t\tRegistering User\n{DIVIDER}\nUsername: {username}\nPassword: \n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nAt least one number\nAt least one uppercase and one lowercase character\nAt least one special symbol !@#$%\nShould be 4 - 20 characters long\nPassword: ")
 
                 if password.upper() == "X":
                     return
@@ -320,12 +336,6 @@ def add_user():
                 elif len(password) > 20:
                     error_output("long")
                     continue
-                # elif not re.search(ALPHABET_PATTERN, password):
-                #     error_output("password")
-                #     continue
-                # elif not re.search(NUMBER_PATTERN, password):
-                #     error_output("password")
-                #     continue
                 elif not re.search(PASSWORD_PATTERN, password):
                     error_output("password")
                     continue
@@ -334,7 +344,7 @@ def add_user():
             # Password double check
             while True:
                 os.system("cls")
-                password2 = input(f"{DIVIDER}\n\t\t\tAdding User\n{DIVIDER}\nUsername: {username}\nPassword: \n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nPlease reenter your password: ")
+                password2 = input(f"{DIVIDER}\n\t\t\tRegistering User\n{DIVIDER}\nUsername: {username}\nPassword: \n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nPlease reenter your password: ")
 
                 if password2.upper() == "X":
                     return
@@ -345,7 +355,7 @@ def add_user():
                     # Check if the user wants to confirm the setting
                     while True:
                         os.system("cls")
-                        finalCheck = input(f"{DIVIDER}\n\t\t\tAdding User\n{DIVIDER}\nUsername: {username}\nPassword: {password}\n{DIVIDER}\n[ C ] Confirm\t\t[ X ] Exit\n{DIVIDER}\n")
+                        finalCheck = input(f"{DIVIDER}\n\t\t\tRegistering User\n{DIVIDER}\nUsername: {username}\nPassword: {password}\n{DIVIDER}\n[ C ] Confirm\t\t[ X ] Exit\n{DIVIDER}\n")
                         
                         if finalCheck.upper() == "X":
                             return
@@ -355,10 +365,7 @@ def add_user():
                             error_output("option")
                         break
 
-                    # Checks if the program aborted at any point 
-                    with open(_USERNAME_AND_PASSWORD, "a", newline="") as csvfile:
-                        csvwriter = csv.writer(csvfile)
-                        csvwriter.writerow([username, user_password_hashing(password)])
+                    write_csv(_USERNAME_AND_PASSWORD, username, password)
                     return
                 else: 
                     error_output("input")
@@ -372,7 +379,6 @@ def delete_user():
 
 def user_password_hashing(userInput: str): 
     output = hashlib.sha256(userInput.encode())
-    input(output.hexdigest())
     return output.hexdigest()
 
 # ===================================================================================================
@@ -507,13 +513,7 @@ def delete_question():
             if delete_check.upper() == "X":
                 break
             elif delete_check.upper() == "C":
-                with open(_QUIZ_QUESTION_TEXT, "r") as f:
-                    lines = f.read().splitlines()
-                
-                with open(_QUIZ_QUESTION_TEXT, "w") as f:
-                    for number, line in enumerate(lines):
-                        if number != deleting_index:
-                            f.write(line + '\n')   
+                write_file(_QUIZ_QUESTION_TEXT, "delete", deleting_index) 
                 input("\033[0;31;40mOption has been deleted!\033[0;37;40m\nPress Enter to Continue\n") 
                 break 
             else:
@@ -643,7 +643,7 @@ def edit_setting():
                         if local_loop:
                             # Change the name of item
                             value_list[edit_index][0] = new_name
-                            write_file(_QUIZ_SETTING_TEXT)   
+                            write_file(_QUIZ_SETTING_TEXT, "edit_setting")   
 
                     # Used to change the setting value             
                     elif selector == "2":
@@ -676,7 +676,7 @@ def edit_setting():
                         if local_loop:
                             # Changes the value of the item
                             value_list[edit_index][1] = new_value
-                            write_file(_QUIZ_SETTING_TEXT)                       
+                            write_file(_QUIZ_SETTING_TEXT, "edit_setting")                       
                     else:
                         error_output("option")
                 else:
@@ -700,13 +700,7 @@ def delete_setting():
             if delete_check.upper() == "X":
                 break
             elif delete_check.upper() == "C":
-                with open(_QUIZ_SETTING_TEXT, "r") as f:
-                    lines = f.read().splitlines()
-                
-                with open(_QUIZ_SETTING_TEXT, "w") as f:
-                    for number, line in enumerate(lines):
-                        if number != deleting_index:
-                            f.write(line + '\n')   
+                write_file(_QUIZ_SETTING_TEXT, "delete", deleting_index) 
                 input("\033[0;31;40mOption has been deleted!\033[0;37;40m\nPress Enter to Continue\n")  
                 break
             else:
