@@ -732,7 +732,8 @@ def select_setting(title: str):
 #   Generate Report Functions
 # ========================================================================
 
-
+def generate_report():
+    return
 
 # ========================================================================
 #   Sub Program Loops

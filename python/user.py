@@ -20,12 +20,11 @@
 #
 # Library/
 # package/	
-# Module /      os, re, csv, time
+# Module /      os, re, hashlib, csv, time
 #
 # Known issues:	eg. no validation of input value
 #
-import os, re, csv, time
-from typing import Dict
+import os, re, hashlib,  csv, time
 
 # ==================================================================
 #   Initialize variables
@@ -192,6 +191,7 @@ def error_output(error_message: str):
 #   User Page Function
 # ==================================================================
 
+# User navigation menu
 def user_menu(inputList: list):
     content = f"{DIVIDER}\n\t\t\t\033[1;37;40m Main \033[0;37;40m\n{DIVIDER}\n"
     for i, element in enumerate(inputList):
@@ -199,6 +199,7 @@ def user_menu(inputList: list):
     content += f"[ X ] Exit Application\n{DIVIDER}\n"
     return content
 
+# Logicial Flow for user menu
 def user_logic(userpage_list,content: str):
     while True:
         global MAIN_LOOP, SUB_LOOP
@@ -233,7 +234,8 @@ def user_logic(userpage_list,content: str):
 # ==================================================================
 #   Login Functions
 # ==================================================================
-   
+
+# Log In Logicial Flow
 def login_menu():
     while True:
         os.system("cls")
@@ -264,6 +266,7 @@ def login_menu():
             error_output("username")
             continue
 
+# check if username exist in the file
 def check_username(username: str):
     value_list = list(dictionary.values())
     for i in value_list:
@@ -271,12 +274,16 @@ def check_username(username: str):
             return True
     return False
 
-# checks if the hashed 
+def user_password_hashing(userInput: str): 
+    output = hashlib.sha256(userInput.encode())
+    return output.hexdigest()
+
+# checks if the hashed matches the password
 def check_password(username: str, password: str):
     value_list = list(dictionary.values())
     for i in value_list:
         if username == i[0]:
-            if password == i[1]:
+            if user_password_hashing(password) == i[1]:
                 return True
             else:
                 return False
