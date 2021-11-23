@@ -28,7 +28,7 @@
 #
 
 import os, re, csv
-import hashlib
+import hashlib, random
 
 # ==================================================================
 #   Initialize Variables
@@ -84,8 +84,8 @@ def read_file_content(file: str, option):
                     if stripped_lines == "":
                         continue
 
-                    current_line_list = stripped_lines.split(": ")
-                    dictionary[f"option {i + 1}"] = [current_line_list[0],current_line_list[1]]
+                    current_line_list = stripped_lines.split("||")
+                    dictionary[f"option {i + 1}"] = [current_line_list[0],current_line_list[1],current_line_list[2]]
             # Format used for question pool dictionary
             elif option == "question":
                 for i, line in enumerate(file_content):
@@ -118,7 +118,7 @@ def write_file(file: str, option: str, index=None):
     elif option == "edit_setting":
         with open(file, "w") as f:
             for line in value_list:
-                f.write(f"{line[0]}: {line[1]}\n")
+                f.write(f"{line[0]}||{line[1]}\n")
 
         
 
@@ -155,7 +155,10 @@ def view_file_content(show_numbers: int, option: str):
     value_list = list(dictionary.values())
 
     if show_numbers == 1:
-        if option == "settings" or option == "csv":
+        if option == "settings":
+            for i, item in enumerate(value_list): 
+                content += f"[ {i + 1} ] {value_list[i][1]}: {value_list[i][2]}\n"
+        elif option == "csv":
             for i, item in enumerate(value_list): 
                 content += f"[ {i + 1} ] {value_list[i][0]}: {value_list[i][1]}\n"
         elif option == "question":
@@ -166,9 +169,12 @@ def view_file_content(show_numbers: int, option: str):
                 content += f"[ {i + 1} ] {value_list[i][0]}: {sample}\n\n"
 
     elif show_numbers == 0:
-        if option == "settings" or option == "csv":
+        if option == "settings":
             for item in value_list:
-                content += f"[ - ] {item[0]}: {item[1]}\n"
+                content += f"[ - ] {item[1]}: {item[2]}\n"
+        elif option == "csv":
+            for item in value_list:
+                content += f"[ - ] {item[0]}: {item[1]}\n"     
         elif option == "question":
             for item in value_list:
                 sample = ""
@@ -203,12 +209,11 @@ def print_menu(name: str):
 # Checks whether the input is an integer or string
 # If the input is a digit, return True
 # if the input is a string, return False
-def check_if_digit(input):
-    try:
-        int(input)
-        return True
-    except ValueError:
-        return False
+def check_if_digit(userInput):
+    if str(userInput).isdigit():
+       return True
+    return False 
+
 
 # Used for easy maintainence of error outputs
 def error_output(error_message: str):
@@ -587,8 +592,10 @@ def add_setting():
             break
 
         # Checks if the program aborted at any point 
+        value_list = list(dictionary.values())
         with open(_QUIZ_SETTING_TEXT, "a") as f:
-            f.write(f"{new_setting_name}: {new_setting_value}")
+            r = random.randint(1,1000000)
+            f.write(f"{r}||{new_setting_name}||{new_setting_value}")
         return
 
 def edit_setting():
@@ -604,14 +611,14 @@ def edit_setting():
         elif check_if_digit(edit_index): # execute if its an integer
             while True:
                 os.system("cls")
-                selector = input(f"{DIVIDER}\nWhat do you want to change?\n{DIVIDER}\nName: {value_list[edit_index][0]}\nValue: {value_list[edit_index][1]}\n{DIVIDER}\n[ 1 ] Setting Name\n[ 2 ] Setting Value\n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\n")
+                selector = input(f"{DIVIDER}\nWhat do you want to change?\n{DIVIDER}\nName: {value_list[edit_index][1]}\nValue: {value_list[edit_index][2]}\n{DIVIDER}\n[ 1 ] Setting Name\n[ 2 ] Setting Value\n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\n")
                 if check_if_digit(selector):
                     local_loop = True
                     # Used to change setting name
                     if selector == "1":
                         while local_loop:
                             os.system("cls")
-                            new_name = input(f"{DIVIDER}\nName: \033[1;37;40m>>> {value_list[edit_index][0]} <<<\033[0;37;40m\nValue: {value_list[edit_index][1]}\n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nPlease input a new name: ")
+                            new_name = input(f"{DIVIDER}\nName: \033[1;37;40m>>> {value_list[edit_index][1]} <<<\033[0;37;40m\nValue: {value_list[edit_index][2]}\n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nPlease input a new name: ")
                             
                             if new_name.upper() == "X":
                                 local_loop = False
@@ -626,7 +633,7 @@ def edit_setting():
 
                         while local_loop:
                             os.system("cls")
-                            confirm_change = input(f"{DIVIDER}\n\t\tConfirm Changes?\n{DIVIDER}\nName: \033[1;37;40m>>> {new_name} <<<\033[0;37;40m\nValue: {value_list[edit_index][1]}\n{DIVIDER}\n[ C ] Confirm \n[ X ] Cancel Changes\n{DIVIDER}\n")
+                            confirm_change = input(f"{DIVIDER}\n\t\tConfirm Changes?\n{DIVIDER}\nName: \033[1;37;40m>>> {new_name} <<<\033[0;37;40m\nValue: {value_list[edit_index][2]}\n{DIVIDER}\n[ C ] Confirm \n[ X ] Cancel Changes\n{DIVIDER}\n")
                             
                             if confirm_change.upper() == "X":
                                 local_loop = False
@@ -643,14 +650,14 @@ def edit_setting():
 
                         if local_loop:
                             # Change the name of item
-                            value_list[edit_index][0] = new_name
+                            value_list[edit_index][1] = new_name
                             write_file(_QUIZ_SETTING_TEXT, "edit_setting")   
 
                     # Used to change the setting value             
                     elif selector == "2":
                         while local_loop:
                             os.system("cls")
-                            new_value = input(f"{DIVIDER}\nName: {value_list[edit_index][0]}\nValue: \033[1;37;40m>>> {value_list[edit_index][1]} <<<\033[0;37;40m\n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nPlease input new value: ")
+                            new_value = input(f"{DIVIDER}\nName: {value_list[edit_index][1]}\nValue: \033[1;37;40m>>> {value_list[edit_index][2]} <<<\033[0;37;40m\n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nPlease input new value: ")
                             if new_value.upper() == "X":
                                 local_loop = False
                                 break
@@ -661,7 +668,7 @@ def edit_setting():
 
                         while local_loop:
                             os.system("cls")
-                            confirm_change = input(f"{DIVIDER}\n\t\tConfirm Changes?\n{DIVIDER}\nSetting Name: {value_list[edit_index][0]}\nSetting Value: \033[1;37;40m>>> {new_value} <<<\033[0;37;40m\n{DIVIDER}\n[ C ] Confirm \n[ X ] Cancel Changes\n{DIVIDER}\n")
+                            confirm_change = input(f"{DIVIDER}\n\t\tConfirm Changes?\n{DIVIDER}\nSetting Name: {value_list[edit_index][1]}\nSetting Value: \033[1;37;40m>>> {new_value} <<<\033[0;37;40m\n{DIVIDER}\n[ C ] Confirm \n[ X ] Cancel Changes\n{DIVIDER}\n")
                             if confirm_change.upper() == "X":
                                 break
                             if confirm_change == "":
@@ -676,7 +683,7 @@ def edit_setting():
 
                         if local_loop:
                             # Changes the value of the item
-                            value_list[edit_index][1] = new_value
+                            value_list[edit_index][2] = new_value
                             write_file(_QUIZ_SETTING_TEXT, "edit_setting")                       
                     else:
                         error_output("option")
@@ -696,7 +703,7 @@ def delete_setting():
 
         while True:
             os.system("cls")
-            delete_check = input(f"{DIVIDER}\n\t\tPlease confirm your selection\n{DIVIDER}\n[ - ] {value_list[deleting_index][0]}: {value_list[deleting_index][1]}\n{DIVIDER}\n[ C ] Confirm\t\t[ X ] Back to Menu\n{DIVIDER}\n")
+            delete_check = input(f"{DIVIDER}\n\t\tPlease confirm your selection\n{DIVIDER}\n[ - ] {value_list[deleting_index][1]}: {value_list[deleting_index][2]}\n{DIVIDER}\n[ C ] Confirm\t\t[ X ] Back to Menu\n{DIVIDER}\n")
             
             if delete_check.upper() == "X":
                 break

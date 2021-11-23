@@ -78,8 +78,8 @@ def read_file_content(file: str, option):
                     if stripped_lines == "":
                         continue
 
-                    current_line_list = stripped_lines.split(": ")
-                    dictionary[f"option {i + 1}"] = [current_line_list[0],current_line_list[1]]
+                    current_line_list = stripped_lines.split("||")
+                    dictionary[f"option {i + 1}"] = [current_line_list[0],current_line_list[1],current_line_list[2]]
             # Format used for question pool dictionary
             elif option == "question":
                 for i, line in enumerate(file_content):
@@ -253,7 +253,7 @@ def login_menu():
                     SUB_LOOP = False
                     return
                 elif check_password(username_input, password_input):
-                    quiz_menu() # Starting of the quiz
+                    quiz_menu(username_input) # Starting of the quiz
                     return
                 else:
                     count -= 1
@@ -293,16 +293,27 @@ def check_password(username: str, password: str):
 #   Question Function
 # ==================================================================
 
-def quiz_menu():
-    input("Quiz Menu")
+def quiz_menu(userInput: str):
+    input(dictionary)
+    input(f"{DIVIDER}\n\t\tQuiz Menu\n{DIVIDER}\n{userInput}\n{DIVIDER}\n[ 1 ] Start Quiz\n[ X ] Back to Menu\n{DIVIDER}\n")
+    quiz_timer()
 
 def start_quiz():
     return
 
+# returns the amount of time set within the settings
 def quiz_timer():
+    read_file_content(_QUIZ_SETTING_TEXT, "settings")
+    value_list = list(dictionary.values())
+    for i in value_list:
+        if i[0] == "1":
+            input(i[2])
+            return i[2]
+
+def randomize_answer():
     return
 
-def get_result():
+def push_result():
     return
 
 # ==================================================================
