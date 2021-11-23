@@ -180,7 +180,7 @@ def view_file_content(show_numbers: int, option: str):
 
 # Prints the text file with some UI.
 # Needs to happen after "ReadFileContent()" has been executed
-def print_file(name: str): 
+def print_menu(name: str): 
 
     option_name = ""
 
@@ -197,7 +197,8 @@ def print_file(name: str):
     content += f"{DIVIDER}\n\t\tSelect one of the options\n{DIVIDER}\n"
     content += f"[ 1 ] Add New {name}\n[ 2 ] Edit {name}\n[ 3 ] Delete {name}\n[ X ] Back to Main\n{DIVIDER}\n"
 
-    return content
+    user_input = input(content)
+    return user_input
 
 # Checks whether the input is an integer or string
 # If the input is a digit, return True
@@ -259,13 +260,13 @@ def main_logic(menu_list: list, content: str):
         if check_if_digit(stored_value):
             if int(stored_value) in range(1, len(menu_list) + 1):
                 if stored_value == "1":
-                    register_user()
+                    register_user_subloop()
                 elif stored_value == "2":
-                    question_pool()
+                    question_pool_subloop()
                 elif stored_value == "3":
-                    quiz_setting()
+                    quiz_setting_subloop()
                 elif stored_value == "4":
-                    generate_report()
+                    generate_report_subloop()
             else:
                 error_output("option")
         elif stored_value.upper() == "X":
@@ -736,30 +737,30 @@ def select_setting(title: str):
 # ========================================================================
 #   Sub Program Loops
 # ========================================================================
-def register_user():
+def register_user_subloop():
     while SUB_LOOP:
+        os.system("cls")
         read_file_content(_USERNAME_AND_PASSWORD, option="csv")
-        user = print_file("User")
-        adminInput = input(user)
-        register_logic(adminInput)
+        user = print_menu("User")
+        register_logic(user)
 
-def question_pool():
+def question_pool_subloop():
     while SUB_LOOP:
+        os.system("cls")
         read_file_content(_QUIZ_QUESTION_TEXT, option="question")
-        questPool = print_file("Question Pool")
-        adminInput = input(questPool)
-        question_logic(adminInput)
+        questPool = print_menu("Question Pool")
+        question_logic(questPool)
 
-def quiz_setting():
+def quiz_setting_subloop():
     while SUB_LOOP:
         os.system("cls")
         read_file_content(_QUIZ_SETTING_TEXT, option="settings")
-        quizSettings = print_file("Quiz Settings")    
-        adminInput = input(quizSettings)
-        setting_logic(adminInput)
+        quizSettings = print_menu("Quiz Settings")    
+        setting_logic(quizSettings)
 
-def generate_report():
+def generate_report_subloop():
     input("Generate Report")
+
 # ========================================================================
 #   Main Program Loop
 # ========================================================================
