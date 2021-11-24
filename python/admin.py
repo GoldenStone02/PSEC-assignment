@@ -190,7 +190,7 @@ def print_menu(name: str):
 
     option_name = ""
 
-    if name == "Question Pool":
+    if name == "Question":
         option_name = "question"
     elif name == "Quiz Settings":
         option_name = "settings"
@@ -381,7 +381,12 @@ def change_password():
     return
 
 def delete_user():
-    return
+    value_list = list(dictionary.values())
+    if len(value_list) == 0:
+        input("User List is empty, please register some users.")
+        return
+    while True:
+        return
 
 def user_password_hashing(userInput: str): 
     output = hashlib.sha256(userInput.encode())
@@ -500,6 +505,9 @@ def edit_question():
 
 def delete_question():
     value_list = list(dictionary.values())
+    if len(value_list) == 0:
+        input("Question Pool is empty, please add some questions")
+        return
     while True:
         os.system("cls")
         deleting_index = input(f"{DIVIDER}\nWhich question do you want to delete?\n{DIVIDER}\n{view_file_content(1, 'question')}{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\n")
@@ -756,7 +764,7 @@ def question_pool_subloop():
     while SUB_LOOP:
         os.system("cls")
         read_file_content(_QUIZ_QUESTION_TEXT, option="question")
-        questPool = print_menu("Question Pool")
+        questPool = print_menu("Question")
         question_logic(questPool)
 
 def quiz_setting_subloop():
@@ -774,5 +782,6 @@ def generate_report_subloop():
 # ========================================================================
 
 while MAIN_LOOP:
+    os.system("cls")
     string = print_main(MAIN_MENU)
     main_logic(MAIN_MENU, string)
