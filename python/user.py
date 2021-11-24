@@ -16,15 +16,19 @@
 # Python ver:	Python 3
 #
 # Reference:	This program is adapted from the following:
-#
-#
+#                   a) Generating non-repeating random numbers in Python
+#                   https://www.tutorialspoint.com/How-to-generate-non-repeating-random-numbers-in-Python
+# 
+#                   b) 
+#                   
 # Library/
 # package/	
 # Module /      os, re, hashlib, csv, time
 #
 # Known issues:	eg. no validation of input value
 #
-import os, re, hashlib,  csv, time
+import os, hashlib, random, csv
+import time, datetime
 
 # ==================================================================
 #   Initialize variables
@@ -40,6 +44,7 @@ START_MENU = ["Begin Quiz"]
 _USERNAME_AND_PASSWORD = "./admin/userid_pswd.csv"
 _QUIZ_SETTING_TEXT = "./admin/quiz_settings.txt"
 _QUIZ_QUESTION_TEXT = "./admin/question_pool.txt"
+_QUIZ_RESULTS = "./admin/quiz_result.csv"
 MAIN_LOOP = True
 SUB_LOOP = True
 
@@ -98,7 +103,6 @@ def read_file_content(file: str, option):
     except FileNotFoundError:
         print("File Doesn't Exist")
 
-
 # Removes linefeed that is in between lines in the file
 def remove_linefeed(file: str):
     temp = []
@@ -145,6 +149,12 @@ def view_file_content(show_numbers: int, option: str):
     
     return content
 
+# writes into a csv file with the given inputs.
+def write_csv(file: str, usernameInput, passwordInput):
+    with open(file, "a", newline="") as csvfile:
+        csvwriter = csv.writer(csvfile)
+        csvwriter.writerow([usernameInput, user_password_hashing(passwordInput)])
+
 # returns content
 def print_file(name: str):
     option_name = ""
@@ -185,8 +195,14 @@ def error_output(error_message: str):
         input(f"\n\033[1;37;41mPassword is incorrect.\033[0;37;40m\n")
 
     elif error_message == "admin":
-        input(f"\n\033[1;37;41mAccount Has been locked\033[0;37;40m\n")
+        input(f"\n\033[1;37;41mAccount has been locked\033[0;37;40m\n")
 
+    elif error_message == "previous":
+        input(f"\n\033[1;37;41mYou are at the first question!!\033[0;37;40m\n")
+    
+    elif error_message == "next":
+        input(f"\n\033[1;37;41mYou are at the last question!!\033[0;37;40m\n")
+    
 # ==================================================================
 #   User Page Function
 # ==================================================================
@@ -231,6 +247,7 @@ def user_logic(userpage_list,content: str):
         else:
             error_output("option")
 
+
 # ==================================================================
 #   Login Functions
 # ==================================================================
@@ -253,7 +270,7 @@ def login_menu():
                     SUB_LOOP = False
                     return
                 elif check_password(username_input, password_input):
-                    quiz_menu(username_input) # Starting of the quiz
+                    quiz_menu(username_input) # starting of the quiz
                     return
                 else:
                     count -= 1
@@ -274,8 +291,9 @@ def check_username(username: str):
             return True
     return False
 
-def user_password_hashing(userInput: str): 
-    output = hashlib.sha256(userInput.encode())
+# hashes the password for safe keeping in the .csv file
+def user_password_hashing(given_input: str): 
+    output = hashlib.sha256(given_input.encode())
     return output.hexdigest()
 
 # checks if the hashed matches the password
@@ -293,26 +311,147 @@ def check_password(username: str, password: str):
 #   Question Function
 # ==================================================================
 
-def quiz_menu(userInput: str):
-    input(dictionary)
-    input(f"{DIVIDER}\n\t\tQuiz Menu\n{DIVIDER}\n{userInput}\n{DIVIDER}\n[ 1 ] Start Quiz\n[ X ] Back to Menu\n{DIVIDER}\n")
-    quiz_timer()
+# display the quiz menu for the user.
+# "username" is a string to identify the user
+def quiz_menu(username: str):
+    while True:
+        os.system("cls")
+        user_input = input(f"{DIVIDER}\n\t\t\tQuiz Menu\n{DIVIDER}\nUser Logged In as: \033[1;37;40m{username}\033[0;37;40m\n\nTime for the quiz: {amount_of_time()} mins\nNumber of Question: {number_of_question()}\n{DIVIDER}\n[ 1 ] Start Quiz\n[ X ] Back to Menu\n{DIVIDER}\n")
+        if user_input.upper() == "X":
+            return
+        elif user_input == "1":
+            start_quiz() # starts the quiz once the user confirms
+        else:
+            error_output("option")
 
+# need to add some kind of notification to show what answers the user selected
+# starts the quiz for the signed user.
 def start_quiz():
+    # selects the question randomly from the question pool
+    question = selection_random_question()
+
+    # selects the first question automatically
+    selected_question_index = 0
+
+    # creates a temporary list to store the user's answer while he is taking the quiz.
+    temp_list = []
+    for i in question:
+        temp_list.append([i[0], i[2], ""])
+    
+    # starts the timer
+    starttime = time.time()
+
+    # main quiz loop
+    while True:
+        # formats the question to prepare for display.
+        sample = ""
+        for j, option in enumerate(question[selected_question_index][1]):
+            sample += f"\n    {chr(97 + j)}) {option}"
+        selected_question = f"q{selected_question_index + 1}) {question[selected_question_index][0]}: {sample}\n\n"
+
+        os.system("cls")
+        user_selection = input(f"{DIVIDER}\n\t\t\tQuiz\n{DIVIDER}\nTime left: {timer(starttime)[0]} min {timer(starttime)[1]} sec\n{DIVIDER}\n{selected_question}Your Answer: {temp_list[selected_question_index][2]}\n{DIVIDER}\n[ P ] Previous Question\t\t[ N ] Next Question\n[ S ] Save & Submit\n{DIVIDER}\n")
+        
+        # if time is up, save and submit the users answer
+        # OR
+        # if user inputs "S", save and submit the answer
+        if user_selection.upper() == "S" or (timer(starttime)[0] <= 0 and timer(starttime)[1] <= 0):
+            input("Save & Submit")
+        elif user_selection.upper() == "P":
+            if selected_question_index == 0:
+                error_output("previous")
+                continue
+            else:
+                selected_question_index -= 1
+        elif user_selection.upper() == "N":
+            if selected_question_index == (len(question) - 1):
+                error_output("next")
+                continue
+            else:
+                selected_question_index += 1
+        elif check_user_input(user_selection, question[selected_question_index][1]):
+            store_user_answer(user_selection, temp_list, selected_question_index)
+        else:
+            error_output("option")
+            continue
+
+# checks if the user's selected option in inside the range of options 
+# for any question. Due to the flexibility of the number of options the admin can set.
+# 
+# "given_user_input" is the user input that will be checked to see if the input is within the range of the options
+# "question_data" is a list containing the question info, such as content, options and answer
+def check_user_input(userInput: str, question_data: list):
+    check_list = []
+    for i, option in enumerate(question_data):
+        check_list.extend(chr(97 + i))
+    for check in check_list:
+        if check == userInput.lower():
+            return True
+    return False
+
+# stores the user answer into a temporary list
+def store_user_answer(userInput: str, question_pool: list, selected_question: int):
+    question_pool[selected_question][2] = userInput
+
+
+# check if the user's answer is correct or incorrect
+def check_user_answer():
     return
 
+# returns the remaining time left
+def timer(starting_time: float):
+    endtime = time.time() - starting_time
+    total_allowed_time = float(amount_of_time()) * 60
+    time_left_min = int((total_allowed_time - endtime)/60)
+    time_left_sec = int((((total_allowed_time - endtime)/60) - time_left_min) * 60)
+    # string = f"{time_left_min} min {time_left_sec} sec"
+    return time_left_min, time_left_sec
+
+
 # returns the amount of time set within the settings
-def quiz_timer():
+def amount_of_time():
     read_file_content(_QUIZ_SETTING_TEXT, "settings")
     value_list = list(dictionary.values())
     for i in value_list:
-        if i[0] == "1":
-            input(i[2])
+        if i[0] == "1": # ID of "time"
             return i[2]
 
-def randomize_answer():
-    return
+# number of question to be used in the quiz
+def number_of_question():
+    read_file_content(_QUIZ_SETTING_TEXT, "settings")
+    value_list = list(dictionary.values())
+    for i in value_list:
+        if i[0] == "2": # ID of "no_of_question"
+            return i[2]
 
+# checks if the admin set the answers to appear randomly
+def randomize_answer():
+    read_file_content(_QUIZ_SETTING_TEXT, "settings")
+    value_list = list(dictionary.values())
+    for i in value_list:
+        if i[0] == "4": # ID of "randomize_answer"
+            if i[2].lower() == "true":
+                return True
+            return False
+
+# randomly selects question from the question pool
+def selection_random_question():
+    read_file_content(_QUIZ_QUESTION_TEXT, "question")
+    question_list = list(dictionary.values())
+    ask_question_list = []
+
+    # creates a list of random non-repeating index numbers for the question selection
+    while len(ask_question_list) != int(number_of_question()):
+        random_number = random.randint(0, len(question_list) - 1)
+        if random_number not in ask_question_list: 
+            ask_question_list.append(random_number)
+
+    # replaces the index values with its corresponding question data
+    for i, index in enumerate(ask_question_list):
+        ask_question_list[i] = question_list[index]
+    return ask_question_list
+
+# pushes the answer to the "quiz_result" file.
 def push_result():
     return
 
