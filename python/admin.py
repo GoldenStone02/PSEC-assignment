@@ -38,7 +38,7 @@ dictionary = {}
 EMPTY = ""
 DIVIDER = f"{EMPTY:=^60}"
 
-PATTERN = r"^[\w]+$"
+PATTERN = r"^[\w.]+$"
 PASSWORD_PATTERN = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%]).+$'
 
 _USERNAME_AND_PASSWORD = "./admin/userid_pswd.csv"
@@ -104,6 +104,7 @@ def read_file_content(file: str, option):
     except FileNotFoundError:
         print("File Doesn't Exist")
 
+# write changes to the selected file
 def write_file(file: str, option: str, index=None):
     value_list = list(dictionary.values())
 
@@ -118,10 +119,9 @@ def write_file(file: str, option: str, index=None):
     elif option == "edit_setting":
         with open(file, "w") as f:
             for line in value_list:
-                f.write(f"{line[0]}||{line[1]}\n")
+                f.write(f"{line[0]}||{line[1]}||{line[2]}\n")
 
-        
-
+# writes username and password into csv file.
 def write_csv(file: str, usernameInput, passwordInput):
     with open(file, "a", newline="") as csvfile:
         csvwriter = csv.writer(csvfile)
@@ -695,9 +695,11 @@ def edit_setting():
                             write_file(_QUIZ_SETTING_TEXT, "edit_setting")                       
                     else:
                         error_output("option")
+                elif selector.upper() == "X":
+                    return    
                 else:
-                    if selector.upper() == "X":
-                        return    
+                    error_output("input")
+                    continue
         else:
             error_output("option")
 
