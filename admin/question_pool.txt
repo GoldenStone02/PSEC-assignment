@@ -1,6 +1,6 @@
-question 1||option A||option B||option C||option D||A
-question 2||option A||option B||option C||option D||B
-question 3||option A||option B||option C||option D||C
-question 4||option A||option B||option C||option D||D
-question 5||option A||option B||option C||option D||A
-question 6||option A||option B||option C||option D||B
+question 1||option A||option B||option C||option D||option A
+question 2||option A||option B||option C||option D||option B
+question 3||option A||option B||option C||option D||option C
+question 4||option A||option B||option C||option D||option D
+question 5||option A||option B||option C||option D||option A
+question 6||option A||option B||option C||option D||option B
