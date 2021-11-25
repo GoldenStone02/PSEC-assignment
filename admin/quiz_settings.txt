@@ -1,4 +1,4 @@
-1||time||60
+1||time||1
 2||no_of_question||5
 3||no_of_attempt||3
-4||randomize_answer||false
+4||randomize_option||true
