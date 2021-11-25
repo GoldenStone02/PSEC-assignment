@@ -45,7 +45,7 @@ START_MENU = ["Begin Quiz"]
 _USERNAME_AND_PASSWORD = "./admin/userid_pswd.csv"
 _QUIZ_SETTING_TEXT = "./admin/quiz_settings.txt"
 _QUIZ_QUESTION_TEXT = "./admin/question_pool.txt"
-_QUIZ_RESULTS = "./admin/quiz_result.csv"
+_QUIZ_RESULTS = "./admin/quiz_results.csv"
 MAIN_LOOP = True
 SUB_LOOP = True
 
@@ -154,9 +154,11 @@ def view_file_content(show_numbers: int, option: str):
 
 # writes into a csv file with the given inputs.
 def write_csv(file: str, dict_input: dict):
-    input(dict_input)
+    # fieldnames are the key values of the first item in the dictionary.
     fields = dict_input[0].keys()
-    input(fields)
+
+    # [ISSUE]: when the user doesn't input anything in the quiz and submit
+    # there will be a PermissionError that occurs on this line.
     with open(file, "w", newline="") as csvfile:
         csvwriter = csv.DictWriter(csvfile, fieldnames=fields)
         csvwriter.writeheader()
@@ -440,10 +442,10 @@ def save_user_answer(input_list: list):
         question_answer =  chr(97 + question_data[2].index(question_data[3]))
         questions_tested.append([question_data[0], question_data[1], question_answer, question_data[4]])
 
-    import json
     # Sorts the list by order for checking
     questions_tested.sort()
-    input(json.dumps(questions_tested, sort_keys=True, indent=4)) # DELETE THIS PLEASE
+    # import json
+    # input(json.dumps(questions_tested, sort_keys=True, indent=4)) # DELETE THIS PLEASE
     return questions_tested, total_marks
 
                 
