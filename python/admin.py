@@ -187,7 +187,6 @@ def view_file_content(show_numbers: int, option: str):
 # Prints the text file with some UI.
 # Needs to happen after "ReadFileContent()" has been executed
 def print_menu(name: str): 
-
     option_name = ""
 
     if name == "Question":
@@ -386,6 +385,7 @@ def delete_user():
         input("User List is empty, please register some users.")
         return
     while True:
+        input(f"{view_file_content(1, 'Question')}")
         return
 
 def user_password_hashing(userInput: str): 
@@ -436,6 +436,7 @@ def add_question():
         
         # Question input check
         while True:
+            os.system("cls")
             question = input(f"{DIVIDER}\n\t\t\tAdding Question\n{DIVIDER}\nQuestion: \n\nOptions: \n{print_option}\n\nAnswer: \n\n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nInput Question: ")
             if question.upper() == "X":
                 return
@@ -453,6 +454,7 @@ def add_question():
             string = print_option
 
             for i in range(int(no_of_options)):
+                os.system("cls")
                 options = input(f"{DIVIDER}\n\t\t\tAdding Options\n{DIVIDER}\nQuestion: {question}\n\nOptions: \n{string}\n\n Answer: \n\n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nInput Options: ")
                 if options.upper() == "X":
                     return
@@ -465,6 +467,7 @@ def add_question():
                         string += f"{chr(97 + j)}) {element}\n"
         # Answer input check
         while True:
+            os.system("cls")
             answer = input(f"{DIVIDER}\n\t\t\tAdding Answers\n{DIVIDER}\nQuestion: {question}\n\nOptions: \n{string}\n\nAnswer: \n\n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nCorrect Answer: ")
             if answer.upper() == "X":
                 return
