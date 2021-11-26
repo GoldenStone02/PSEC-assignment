@@ -148,7 +148,7 @@ def writes_to_file(file: str, option: str, index=None):
             csvwriter.writerows(csv_dict_list)
     
     # Deletes items from csv files
-    elif option == "delete_csv":
+    elif option == "delete_user":
         # Removes the user from the csv file
         csv_dict_list.pop(index) 
 
@@ -535,7 +535,7 @@ def delete_user():
             if delete_check.upper() == "X":
                 break
             elif delete_check.upper() == "C":
-                writes_to_file(_USERNAME_AND_PASSWORD, "delete_user", int(deleting_index)) 
+                writes_to_file(_USERNAME_AND_PASSWORD, "delete_user", int(deleting_index) - 1) 
                 input("\033[0;31;40mUser has been deleted!\033[0;37;40m\nPress Enter to Continue\n") 
                 break 
             else:
