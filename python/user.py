@@ -9,9 +9,13 @@
 #
 # Usage syntax:	Run with play button / command line, eg. py read-cmd-line 1 2 3
 # 
-# Input file:	Specify full path, eg. d:/psec/p01/students.txt
+# Input file:   C:\PSEC_project\question_pool.txt
+#               C:\PSEC_project\quiz_settings.txt
+#               C:\PSEC_project\userid_pswd.csv
+#               C:\PSEC_project\quiz_results.csv
 # 
-# Output file:	Specify full path, eg. console for d:/psec/p01/students.out
+# Output file:  C:\PSEC_project\userid_pswd.csv
+#               C:\PSEC_project\quiz_results.csv
 # 
 # Python ver:	Python 3
 #
@@ -19,7 +23,14 @@
 #                   a) Generating non-repeating random numbers in Python
 #                   https://www.tutorialspoint.com/How-to-generate-non-repeating-random-numbers-in-Python
 # 
-#                   b) 
+#                   b) Python time ctime() method
+#                   https://www.tutorialspoint.com/python/time_ctime.htm
+# 
+#                   c) w3schools -Python random shuffle() method
+#                   https://www.w3schools.com/python/ref_random_shuffle.asp
+# 
+#                   d) How to read and create csv files using python
+#                   https://linuxconfig.org/how-to-read-and-create-csv-files-using-python
 #                   
 # Library/
 # package/	
@@ -63,7 +74,6 @@ def read_file_content(file: str, option):
             csv_dict_list.clear()
             with open(file, 'r') as csvfile:
                 # Uses DictReader for easy storing of the value
-                # [Issue over here] csv.DictReader is reading memory that it is not supposed to
                 for line in csv.DictReader(csvfile):
                     csv_dict_list.append(dict(line))
                 
@@ -492,14 +502,14 @@ def save_user_answer(input_list: list):
 # pushes the answer to the "quiz_result" file.
 # 
 # username: the username that the user inputted
-# user_answer[0]: questions_tested list
-# user_answer[1]: total_marks
+# input_list[0]: questions_tested list
+# input_list[1]: total_marks
 def push_result(username: str, input_list: list):
     read_file_content(_QUIZ_QUESTION_TEXT, option="question")
     question_pool = list(dictionary.values())
     # iterates over the entire question_pool to ensure that all question are being tracked
     for i, element in enumerate(question_pool):
-        # checks whether is the current item in the "user_answer" list
+        # checks whether is the current item in the "input_list" list
         if element[0] in input_list[0][i][1]:
             pass
         else:
@@ -520,8 +530,8 @@ def push_result(username: str, input_list: list):
 
 # Formats the data into a dictionary for csv printing
 def format_into_dict(username: str, input_list: list):
-    # user_answer[0]: question_list
-    # user_answer[1]: total_mark
+    # input_list[0]: question_list
+    # input_list[1]: total_mark
     result = {
         "User": username,
         "No. Qn answered correct": input_list[1],
@@ -642,6 +652,7 @@ def login_subloop():
 # ==============================================================================================================================
 #   Main Program Loop
 # ==============================================================================================================================
+# Try loop is used in order to catch any bad inputs the user might have done within the stack
 while MAIN_LOOP:
     try:
         while MAIN_LOOP:

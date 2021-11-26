@@ -5,25 +5,35 @@
 # 
 # Script name:	admin.py
 # 
-# Purpose:	Describe purpose of script
+# Purpose:	The purpose of the script is to allow an administer to edit and change the settings within 
+#           the files without having to manual search through every file to find the correct setting
+#           or text to change.
 #
 # Usage syntax:	Run with play button / command line, eg. py read-cmd-line 1 2 3
 # 
-# Input file:   d:/PSEC/admin/userid_pswd.csv
-#               d:/PSEC/admin/quiz_settings.txt
-#               d:/PSEC/admin/question_pool.txt
+# Input file:   C:\PSEC_project\question_pool.txt
+#               C:\PSEC_project\quiz_settings.txt
+#               C:\PSEC_project\userid_pswd.csv
+#               C:\PSEC_project\quiz_results.csv
 # 
-# Output file:	Specify full path, eg. console for d:/psec/p01/students.out
+# Output file:  C:\PSEC_project\question_pool.txt
+#               C:\PSEC_project\quiz_settings.txt
+#               C:\PSEC_project\userid_pswd.csv
+#               C:\PSEC_project\quiz_results.csv
+# 
 # 
 # Python ver:	Python 3
 #
 # Reference:	This program is adapted from the following:
-#               a) GeeksforGeeks: Use of regex to filter out text
+#               a) GeeksforGeeks - Use of regex to filter out text
 #               https://www.geeksforgeeks.org/check-if-a-string-contains-uppercase-lowercase-special-characters-and-numeric-values/
 # 
-#               b) Python time ctime() method
-#               https://www.tutorialspoint.com/python/time_ctime.htm
+#               b) hashlib - Python Documentation
+#               https://docs.python.org/3/library/hashlib.html 
 # 
+#               c) w3schools - Python Dictionary values() method
+#               https://www.w3schools.com/python/ref_dictionary_values.asp
+#  
 # Library/
 # package/	
 # Module /      os, re, csv, hashlib, random
@@ -484,7 +494,7 @@ def add_user():
                     continue
 
 # Edits either the email or password from "userid_passwd.csv":
-# Don't change the username as it might effect "quiz_result"
+# Don't change the username as it might effect "quiz_result" [ISSUE]
 def edit_user():
     input("Change User")
     return
@@ -647,6 +657,7 @@ def add_question():
         return
     
 # Edits question from "question_pool"
+# [ISSUE]
 def edit_question(): 
     return
 
@@ -749,7 +760,6 @@ def add_setting():
             break
 
         # Checks if the program aborted at any point 
-        value_list = list(dictionary.values())
         with open(_QUIZ_SETTING_TEXT, "a") as f:
             r = random.randint(1,1000000)
             f.write(f"{r}||{new_setting_name}||{new_setting_value}")
