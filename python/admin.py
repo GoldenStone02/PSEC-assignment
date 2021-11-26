@@ -69,7 +69,6 @@ def read_file_content(file: str, option):
             csv_dict_list.clear()
             with open(file, 'r') as csvfile:
                 # Uses DictReader for easy storing of the value
-                # [Issue over here] csv.DictReader is reading memory that it is not supposed to
                 for line in csv.DictReader(csvfile):
                     csv_dict_list.append(dict(line))
                 
@@ -113,10 +112,11 @@ def read_file_content(file: str, option):
     except FileNotFoundError:
         print("File Doesn't Exist")
 
-# write changes to the selected file
-def write_file(file: str, option: str, index=None):
+# Writes changes to the selected file
+def writes_to_file(file: str, option: str, index=None):
     value_list = list(dictionary.values())
 
+    # Deletes items from text file
     if option == "delete":
         with open(file, "r") as f:
             lines = f.read().splitlines()
@@ -125,18 +125,45 @@ def write_file(file: str, option: str, index=None):
             for number, line in enumerate(lines):
                 if number != index:
                     f.write(line + '\n')  
+
+    # Writes items into csv file 
+    elif option == "csv":
+        # Fieldnames are the key values of the first item in the dictionary.
+        fields = csv_dict_list[0].keys()
+
+        # Writes to the csv file with the correct headings and value
+        with open(file, "w", newline="") as csvfile:
+            csvwriter = csv.DictWriter(csvfile, fieldnames=fields)
+            csvwriter.writeheader()
+            csvwriter.writerows(csv_dict_list)
+    
+    # Deletes items from csv files
+    elif option == "delete_csv":
+        # Removes the user from the csv file
+        csv_dict_list.pop(index) 
+
+        # Fieldnames are the key values of the first item in the dictionary.
+        fields = csv_dict_list[0].keys()
+
+        # Writes to the csv file with the correct headings and value
+        with open(file, "w", newline="") as csvfile:
+            csvwriter = csv.DictWriter(csvfile, fieldnames=fields)
+            csvwriter.writeheader()
+            csvwriter.writerows(csv_dict_list)
+    
+    # Edit setting variables from the settings text file
     elif option == "edit_setting":
         with open(file, "w") as f:
             for line in value_list:
                 f.write(f"{line[0]}||{line[1]}||{line[2]}\n")
 
-# writes into a csv file with the given inputs.
-def write_csv(file: str, dict_input: dict):
+# Writes into a csv file with the given inputs.
+def writes_to_csv(file: str, dict_input: dict):
 
-    # fieldnames are the key values of the first item in the dictionary.
+    # Fieldnames are the key values of the first item in the dictionary.
     fields = dict_input[0].keys()
 
-    # writes to the csv file with the correct headings and value
+    # Writes to the csv file with the correct headings and value
     with open(file, "w", newline="") as csvfile:
         csvwriter = csv.DictWriter(csvfile, fieldnames=fields)
         csvwriter.writeheader()
@@ -160,7 +187,7 @@ def remove_linefeed(file: str):
         for line in temp:
             f.write(line + "\n")
 
-# returns the file content using "dictionary"
+# Returns the file content using "dictionary"
 # "show_number" parameter is used to define the format of returning string.
 # "0" prints out file content without numbering
 # "1" prints out with sequence numbering
@@ -187,9 +214,9 @@ def view_file_content(show_numbers: int, option: str):
             content += f"{header_text}\n"
 
             for i, sub_dict in enumerate(csv_dict_list):
-                # reads from csv formatter
+                # Reads from csv formatter
                 csv_list = list(sub_dict.values())
-                content += f"[ - ] {csv_list[0]}\t|{csv_list[1][:10]}\t|\t{csv_list[2][:10]}...\t|\n" 
+                content += f"[ {i + 1} ] {csv_list[0]}\t|{csv_list[1][:10]}\t|\t{csv_list[2][:10]}...\t|\n" 
 
         # Formats dictionary for question with numbering
         elif option == "question":
@@ -218,10 +245,10 @@ def view_file_content(show_numbers: int, option: str):
 
             # Gets the values of each user stored in the system
             for sub_dict in csv_dict_list:
-                # reads from csv formatter
+                # Reads from csv formatter
                 csv_list = list(sub_dict.values())
                 
-                # formats the input for display
+                # Formats the input for display
                 content += f"[ - ] {csv_list[0]}\t|{csv_list[1][:10]}\t|\t{csv_list[2][:10]}...\t|\n" 
    
         # Formats dictionary for question w/o numbering
@@ -307,7 +334,7 @@ def error_output(error_message: str):
 #   Main Page Functions
 # ============================================================================================
 
-# prints page with a list, checks whether is input is in range of list
+# Prints page with a list, checks whether is input is in range of list
 # "input_list" parameter is for dynamic changing of the menu
 def print_main(input_list: list):
     content = f"{DIVIDER}\n\t\t\t\033[1;37;40m Main \033[0;37;40m\n{DIVIDER}\n"
@@ -316,7 +343,7 @@ def print_main(input_list: list):
     content += f"[ X ] Exit Application\n{DIVIDER}\n"
     return content
 
-# main logical system for selection page
+# Main logical system for selection page
 # "menu_list" is meant for easily change within the UI.
 def main_logic(menu_list: list, content: str):
     global MAIN_LOOP, SUB_LOOP
@@ -347,7 +374,6 @@ def main_logic(menu_list: list, content: str):
             else:
                 error_output("option")
             os.system("cls")
-        return
     else:
         error_output("option")
 
@@ -364,13 +390,14 @@ def register_logic(userInput: str):
     elif valueCap == "1":
         add_user()
     elif valueCap == "2":
-        change_password()
+        edit_user()
     elif valueCap == "3":
         delete_user()
     else:
         error_output("input")
         return
 
+# Add users to "userid_passwd.csv"
 def add_user():
     while True:
         # Username check
@@ -386,7 +413,6 @@ def add_user():
             break
 
         # Email check
-        # NEED TO IMPLEMENT [ISSUE]
         while True:
             os.system("cls")
             email = input(f"{DIVIDER}\n\t\t\tRegistering User\n{DIVIDER}\nUsername: {username}\nEmail: \nPassword: \n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nEnter email: ")
@@ -451,24 +477,62 @@ def add_user():
 
                     # Adds the new value into the list 
                     csv_dict_list.append(user_dict)
-                    write_csv(_USERNAME_AND_PASSWORD, csv_dict_list)
+                    writes_to_csv(_USERNAME_AND_PASSWORD, csv_dict_list)
                     return
                 else: 
                     error_output("input")
                     continue
 
-def change_password():
+# Edits either the email or password from "userid_passwd.csv":
+# Don't change the username as it might effect "quiz_result"
+def edit_user():
     input("Change User")
     return
 
+# Deletes user from "userid_passwd.csv"
 def delete_user():
     if len(csv_dict_list) == 0:
         input("User List is empty, please register some users.")
         return
     while True:
-        input(f"{view_file_content(1, 'Question')}")
-        return
+        os.system("cls")
+        deleting_index = input(f"{DIVIDER}\nDeleting User\n{DIVIDER}\n{view_file_content(1, 'csv')}\n{DIVIDER}\nWhich user do you wish to delete?\n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\n")
+        if deleting_index.upper() == "X":
+            return
+        elif not check_if_digit(deleting_index):
+            error_output("input")
+            continue
+        else:
+            # Formatting for display during "delete_check"
+            # Reads from csv formatter
+            csv_list = list(csv_dict_list[int(deleting_index) - 1].values())
+            
+            # Gets the header keys
+            headers = list(csv_dict_list[int(deleting_index) - 1].keys())
+            header_text = "\t"
 
+            # Formats for printing
+            for head in headers:
+                header_text += head + "\t|\t"
+            
+            # Formats the input for display
+            content = f"{header_text}\n"
+            content += f"[ {deleting_index} ] {csv_list[0]}\t|{csv_list[1][:10]}\t|\t{csv_list[2][:10]}...\t|\n" 
+        
+        while True:
+            os.system("cls")
+            delete_check = input(f"{DIVIDER}\nDeleting User\n{DIVIDER}\n{content}\n{DIVIDER}\nPlease confirm your selection\n{DIVIDER}\n[ C ] Confirm\t[ X ] Back to Menu\n{DIVIDER}\n")
+            if delete_check.upper() == "X":
+                break
+            elif delete_check.upper() == "C":
+                writes_to_file(_USERNAME_AND_PASSWORD, "delete_user", int(deleting_index)) 
+                input("\033[0;31;40mUser has been deleted!\033[0;37;40m\nPress Enter to Continue\n") 
+                break 
+            else:
+                error_output("option")
+                continue
+
+# Hashes the user's password
 def user_password_hashing(userInput: str): 
     output = hashlib.sha256(userInput.encode())
     return output.hexdigest()
@@ -493,10 +557,9 @@ def question_logic(userInput: str):
     else:
         error_output("option")
 
+# Add question into the "question_pool.txt"
 def add_question():
     while True:
-        # Possible Advance feature: different number of options
-
         while True:
             os.system("cls")
             print_option = ""
@@ -573,7 +636,7 @@ def add_question():
                 continue
             break
         
-        # Formatting 
+        # Formatting of questions into question pool
         string = f"{question}||"
         for element in options_listing:
             string += f"{element}||"
@@ -583,10 +646,11 @@ def add_question():
             f.write(string)
         return
     
-
+# Edits question from "question_pool"
 def edit_question(): 
     return
 
+# Deletes question from "question_pool"
 def delete_question():
     value_list = list(dictionary.values())
     if len(value_list) == 0:
@@ -611,7 +675,7 @@ def delete_question():
             if delete_check.upper() == "X":
                 break
             elif delete_check.upper() == "C":
-                write_file(_QUIZ_QUESTION_TEXT, "delete", deleting_index) 
+                writes_to_file(_QUIZ_QUESTION_TEXT, "delete", deleting_index) 
                 input("\033[0;31;40mOption has been deleted!\033[0;37;40m\nPress Enter to Continue\n") 
                 break 
             else:
@@ -641,6 +705,7 @@ def setting_logic(userInput: str):
     else:
         error_output("option")
 
+# Add settings into "quiz_settings.txt"
 def add_setting(): 
     while True:
         # Name check
@@ -690,6 +755,7 @@ def add_setting():
             f.write(f"{r}||{new_setting_name}||{new_setting_value}")
         return
 
+# Edits settings from "quiz_settings.txt"
 def edit_setting():
     value_list = list(dictionary.values())
 
@@ -743,7 +809,7 @@ def edit_setting():
                         if local_loop:
                             # Change the name of item
                             value_list[edit_index][1] = new_name
-                            write_file(_QUIZ_SETTING_TEXT, "edit_setting")   
+                            writes_to_file(_QUIZ_SETTING_TEXT, "edit_setting")   
 
                     # Used to change the setting value             
                     elif selector == "2":
@@ -776,7 +842,7 @@ def edit_setting():
                         if local_loop:
                             # Changes the value of the item
                             value_list[edit_index][2] = new_value
-                            write_file(_QUIZ_SETTING_TEXT, "edit_setting")                       
+                            writes_to_file(_QUIZ_SETTING_TEXT, "edit_setting")                       
                     else:
                         error_output("option")
                 elif selector.upper() == "X":
@@ -787,6 +853,7 @@ def edit_setting():
         else:
             error_output("option")
 
+# Deletes settings from "quiz_settings.txt"
 def delete_setting(): 
     value_list = list(dictionary.values())
     while True:
@@ -802,7 +869,7 @@ def delete_setting():
             if delete_check.upper() == "X":
                 break
             elif delete_check.upper() == "C":
-                write_file(_QUIZ_SETTING_TEXT, "delete", deleting_index) 
+                writes_to_file(_QUIZ_SETTING_TEXT, "delete", deleting_index) 
                 input("\033[0;31;40mOption has been deleted!\033[0;37;40m\nPress Enter to Continue\n")  
                 break
             else:
@@ -833,8 +900,8 @@ def select_setting(title: str):
 #   Generate Report Functions
 # ========================================================================
 
-def generate_report():
-    read_file_content(_QUIZ_RESULTS, option="csv")
+# Logical system for generating report
+def generate_report_logic():
     return
 
 # ========================================================================
@@ -866,6 +933,7 @@ def generate_report_subloop():
         os.system("cls")
         read_file_content(_QUIZ_RESULTS, option="csv")
         input("Generate Report")
+        generate_report_logic()
 
 # ========================================================================
 #   Main Program Loop
