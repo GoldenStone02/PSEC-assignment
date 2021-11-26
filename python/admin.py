@@ -18,11 +18,15 @@
 # Python ver:	Python 3
 #
 # Reference:	This program is adapted from the following:
+#               a) GeeksforGeeks: Use of regex to filter out text
 #               https://www.geeksforgeeks.org/check-if-a-string-contains-uppercase-lowercase-special-characters-and-numeric-values/
-#
+# 
+#               b) Python time ctime() method
+#               https://www.tutorialspoint.com/python/time_ctime.htm
+# 
 # Library/
 # package/	
-# Module /      os, re, csv, hashlib
+# Module /      os, re, csv, hashlib, random
 #
 # Known issues:	eg. no validation of input value
 #
@@ -34,18 +38,22 @@ import hashlib, random
 #   Initialize Variables
 # ==================================================================
 dictionary = {}
+csv_dict_list = []
 
 EMPTY = ""
 DIVIDER = f"{EMPTY:=^60}"
 
 PATTERN = r"^[\w.]+$"
+EMAIL_PATTERN = r"([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)"
 PASSWORD_PATTERN = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%]).+$'
+
+MAIN_MENU = ["Register User", "Question Pool", "Quiz Settings", "Generate Report"]
 
 _USERNAME_AND_PASSWORD = "./admin/userid_pswd.csv"
 _QUIZ_SETTING_TEXT = "./admin/quiz_settings.txt"
 _QUIZ_QUESTION_TEXT = "./admin/question_pool.txt"
-_QUIZ_RESULTS = "./admin/quiz_results.txt"
-MAIN_MENU = ["Register User", "Question Pool", "Quiz Settings", "Generate Report"]
+_QUIZ_RESULTS = "./admin/quiz_results.csv"
+
 MAIN_LOOP = True
 SUB_LOOP = True
 
@@ -58,11 +66,12 @@ SUB_LOOP = True
 def read_file_content(file: str, option):
     try:
         if option == "csv":
+            csv_dict_list.clear()
             with open(file, 'r') as csvfile:
-                csvreader = csv.reader(csvfile)
-                next(csvreader)
-                for i, element in enumerate(csvreader):
-                    dictionary[f"user {i + 1}"] = element
+                # Uses DictReader for easy storing of the value
+                # [Issue over here] csv.DictReader is reading memory that it is not supposed to
+                for line in csv.DictReader(csvfile):
+                    csv_dict_list.append(dict(line))
                 
         else:
             # Ensures that the file has been formatted correctly
@@ -121,11 +130,17 @@ def write_file(file: str, option: str, index=None):
             for line in value_list:
                 f.write(f"{line[0]}||{line[1]}||{line[2]}\n")
 
-# writes username and password into csv file.
-def write_csv(file: str, usernameInput, passwordInput):
-    with open(file, "a", newline="") as csvfile:
-        csvwriter = csv.writer(csvfile)
-        csvwriter.writerow([usernameInput, user_password_hashing(passwordInput)])
+# writes into a csv file with the given inputs.
+def write_csv(file: str, dict_input: dict):
+
+    # fieldnames are the key values of the first item in the dictionary.
+    fields = dict_input[0].keys()
+
+    # writes to the csv file with the correct headings and value
+    with open(file, "w", newline="") as csvfile:
+        csvwriter = csv.DictWriter(csvfile, fieldnames=fields)
+        csvwriter.writeheader()
+        csvwriter.writerows(dict_input)
 
 # Removes linefeed that is in between lines in the file
 def remove_linefeed(file: str):
@@ -155,12 +170,28 @@ def view_file_content(show_numbers: int, option: str):
     value_list = list(dictionary.values())
 
     if show_numbers == 1:
+        # Formats dictionary for settings with numbering
         if option == "settings":
             for i, item in enumerate(value_list): 
                 content += f"[ {i + 1} ] {value_list[i][1]}: {value_list[i][2]}\n"
+
+        # Formats dictionary for csv with numbering
         elif option == "csv":
-            for i, item in enumerate(value_list): 
-                content += f"[ {i + 1} ] {value_list[i][0]}: {value_list[i][1]}\n"
+            # Gets the header keys
+            headers = list(csv_dict_list[0].keys())
+            header_text = "\t"
+
+            # Formats for printing
+            for head in headers:
+                header_text += head + "\t|\t"
+            content += f"{header_text}\n"
+
+            for i, sub_dict in enumerate(csv_dict_list):
+                # reads from csv formatter
+                csv_list = list(sub_dict.values())
+                content += f"[ - ] {csv_list[0]}\t|{csv_list[1][:10]}\t|\t{csv_list[2][:10]}...\t|\n" 
+
+        # Formats dictionary for question with numbering
         elif option == "question":
             for i, item in enumerate(value_list): 
                 sample = ""
@@ -169,12 +200,31 @@ def view_file_content(show_numbers: int, option: str):
                 content += f"[ {i + 1} ] {value_list[i][0]}: {sample}\n\n"
 
     elif show_numbers == 0:
+        # Formats dictionary for settings w/o numbering
         if option == "settings":
             for item in value_list:
                 content += f"[ - ] {item[1]}: {item[2]}\n"
+
+        # Formats dictionary for csv w/o numbering
         elif option == "csv":
-            for item in value_list:
-                content += f"[ - ] {item[0]}: {item[1]}\n"     
+            # Gets the header keys
+            headers = list(csv_dict_list[0].keys())
+            header_text = "\t"
+
+            # Formats for printing
+            for head in headers:
+                header_text += head + "\t|\t"
+            content += f"{header_text}\n"
+
+            # Gets the values of each user stored in the system
+            for sub_dict in csv_dict_list:
+                # reads from csv formatter
+                csv_list = list(sub_dict.values())
+                
+                # formats the input for display
+                content += f"[ - ] {csv_list[0]}\t|{csv_list[1][:10]}\t|\t{csv_list[2][:10]}...\t|\n" 
+   
+        # Formats dictionary for question w/o numbering
         elif option == "question":
             for item in value_list:
                 sample = ""
@@ -189,12 +239,15 @@ def view_file_content(show_numbers: int, option: str):
 def print_menu(name: str): 
     option_name = ""
 
+    # Allows for dynamic change of the program using only one UI
     if name == "Question":
         option_name = "question"
     elif name == "Quiz Settings":
         option_name = "settings"
     elif name == "User":
         option_name = "csv"
+    
+
     content = f"{DIVIDER}\n\t\t\t\033[1;37;40m {name}\033[0;37;40m\n{DIVIDER}\n"
 
     content += view_file_content(0, option_name)
@@ -216,29 +269,38 @@ def check_if_digit(userInput):
 
 # Used for easy maintainence of error outputs
 def error_output(error_message: str):
+    string = ""
     if error_message == "option":
-        input("\033[1;37;41mPlease select a valid option.\033[0;37;40m")
+        string += "\033[1;37;41mPlease select a valid option.\033[0;37;40m"
 
     elif error_message == "input":
-        input(f"\n\033[1;37;41mPlease enter a valid input\033[0;37;40m\n")
+        string += "\n\033[1;37;41mPlease enter a valid input\033[0;37;40m\n"
 
     elif error_message == "range":
-        input("\033[1;37;41mPlease enter a value within the range.\033[0;37;40m")
+        string += "\033[1;37;41mPlease enter a value within the range.\033[0;37;40m"
 
     elif error_message == "special":
-        input(f"\n\033[1;37;41mInput value can't contain special characters!\033[0;37;40m\n")
+        string += "\n\033[1;37;41mInput value can't contain special characters!\033[0;37;40m\n"
 
     elif error_message == "short":
-        input(f"\n\033[1;37;41mLength of input was too short\033[0;37;40m\n")
+        string += "\n\033[1;37;41mLength of input was too short\033[0;37;40m\n"
 
     elif error_message == "long":
-        input(f"\n\033[1;37;41mLength of input was too long\033[0;37;40m\n")
+        string += "\n\033[1;37;41mLength of input was too long\033[0;37;40m\n"
     
     elif error_message == "letter":
-        input(f"\n\033[1;37;41mMust have at least one uppercase and lowercase character\033[0;37;40m\n")
+        string += "\n\033[1;37;41mMust have at least one uppercase and lowercase character\033[0;37;40m\n"
 
     elif error_message == "password":
-        input(f"\n\033[1;37;41mMissing one of the criteria, please try again\033[0;37;40m\n")
+        string += "\n\033[1;37;41mMissing one of the criteria, please try again\033[0;37;40m\n"
+    
+    elif error_message == "email":
+        string += "\n\033[1;37;41mFormat of email was incorrect, please try again\033[0;37;40m\n"
+
+    elif error_message == "bad_input":
+        string += "\n\033[1;37;41mBad Input, program restarted\033[0;37;40m\n"
+    
+    input(string)
 
 
 # ============================================================================================
@@ -257,38 +319,37 @@ def print_main(input_list: list):
 # main logical system for selection page
 # "menu_list" is meant for easily change within the UI.
 def main_logic(menu_list: list, content: str):
-    while True:
-        global MAIN_LOOP, SUB_LOOP
-        SUB_LOOP = True
-        stored_value = input(content)
-        if check_if_digit(stored_value):
-            if int(stored_value) in range(1, len(menu_list) + 1):
-                if stored_value == "1":
-                    register_user_subloop()
-                elif stored_value == "2":
-                    question_pool_subloop()
-                elif stored_value == "3":
-                    quiz_setting_subloop()
-                elif stored_value == "4":
-                    generate_report_subloop()
-            else:
-                error_output("option")
-        elif stored_value.upper() == "X":
-            os.system("cls")
-            while True:
-                userConfirm = input(f"{DIVIDER}\n\033[1;37;40m\t\tAre you sure want to quit?\033[0;37;40m\n{DIVIDER}\n[ Y ] Yes\t\t[ N ] No\n{DIVIDER}\n")
-                if userConfirm.upper() == "Y":
-                    print("\033[0;32;40mGoodbye\033[0;37;40m")
-                    MAIN_LOOP = False
-                    return
-                elif userConfirm.upper() == "N":
-                    return
-                else:
-                    error_output("option")
-                os.system("cls")
-            return
+    global MAIN_LOOP, SUB_LOOP
+    SUB_LOOP = True
+    stored_value = input(content)
+    if check_if_digit(stored_value):
+        if int(stored_value) in range(1, len(menu_list) + 1):
+            if stored_value == "1":
+                register_user_subloop()
+            elif stored_value == "2":
+                question_pool_subloop()
+            elif stored_value == "3":
+                quiz_setting_subloop()
+            elif stored_value == "4":
+                generate_report_subloop()
         else:
             error_output("option")
+    elif stored_value.upper() == "X":
+        os.system("cls")
+        while True:
+            userConfirm = input(f"{DIVIDER}\n\033[1;37;40m\t\tAre you sure want to quit?\033[0;37;40m\n{DIVIDER}\n[ Y ] Yes\t\t[ N ] No\n{DIVIDER}\n")
+            if userConfirm.upper() == "Y":
+                print("\033[0;32;40mGoodbye\033[0;37;40m")
+                MAIN_LOOP = False
+                return
+            elif userConfirm.upper() == "N":
+                return
+            else:
+                error_output("option")
+            os.system("cls")
+        return
+    else:
+        error_output("option")
 
 # ===================================================================================================
 #   Register User Functions
@@ -315,7 +376,7 @@ def add_user():
         # Username check
         while True:
             os.system("cls")
-            username = input(f"{DIVIDER}\n\t\t\tRegistering User\n{DIVIDER}\nUsername: \nPassword: \n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nUsername: ")
+            username = input(f"{DIVIDER}\n\t\t\tRegistering User\n{DIVIDER}\nUsername: \nEmail: \nPassword: \n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nUsername: ")
 
             if username.upper() == "X":
                 return
@@ -324,11 +385,23 @@ def add_user():
                 continue
             break
 
+        # Email check
+        # NEED TO IMPLEMENT [ISSUE]
+        while True:
+            os.system("cls")
+            email = input(f"{DIVIDER}\n\t\t\tRegistering User\n{DIVIDER}\nUsername: {username}\nEmail: \nPassword: \n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nEnter email: ")
+            if email.upper() == "X":
+                return
+            elif not re.search(EMAIL_PATTERN, email):
+                error_output("email")
+                continue
+            break
+
         while True:
             # Password check
             while True:
                 os.system("cls")
-                password = input(f"{DIVIDER}\n\t\t\tRegistering User\n{DIVIDER}\nUsername: {username}\nPassword: \n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nAt least one number\nAt least one uppercase and one lowercase character\nAt least one special symbol !@#$%\nShould be 4 - 20 characters long\nPassword: ")
+                password = input(f"{DIVIDER}\n\t\t\tRegistering User\n{DIVIDER}\nUsername: {username}\nEmail: {email}\nPassword: \n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nAt least one number\nAt least one uppercase and one lowercase character\nAt least one special symbol !@#$%\nShould be 4 - 20 characters long\nPassword: ")
 
                 if password.upper() == "X":
                     return
@@ -349,7 +422,7 @@ def add_user():
             # Password double check
             while True:
                 os.system("cls")
-                password2 = input(f"{DIVIDER}\n\t\t\tRegistering User\n{DIVIDER}\nUsername: {username}\nPassword: \n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nPlease reenter your password: ")
+                password2 = input(f"{DIVIDER}\n\t\t\tRegistering User\n{DIVIDER}\nUsername: {username}\nEmail: {email}\nPassword: \n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nPlease reenter your password: ")
 
                 if password2.upper() == "X":
                     return
@@ -360,28 +433,36 @@ def add_user():
                     # Check if the user wants to confirm the setting
                     while True:
                         os.system("cls")
-                        finalCheck = input(f"{DIVIDER}\n\t\t\tRegistering User\n{DIVIDER}\nUsername: {username}\nPassword: {password}\n{DIVIDER}\n[ C ] Confirm\t\t[ X ] Exit\n{DIVIDER}\n")
+                        finalCheck = input(f"{DIVIDER}\n\t\t\tRegistering User\n{DIVIDER}\nUsername: {username}\nEmail: {email}\nPassword: {password}\n{DIVIDER}\n[ C ] Confirm\t\t[ X ] Exit\n{DIVIDER}\n")
                         
                         if finalCheck.upper() == "X":
                             return
                         elif finalCheck.upper() == "C":
                             input("\033[0;32;40mYour changes have been saved!\033[0;37;40m\nPress Enter to Continue\n")
+                            break
                         else:
                             error_output("option")
-                        break
+                            continue
+                    user_dict = {
+                        "user": username,
+                        "email": email,
+                        "password": user_password_hashing(password)
+                    }
 
-                    write_csv(_USERNAME_AND_PASSWORD, username, password)
+                    # Adds the new value into the list 
+                    csv_dict_list.append(user_dict)
+                    write_csv(_USERNAME_AND_PASSWORD, csv_dict_list)
                     return
                 else: 
                     error_output("input")
                     continue
 
 def change_password():
+    input("Change User")
     return
 
 def delete_user():
-    value_list = list(dictionary.values())
-    if len(value_list) == 0:
+    if len(csv_dict_list) == 0:
         input("User List is empty, please register some users.")
         return
     while True:
@@ -753,6 +834,7 @@ def select_setting(title: str):
 # ========================================================================
 
 def generate_report():
+    read_file_content(_QUIZ_RESULTS, option="csv")
     return
 
 # ========================================================================
@@ -780,13 +862,21 @@ def quiz_setting_subloop():
         setting_logic(quizSettings)
 
 def generate_report_subloop():
-    input("Generate Report")
+    while SUB_LOOP:
+        os.system("cls")
+        read_file_content(_QUIZ_RESULTS, option="csv")
+        input("Generate Report")
 
 # ========================================================================
 #   Main Program Loop
 # ========================================================================
 
+# Try loop is used in order to catch any bad inputs the user might have done within the stack
 while MAIN_LOOP:
-    os.system("cls")
-    string = print_main(MAIN_MENU)
-    main_logic(MAIN_MENU, string)
+    try:
+        while MAIN_LOOP:
+            os.system("cls")
+            string = print_main(MAIN_MENU)
+            main_logic(MAIN_MENU, string)
+    except:
+        error_output("bad_input")
