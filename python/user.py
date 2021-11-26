@@ -5,7 +5,9 @@
 # 
 # Script name:	user.py
 # 
-# Purpose:	Describe purpose of script
+# Purpose:	The purpose of the script is for the user to take a quiz whilst needing little knowledge on 
+#           knowing how to operate the quiz. With the script also storing the user's attempt data for later
+#           analysis by the administer.
 #
 # Usage syntax:	Run with play button / command line, eg. py read-cmd-line 1 2 3
 # 
@@ -184,8 +186,6 @@ def print_file(name: str):
     if name == "Log In":
         option_name = "login"
         content += f"Question\n{DIVIDER}\n[ P ] Previous Question\t[ N ] Next Question\n[ X ] Back to Menu\n{DIVIDER}\n"
-    # content += f"{DIVIDER}\n\t\tSelect one of the options\n{DIVIDER}\n"
-    # content += f"[ 1 ] Add New {name}\n[ 2 ] Edit {name}\n[ 3 ] Delete {name}\n[ X ] Back to Main\n{DIVIDER}\n"
 
     return content
 

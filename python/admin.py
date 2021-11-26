@@ -7,7 +7,8 @@
 # 
 # Purpose:	The purpose of the script is to allow an administer to edit and change the settings within 
 #           the files without having to manual search through every file to find the correct setting
-#           or text to change.
+#           or text to change. The administer can also get the data about student performance within the quiz
+#           and other statistical data.
 #
 # Usage syntax:	Run with play button / command line, eg. py read-cmd-line 1 2 3
 # 
