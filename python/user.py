@@ -7,7 +7,7 @@
 # 
 # Purpose:	The purpose of the script is for the user to take a quiz whilst needing little knowledge on 
 #           knowing how to operate the quiz. With the script also storing the user's attempt data for later
-#           analysis by the administer.
+#           analysis by the administrator.
 #
 # Usage syntax:	Run with play button / command line, eg. py read-cmd-line 1 2 3
 # 
@@ -138,7 +138,7 @@ def remove_linefeed(file: str):
         for line in temp:
             f.write(line + "\n")
 
-# returns the file content using "dictionary"
+# Returns the file content using "dictionary"
 # "show_number" parameter is used to define the format of returning string.
 # "0" prints out file content without numbering
 # "1" prints out with sequence numbering
@@ -166,19 +166,19 @@ def view_file_content(show_numbers: int, option: str):
     return content
 
 
-# writes into a csv file with the given inputs.
+# Writes into a csv file with the given inputs.
 def write_csv(file: str, dict_input: dict):
-    # fieldnames are the key values of the first item in the dictionary.
+    # Fieldnames are the key values of the first item in the dictionary.
     fields = dict_input[0].keys()
 
-    # writes to the csv file with the correct headings and value
+    # Writes to the csv file with the correct headings and value
     with open(file, "w", newline="") as csvfile:
         csvwriter = csv.DictWriter(csvfile, fieldnames=fields)
         csvwriter.writeheader()
         csvwriter.writerows(dict_input)
 
 
-# returns content
+# Returns content
 def print_file(name: str):
     option_name = ""
     content = f"{DIVIDER}\n\t\t\t\033[1;37;40m {name}\033[0;37;40m\n{DIVIDER}\n"
@@ -201,35 +201,39 @@ def check_if_digit(input):
 # Used for easy maintainence of error outputs
 def error_output(error_message: str):
     string = ""
-    if error_message == "option":
+    if error_message == "option":               # Wrong option selected
         string += "\033[1;37;41mPlease select a valid option.\033[0;37;40m"
 
-    elif error_message == "input":
-        string += f"\n\033[1;37;41mPlease enter a valid input.\033[0;37;40m\n"
+    elif error_message == "empty_input":        # Empty input
+        string += f"\033[1;37;41mEmpty input, please try again\033[0;37;40m"
 
-    elif error_message == "special":
-        string += f"\n\033[1;37;41mInput value can't contain special characters!\033[0;37;40m\n"
+    elif error_message == "input":              # Invalid input
+        string += f"\033[1;37;41mPlease enter a valid input.\033[0;37;40m"
 
-    elif error_message == "username":
-        string += f"\n\033[1;37;41mUsername could not be found.\033[0;37;40m\n"
+    elif error_message == "range":              # Input value not within range
+        string += "\033[1;37;41mPlease enter a value within the range.\033[0;37;40m"
 
-    elif error_message == "password":
-        string += f"\n\033[1;37;41mPassword is incorrect.\033[0;37;40m\n"
+    # 
+    elif error_message == "username":           # User not found in database    [Unique to user.py]
+        string += f"\033[1;37;41mUsername could not be found.\033[0;37;40m"
 
-    elif error_message == "admin":
-        string += f"\n\033[1;37;41mAccount has been locked\033[0;37;40m\n"
+    elif error_message == "password":           # Password input was incorrect  [Unique to user.py]
+        string += f"\033[1;37;41mPassword is incorrect.\033[0;37;40m"
 
-    elif error_message == "previous":
-        string += f"\n\033[1;37;41mYou are at the first question!!\033[0;37;40m\n"
+    elif error_message == "admin":              # Account locked when user enters wrong password 3 times [ISSUE] Doesn't lock account
+        string += f"\033[1;37;41mAccount has been locked\033[0;37;40m"
+
+    elif error_message == "previous":           # No more questions in front of selected question
+        string += f"\033[1;37;41mYou are at the first question!!\033[0;37;40m"
     
-    elif error_message == "next":
-        string += f"\n\033[1;37;41mYou are at the last question!!\033[0;37;40m\n"
+    elif error_message == "next":               # No more questions after selected question
+        string += f"\033[1;37;41mYou are at the last question!!\033[0;37;40m"
     
-    elif error_message == "no_attempts":
-        string += f"\n\033[1;37;41mYou have no remaining attempt\033[0;37;40m\n"
+    elif error_message == "no_attempts":        # No more attempts remaining  
+        string += f"\033[1;37;41mYou have no remaining attempt\033[0;37;40m"
     
-    elif error_message == "bad_input":
-        string += f"\n\033[1;37;41mBad Input, program restarted\033[0;37;40m\n"
+    elif error_message == "bad_input":          # Bad Input --> Refers to EOFERROR (Occurs only when CTRL+Z is inputted)
+        string += f"\033[1;37;41mBad Input, program restarted\033[0;37;40m"
     
     input(string)
 
@@ -260,10 +264,10 @@ def user_logic(userpage_list, content: str):
                 elif stored_value == "2":
                     reset_password()
             else:
-                error_output("option")
+                error_output("range")
         elif stored_value.upper() == "X":
-            os.system("cls")
             while True:
+                os.system("cls")
                 userConfirm = input(f"{DIVIDER}\n\033[1;37;40m\t\tAre you sure want to quit?\033[0;37;40m\n{DIVIDER}\n[ Y ] Yes\t\t[ N ] No\n{DIVIDER}\n")
                 if userConfirm.upper() == "Y":
                     print("\033[0;32;40mGoodbye\033[0;37;40m")
@@ -273,8 +277,9 @@ def user_logic(userpage_list, content: str):
                     break
                 else:
                     error_output("option")
-                os.system("cls")
             return
+        elif stored_value == "":
+            error_output("empty_input")
         else:
             error_output("option")
 
@@ -292,7 +297,11 @@ def login_menu():
             global SUB_LOOP
             SUB_LOOP = False
             return
+        elif user_username_input == "":
+            error_output("empty_input")
+        # Checks if the username input is inside the database
         elif check_username(user_username_input):
+            # Counter for number of attempts before a user's account is locked 
             count = 3
             while count != 0:
                 os.system("cls")
@@ -301,20 +310,22 @@ def login_menu():
                     SUB_LOOP = False
                     return
                 elif check_password(user_username_input, password_input):
-                    quiz_menu(user_username_input) # starting of the quiz
+                    quiz_menu(user_username_input) # Starting of the quiz
                     return
                 else:
                     count -= 1
                     error_output("password")
                     continue
             if count == 0:
+                os.system("cls")
+                # [ISSUE] Need a way to lock the user's account
                 error_output("admin")
                 break
         else:
             error_output("username")
             continue
 
-# check if username exist in the file
+# Check if username exist in the file
 def check_username(username: str):
     read_file_content(_USERNAME_AND_PASSWORD, option="csv")
     for i in csv_dict_list:
@@ -322,12 +333,12 @@ def check_username(username: str):
             return True
     return False
 
-# hashes the password for safe keeping in the .csv file
+# Hashes the password for safe keeping in the .csv file
 def user_password_hashing(given_input: str): 
     output = hashlib.sha256(given_input.encode())
     return output.hexdigest()
 
-# checks if the hashed matches the password
+# Checks if the hashed matches the password
 def check_password(username: str, password: str):
     read_file_content(_USERNAME_AND_PASSWORD, option="csv")
     for i in csv_dict_list:
@@ -340,13 +351,14 @@ def check_password(username: str, password: str):
 #  NOT IMPLEMENTED [ISSUE]
 def reset_password():
     read_file_content(_USERNAME_AND_PASSWORD, option="csv")
+    input("Reset Password")
     return
 
 # ========================================================================================================================
 #   Question Function
 # ========================================================================================================================
 
-# display the quiz menu for the user.
+# Display the quiz menu for the user.
 # "username" is a string to identify the user
 def quiz_menu(username: str):
     while True:
@@ -358,12 +370,12 @@ def quiz_menu(username: str):
             if remaining_attempt(username) == 0:
                 error_output("no_attempts")
                 continue
-            start_quiz(username) # starts the quiz once the user confirms
+            start_quiz(username) # Starts the quiz once the user confirms
         else:
             error_output("option")
 
 
-# gets the remaining amount of attempt the current user can do.
+# Gets the remaining amount of attempt the current user can do.
 def remaining_attempt(username: str):
     no_of_attempt_allowed =  check_number_of_attempts() 
     count = 0
@@ -376,18 +388,18 @@ def remaining_attempt(username: str):
     return no_of_attempt_allowed - count
 
 
-# need to add some kind of notification to show what answers the user selected
-# starts the quiz for the signed user.
+# Need to add some kind of notification to show what answers the user selected
+# Starts the quiz for the signed user.
 def start_quiz(username: str):
 
-    # selects the question randomly from the question pool
-    # each element includes values 
+    # Selects the question randomly from the question pool
+    # Each element includes values 
     question = selection_random_question()
 
-    # selects the first question automatically
+    # Selects the first question automatically
     selected_question_index = 0
 
-    # creates a temporary list to store the user's answer while he is taking the quiz.
+    # Creates a temporary list to store the user's answer while he is taking the quiz.
     temp_list = []
     for i in question:
         # elements in "i" list
@@ -400,53 +412,59 @@ def start_quiz(username: str):
         temp_list.append(i)
         # Needs to add every value of the list into the temp_list
     
-    # starts the timer
+    # Starts the timer
     starttime = time.time()
 
-    # main quiz loop
+    # Main quiz loop
     while True:
         sample = ""
         
-        # prepares the option for displaying
+        # Prepares the option for displaying
         for j, option in enumerate(question[selected_question_index][2]):
             sample += f"\n    {chr(97 + j)}) {option}"
         
-        # formats the question to prepare for display.
+        # Formats the question to prepare for display.
         selected_question = f"q{selected_question_index + 1}) {question[selected_question_index][1]}: {sample}\n\n"
 
         os.system("cls")
         user_selection = input(f"{DIVIDER}\n\t\t\tQuiz\n{DIVIDER}\nTime left: {timer(starttime)[0]} min {timer(starttime)[1]} sec\n{DIVIDER}\n{selected_question}Your Answer: {temp_list[selected_question_index][4]}\n{DIVIDER}\n[ P ] Previous Question\t\t[ N ] Next Question\n[ S ] Save & Submit\n{DIVIDER}\n")
         
-        # if time is up, save and submit the users answer
+        # If time is up, save and submit the users answer
         # OR
-        # if user inputs "S", save and submit the answer
+        # If user inputs "S", save and submit the answer
         if user_selection.upper() == "S" or (timer(starttime)[0] <= 0 and timer(starttime)[1] <= 0):
             value = save_user_answer(temp_list)
             push_result(username, value)
             show_result(value)
             return
+        # Goes to the previous question
         elif user_selection.upper() == "P":
+            # If at the first question, return an error
             if selected_question_index == 0:
                 error_output("previous")
                 continue
             else:
                 selected_question_index -= 1
+
+        # Goes to the next question
         elif user_selection.upper() == "N":
+            # If at the last question, return an error
             if selected_question_index == (len(question) - 1):
                 error_output("next")
                 continue
             else:
                 selected_question_index += 1
-        # checks if the entered input is within range of the available options
+
+        # Checks if the entered input is within range of the available options
         elif check_user_input(user_selection, question[selected_question_index][2]):
-            # stores the user answer into a temporary list whilst taking quiz
+            # Stores the user answer into a temporary list whilst taking quiz
             temp_list[selected_question_index][4] = user_selection
         else:
             error_output("option")
             continue
 
-# checks if the user's selected option in inside the range of options 
-# for any question. Due to the flexibility of the number of options the admin can set.
+# Checks if the user's selected option in inside the range of options 
+# For any question. Due to the flexibility of the number of options the admin can set.
 # 
 # "given_user_input" is the user input that will be checked to see if the input is within the range of the options
 # "question_data" is a list containing the question info, such as content, options and answer
@@ -476,15 +494,17 @@ def save_user_answer(input_list: list):
         try:
             total_questions += 1
             index = ord(question_data[4]) - 97
-        except TypeError: # TypeError occurs when user didn't answer the question
+
+        # TypeError occurs when user didn't answer the question
+        except TypeError: 
             question_data[4] = "Didn't Answer"
         else:
             if question_data[3] == question_data[2][index]:
                 answered_correct += 1
             else:
                 answered_wrong += 1
-        # gets the index value of the question answer from the options
-        # for if "randomize_options" is true
+        # Gets the index value of the question answer from the options
+        # if "randomize_options" is true
         question_answer =  chr(97 + question_data[2].index(question_data[3]))
         questions_tested.append([question_data[0], question_data[1], question_answer, question_data[4]])
 
@@ -499,7 +519,7 @@ def save_user_answer(input_list: list):
     return questions_tested, answered_correct, answered_wrong, total_questions
 
                 
-# pushes the answer to the "quiz_result" file.
+# Pushes the answer to the "quiz_result" file.
 # 
 # username: the username that the user inputted
 # input_list[0]: questions_tested list
@@ -507,23 +527,23 @@ def save_user_answer(input_list: list):
 def push_result(username: str, input_list: list):
     read_file_content(_QUIZ_QUESTION_TEXT, option="question")
     question_pool = list(dictionary.values())
-    # iterates over the entire question_pool to ensure that all question are being tracked
+    # Iterates over the entire question_pool to ensure that all question are being tracked
     for i, element in enumerate(question_pool):
-        # checks whether is the current item in the "input_list" list
+        # Checks whether is the current item in the "input_list" list
         if element[0] in input_list[0][i][1]:
             pass
         else:
-            # gets the index value of the question answer from the options
-            # this is extra formatting for the missing tested question
+            # Gets the index value of the question answer from the options
+            # This is extra formatting for the missing tested question
             question_answer = chr(97 + question_pool[i][1].index(question_pool[i][-1]))
-            # formats the missing value (aka those not tested) into the list
+            # Formats the missing value (aka those not tested) into the list
             formatted_missing_question = [i, question_pool[i][0], question_answer, "Not Tested"]
             input_list[0].insert(i, formatted_missing_question)
 
-    # reads the file to ensure that all values in the file has been stored.
+    # Reads the file to ensure that all values in the file has been stored.
     read_file_content(_QUIZ_RESULTS, option="csv")
 
-    # pushes all the elements into a dictionary for printing
+    # Pushes all the elements into a dictionary for printing
     new_dict = format_into_dict(username, input_list)
     csv_dict_list.append(new_dict)
     write_csv(_QUIZ_RESULTS, csv_dict_list)
@@ -546,7 +566,7 @@ def format_into_dict(username: str, input_list: list):
     
     return result
 
-# returns a string to display the user's result
+# Returns a string to display the user's result
 def show_result(input_list: list):
     string = ""
     
@@ -565,7 +585,7 @@ def show_result(input_list: list):
     input(string)
     return
 
-# returns the remaining time left
+# Returns the remaining time left in a tuple
 def timer(starting_time: float):
     endtime = time.time() - starting_time
     total_allowed_time = float(check_amount_of_time()) * 60
@@ -574,7 +594,7 @@ def timer(starting_time: float):
     return time_left_min, time_left_sec
 
 
-# returns the amount of time set within the settings
+# Returns the amount of time set within the settings
 def check_amount_of_time():
     read_file_content(_QUIZ_SETTING_TEXT, option="settings")
     value_list = list(dictionary.values())
@@ -582,7 +602,7 @@ def check_amount_of_time():
         if i[0] == "1": # ID of "time"
             return i[2]
 
-# number of question to be used in the quiz
+# Number of question to be used in the quiz
 def check_number_of_question():
     read_file_content(_QUIZ_SETTING_TEXT, option="settings")
     value_list = list(dictionary.values())
@@ -590,6 +610,7 @@ def check_number_of_question():
         if i[0] == "2": # ID of "no_of_question"
             return i[2]
 
+# Checks the number of attempts set for the quiz
 def check_number_of_attempts():
     read_file_content(_QUIZ_SETTING_TEXT, option="settings")
     value_list = list(dictionary.values())
@@ -597,7 +618,7 @@ def check_number_of_attempts():
         if i[0] == "3": # ID of "no_of_attempt"
             return int(i[2])
 
-# checks if the admin set the answers to appear randomly
+# Checks if the admin set the answers to appear randomly
 def check_randomize_option():
     read_file_content(_QUIZ_SETTING_TEXT, option="settings")
     value_list = list(dictionary.values())
@@ -607,8 +628,8 @@ def check_randomize_option():
                 return True
             return False
 
-# randomly selects question from the question pool
-# returns a nested list
+# Randomly selects question from the question pool
+# Returns a nested list
 # 
 # ask_question_list[0]: index of where the question appears in the dictionary
 # ask_question_list[1]: question content
@@ -619,24 +640,24 @@ def selection_random_question():
     question_list = list(dictionary.values())
     ask_question_list = []
 
-    # creates a list of random non-repeating index numbers for the question selection
+    # Creates a list of random non-repeating index numbers for the question selection
     while len(ask_question_list) != int(check_number_of_question()):
         random_number = random.randint(0, len(question_list) - 1)
         if random_number not in ask_question_list: 
             ask_question_list.append(random_number)
 
-    # replaces the index values with its corresponding question data
+    # Replaces the index values with its corresponding question data
     for i, index in enumerate(ask_question_list):
-        # adds the index value of the question
-        # this is for later use when writing to csv
+        # Adds the index value of the question
+        # This is for later use when writing to csv
         question_list[index].insert(0, index)
 
         # Checks if randomize option has been enabled
-        # if True, shuffle the options in the list
+        # If True, shuffle the options in the list
         if check_randomize_option():
             random.shuffle(question_list[index][2])
 
-        # writes the changes into the "ask_question_list" list
+        # Writes the changes into the "ask_question_list" list
         ask_question_list[i] =  question_list[index]
     return ask_question_list
 
