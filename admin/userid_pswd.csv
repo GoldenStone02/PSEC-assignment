@@ -1,4 +1,3 @@
-user,email,password
-something,something@mail.com,1!qqQ
+userID,email,password
 testuser,testing@mail.com,6524d39132de417b8915d6d26d0b73759cc6292b95ca5652b2fbc797392cd1a7
-testuser1,test@gmail.com,195f62edd40a1d9b0c6407104596d6c29e2b408ecc1cc964e803376917ab1fd0
+joshua,joshua@mail.com,6524d39132de417b8915d6d26d0b73759cc6292b95ca5652b2fbc797392cd1a7
