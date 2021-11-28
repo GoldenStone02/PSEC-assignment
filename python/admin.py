@@ -44,7 +44,6 @@
 
 import os, re, csv
 import hashlib, random
-from sre_constants import error
 
 # ==================================================================
 #   Initialize Variables
@@ -1424,22 +1423,22 @@ def register_user_subloop():
     while SUB_LOOP:
         os.system("cls")
         read_file_content(_USERNAME_AND_PASSWORD, option="csv")
-        user = print_menu("User")
-        register_logic(user)
+        userInput = print_menu("User")
+        register_logic(userInput)
 
 def question_pool_subloop():
     while SUB_LOOP:
         os.system("cls")
         read_file_content(_QUIZ_QUESTION_TEXT, option="question")
-        questPool = print_menu("Question")
-        question_logic(questPool)
+        userInput = print_menu("Question")
+        question_logic(userInput)
 
 def quiz_setting_subloop():
     while SUB_LOOP:
         os.system("cls")
         read_file_content(_QUIZ_SETTING_TEXT, option="settings")
-        quizSettings = print_menu("Quiz Settings")    
-        setting_logic(quizSettings)
+        userInput = print_menu("Quiz Settings")    
+        setting_logic(userInput)
 
 def generate_report_subloop():
     while SUB_LOOP:

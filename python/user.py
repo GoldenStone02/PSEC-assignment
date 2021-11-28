@@ -36,7 +36,7 @@
 #                   
 # Library/
 # package/	
-# Module /      os, re, hashlib, csv, time
+# Module /      os, re, hashlib, random, csv, time
 #
 # Known issues:	Reset of password doesn't send the user any email for the new password
 #
@@ -453,10 +453,8 @@ def password_change(username: str):
                     input("\033[0;32;40mYour password have been reset!\nPlease check your email for the new password.\033[0;37;40m\nPress Enter to Continue\n")
                     for user in csv_dict_list:
                         if username == user["userID"]:
-                            
-                            # Default password once an account has been reset
-                            # Password: 123456789
-                            # User is adviced to change password upon re-enter his/her account
+
+                            # User's password is changed
                             user["password"] = user_password_hashing(password_input)
 
                     # Writes the new password 
