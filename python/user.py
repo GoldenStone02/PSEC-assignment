@@ -324,6 +324,7 @@ def login_menu():
                     return
                 elif check_password(user_username_input, password_input):
                     quiz_menu(user_username_input) # Starting of the quiz
+                    SUB_LOOP = False
                     return
                 else:
                     count -= 1
@@ -393,6 +394,7 @@ def reset_password():
                     error_output("empty_input")
                     continue
                 elif check_email(email_input):
+                    input("\033[0;32;40mSuccess! You're authorize change your password\033[0;37;40m\nPress Enter to Continue\n")
                     password_change(username_input)
                     return
                 else:
@@ -428,7 +430,7 @@ def password_change(username: str):
     # Password double check
     while True:
         os.system("cls")
-        password2 = input(f"{DIVIDER}\n\t\t\tRegistering User\n{DIVIDER}\nPassword: \n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nPlease re-enter your password: ")
+        password2 = input(f"{DIVIDER}\n\t\t\tReset Password\n{DIVIDER}\nPassword: \n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nPlease re-enter your password: ")
         
         # Check if the user wants to exit the menu
         if password2.upper() == "X":

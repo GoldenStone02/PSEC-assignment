@@ -44,6 +44,7 @@
 
 import os, re, csv
 import hashlib, random
+from sre_constants import error
 
 # ==================================================================
 #   Initialize Variables
@@ -167,6 +168,7 @@ def writes_to_file(file: str, option: str, index=None):
             csvwriter.writeheader()
             csvwriter.writerows(csv_dict_list)
     
+    # Edits question pool from the question pool text file
     elif option == "edit_question":
         with open(file, "w") as f:
             for line in value_list:
@@ -180,7 +182,6 @@ def writes_to_file(file: str, option: str, index=None):
         with open(file, "w") as f:
             for line in value_list:
                 f.write(f"{line[0]}||{line[1]}||{line[2]}\n")
-
 
 
 # Removes linefeed that is in between lines in the file
@@ -200,6 +201,7 @@ def remove_linefeed(file: str):
     with open(file, "w") as f:
         for line in temp:
             f.write(line + "\n")
+
 
 # Returns the file content using "dictionary"
 # "show_number" parameter is used to define the format of returning string.
@@ -276,6 +278,7 @@ def view_file_content(show_numbers: int, option: str):
     
     return content
 
+
 # Prints the text file with some UI.
 # Needs to happen after "ReadFileContent()" has been executed
 def print_menu(name: str): 
@@ -300,6 +303,22 @@ def print_menu(name: str):
     user_input = input(content)
     return user_input
 
+
+# Checks if the user's selected option in inside the range of options 
+# For any question. Due to the flexibility of the number of options the admin can set.
+# 
+# "given_user_input" is the user input that will be checked to see if the input is within the range of the options
+# "question_data" is a list containing the question info, such as content, options and answer
+def check_user_input(userInput: str, question_data: list):
+    check_list = []
+    for i, option in enumerate(question_data):
+        check_list.extend(chr(97 + i))
+    for check in check_list:
+        if check == userInput.lower():
+            return True
+    return False
+
+
 # Checks whether the input is an integer or string
 # If the input is a digit, return True
 # if the input is a string, return False
@@ -320,34 +339,34 @@ def error_output(error_message: str):
         string += f"\033[1;37;41mEmpty input, please try again\033[0;37;40m"
 
     elif error_message == "input":              # Invalid input
-        string += "\n\033[1;37;41mPlease enter a valid input\033[0;37;40m\n"
+        string += "\033[1;37;41mPlease enter a valid input\033[0;37;40m\n"
 
     elif error_message == "range":              # Input value not within range
         string += "\033[1;37;41mPlease enter a value within the range.\033[0;37;40m"
 
     elif error_message == "special":            # Input field can't contain special characters  [Unique to admin.py]
-        string += "\n\033[1;37;41mInput value can't contain special characters!\033[0;37;40m\n"
+        string += "\033[1;37;41mInput value can't contain special characters!\033[0;37;40m\n"
 
-    elif error_message == "short":              # Input value was too short                     [Unique to admin.py]
-        string += "\n\033[1;37;41mLength of input was too short\033[0;37;40m\n"
+    elif error_message == "short":              # Input value was too short         
+        string += "\033[1;37;41mLength of input was too short\033[0;37;40m\n"
 
-    elif error_message == "long":               # Input value was too long                      [Unique to admin.py]
-        string += "\n\033[1;37;41mLength of input was too long\033[0;37;40m\n"
+    elif error_message == "long":               # Input value was too long           
+        string += "\033[1;37;41mLength of input was too long\033[0;37;40m\n"
     
     elif error_message == "letter":             # Input value must contain letters              [Unique to admin.py]
-        string += "\n\033[1;37;41mMust have at least one uppercase and lowercase character\033[0;37;40m\n"
+        string += "\033[1;37;41mMust have at least one uppercase and lowercase character\033[0;37;40m\n"
 
     elif error_message == "username_match":     # Same username is found in the database        [Unique to admin.py]
-        string += "\n\033[1;37;41mUsername exists already, please try another name\033[0;37;40m\n"
+        string += "\033[1;37;41mUsername exists already, please try another name\033[0;37;40m\n"
 
-    elif error_message == "password":           # Doesn't meet the password criteria            [Unique to admin.py]
-        string += "\n\033[1;37;41mMissing one of the criteria, please try again\033[0;37;40m\n"
+    elif error_message == "password":           # Doesn't meet the password criteria  
+        string += "\033[1;37;41mMissing one of the criteria, please try again\033[0;37;40m\n"
     
     elif error_message == "email":              # Email in wrong format                         [Unique to admin.py]
-        string += "\n\033[1;37;41mFormat of email was incorrect, please try again\033[0;37;40m\n"
+        string += "\033[1;37;41mFormat of email was incorrect, please try again\033[0;37;40m\n"
 
     elif error_message == "bad_input":          # Bad Input --> Refers to EOFERROR (Occurs only when CTRL+Z is inputted)
-        string += "\n\033[1;37;41mBad Input, program restarted\033[0;37;40m\n"
+        string += "\033[1;37;41mBad Input, program restarted\033[0;37;40m\n"
     
     input(string)
 
@@ -425,7 +444,7 @@ def register_logic(userInput: str):
 def check_username(username: str):
     read_file_content(_USERNAME_AND_PASSWORD, option="csv")
     for i in csv_dict_list:
-        if username == i["user"]:
+        if username == i["userID"]:
             return True
     return False
 
@@ -487,7 +506,7 @@ def add_user():
             # Password double check
             while True:
                 os.system("cls")
-                password2 = input(f"{DIVIDER}\n\t\t\tRegistering User\n{DIVIDER}\nUsername: {username_input}\nEmail: {email_input}\nPassword: \n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nPlease reenter your password: ")
+                password2 = input(f"{DIVIDER}\n\t\t\tRegistering User\n{DIVIDER}\nUsername: {username_input}\nEmail: {email_input}\nPassword: \n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nPlease re-enter your password: ")
                 
                 # Check if the user wants to exit the menu
                 if password2.upper() == "X":
@@ -513,7 +532,7 @@ def add_user():
 
                     # Formats the values into a dictionary for writing into csv
                     user_dict = {
-                        "user": username_input,
+                        "userID": username_input,
                         "email": email_input,
                         "password": user_password_hashing(password_input)
                     }
@@ -528,13 +547,142 @@ def add_user():
 
 
 # Edits either the email or password from "userid_passwd.csv":
-# Don't change the username as it might effect "quiz_result" [ISSUE]
+# Don't change the username as it might effect "quiz_result"
 def edit_user():
     if len(csv_dict_list) == 0:
         input("User List is empty, please register some users.")
-    return
-    input("Change User")
-    return
+        return
+    while True:
+        os.system("cls")
+        selected_user_index = input(f"{DIVIDER}\n\t\tEditing User\n{DIVIDER}\n{view_file_content(1, 'csv')}\n{DIVIDER}\nSelect a User\n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\n")
+        
+        # Checks if the string is empty
+        if selected_user_index.upper() == "X":
+            return
+        elif not check_if_digit(selected_user_index):
+            error_output("input")
+            continue
+        elif check_if_digit(selected_user_index):
+            selection_for_user(int(selected_user_index) - 1)
+            return
+        else:
+            error_output("input")
+
+# Shows the selected user
+def user_display(index: int):
+    user_details = csv_dict_list[index]
+
+    string = f"userID\t\t|\t{user_details['userID']}\n"
+    string += f"email\t\t|\t{user_details['email']}\n"
+    string += f"password\t|\t{user_details['password'][:10]}...\n"
+    return string
+
+def selection_for_user(index: int):
+    selected = user_display(index)
+    while True:
+        os.system("cls")
+        user_selection = input(f"{DIVIDER}\n\t\tEditing User\n{DIVIDER}\n{selected}\n{DIVIDER}\nSelect a User\n{DIVIDER}\n[ 1 ] Change Email\n[ 2 ] Change Password\n[ X ] Back to Menu\n{DIVIDER}\n")
+        if user_selection.upper() == "X":
+            return
+        elif user_selection == "":
+            error_output("empty_input")
+            continue
+        elif int(user_selection) < 1 or int(user_selection) > 2:
+            error_output("range")
+            continue
+        elif check_if_digit(user_selection):
+            local_loop = True
+
+            # Change email
+            if user_selection == "1":
+                while local_loop:
+                    os.system("cls")
+                    new_email = input(f"{DIVIDER}\n\t\tEditing Email\n{DIVIDER}\n\tEmail\t|\t{csv_dict_list[index]['email']}\n{DIVIDER}\nPlease input your new email\n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\n")
+                    if new_email.upper() == "X":
+                        local_loop = False
+                    elif new_email == "":
+                        error_output("empty_input")
+                        continue
+                    elif not re.search(EMAIL_PATTERN, new_email):
+                        error_output("email")
+                        continue
+                    break
+                
+                while local_loop:
+                    os.system("cls")
+                    confirm_change = input(f"{DIVIDER}\n\t\tConfirm Changes?\n{DIVIDER}\n\tOld email\t|\t{csv_dict_list[index]['email']}\n\tNew email\t|\t\033[1;37;40m{new_email}\033[0;37;40m\n{DIVIDER}\n[ C ] Confirm \n[ X ] Cancel Changes\n{DIVIDER}\n")
+                    
+                    # Check if the user wants to exit the menu
+                    if confirm_change.upper() == "X":
+                        local_loop = False
+                    elif confirm_change == "":
+                        error_output("empty_input")
+                        continue
+                    elif confirm_change.upper() == "C":
+                        input("\033[0;32;40mYour changes have been saved!\033[0;37;40m\nPress Enter to Continue\n")                       
+                    else:
+                        error_output("input")
+                        continue
+                    break 
+
+                if local_loop:
+                    csv_dict_list[index]["email"] = new_email
+                    writes_to_file(_USERNAME_AND_PASSWORD, "csv")
+            # Change password
+            elif user_selection == "2":
+                while local_loop:
+                    os.system("cls")
+                    new_password = input(f"{DIVIDER}\n\t\tEditing Password\n{DIVIDER}\n\tPassword\t|\t{csv_dict_list[index]['password'][:10]}...\n{DIVIDER}\nPlease input your new password\n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\n")
+                    if new_password.upper() == "X":
+                        local_loop = False
+                    elif new_password == "":
+                        error_output("empty_input")
+                        continue
+                    elif len(new_password) < 4:
+                        error_output("short")
+                        continue
+                    elif len(new_password) > 20:
+                        error_output("long")
+                        continue
+                    elif not re.search(PASSWORD_PATTERN, new_password):
+                        error_output("password")
+                        continue
+                    break
+
+                while local_loop:
+                    os.system("cls")
+                    password2 = input(f"{DIVIDER}\n\t\tEditing Password\n{DIVIDER}\n\tPassword\t|\t{csv_dict_list[index]['password'][:10]}...\n{DIVIDER}\nPlease reneter your new password\n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\n")
+                    if password2.upper() == "X":
+                        local_loop = False
+                    elif password2 == "":
+                        error_output("empty_input")
+                        continue
+                    elif password2 == new_password:
+                        break
+
+                while local_loop:
+                    os.system("cls")
+                    confirm_change = input(f"{DIVIDER}\n\t\tConfirm Changes?\n{DIVIDER}\n\tOld Password\t|\t{csv_dict_list[index]['password'][:10]}\n\tNew password\t|\t\033[1;37;40m{user_password_hashing(new_password)[:10]}...\033[0;37;40m\n{DIVIDER}\n[ C ] Confirm \n[ X ] Cancel Changes\n{DIVIDER}\n")
+                    
+                    # Check if the user wants to exit the menu
+                    if confirm_change.upper() == "X":
+                        local_loop = False
+                    elif confirm_change == "":
+                        error_output("empty_input")
+                        continue
+                    elif confirm_change.upper() == "C":
+                        input("\033[0;32;40mYour changes have been saved!\033[0;37;40m\nPress Enter to Continue\n")                       
+                    else:
+                        error_output("input")
+                        continue
+                    break 
+
+                if local_loop:
+                    csv_dict_list[index]["password"] = user_password_hashing(new_password)
+                    writes_to_file(_USERNAME_AND_PASSWORD, "csv")
+                    return
+        else:
+            error_output("input") 
 
 # Deletes user from "userid_passwd.csv"
 def delete_user():
@@ -543,7 +691,7 @@ def delete_user():
         return
     while True:
         os.system("cls")
-        deleting_index = input(f"{DIVIDER}\nDeleting User\n{DIVIDER}\n{view_file_content(1, 'csv')}\n{DIVIDER}\nWhich user do you wish to delete?\n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\n")
+        deleting_index = input(f"{DIVIDER}\n\t\tDeleting User\n{DIVIDER}\n{view_file_content(1, 'csv')}\n{DIVIDER}\nWhich user do you wish to delete?\n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\n")
         
         # Check if the user wants to exit the menu
         if deleting_index.upper() == "X":
@@ -740,7 +888,7 @@ def edit_question():
                 selected_question_display = question_display(edit_index)
 
                 os.system("cls")
-                user_selection = input(f"{DIVIDER}\n\t\tWhat do you want to edit?\n{DIVIDER}\n{selected_question_display}\n{DIVIDER}\n[ 1 ] Question Content\n[ 2 ] Question Options\n[ 3 ] Question Answer\n[ X ] Back to Menu\n{DIVIDER}\n")
+                user_selection = input(f"{DIVIDER}\n\t\tEditing Question\n{DIVIDER}\n{selected_question_display}\n{DIVIDER}\nWhat do you want to edit?\n{DIVIDER}\n[ 1 ] Question Content\n[ 2 ] Question Options\n[ 3 ] Question Answer\n[ X ] Back to Menu\n{DIVIDER}\n")
                 if user_selection.upper() == "X":
                     return
                 elif check_if_digit(user_selection):
@@ -756,7 +904,7 @@ def edit_question():
 # "text" is used for adding addition text for the user
 # "selection" is for knowing whether is the user editing the options or the answer
 # as long as "selection" has a value, it
-def question_display(selected_index: int, text=None, selection=None):
+def question_display(selected_index: int):
     # Gets the values of the current dictionary
     value_list = list(dictionary.values())
     DIVIDER_2 = f"{EMPTY:-^60}"
@@ -794,7 +942,7 @@ def selection_for_question_pool(input_string: str, index: int):
             new_question_content = input(f"{DIVIDER}\n\t\tEditing Question Content\n{DIVIDER}\n{selected_question_display}\n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\n")
             
             # Check if the user wants to exit the menu
-            if new_question_content.upper == "X":
+            if new_question_content.upper() == "X":
                 local_loop = False
             elif new_question_content == "":
                 error_output("empty_input")
@@ -813,10 +961,7 @@ def selection_for_question_pool(input_string: str, index: int):
                 local_loop = False
             elif confirm_change == "":
                 error_output("empty_input")
-                continue            
-            elif "||" in confirm_change:
-                error_output("special")
-                continue     
+                continue
             elif confirm_change.upper() == "C":
                 input("\033[0;32;40mYour changes have been saved!\033[0;37;40m\nPress Enter to Continue\n")                       
             else:
@@ -848,7 +993,7 @@ def selection_for_question_pool(input_string: str, index: int):
                     new_option_content = input(f"{DIVIDER}\n\t\tEditing Question Options\n{DIVIDER}\n{selected_question_display}\nSelected Option | {option_number}\n\tOption\t| {value_list[index][1][list_index]}\n\tNew\t|\n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\n")
                     
                     # Check if the user wants to exit the menu
-                    if new_option_content == "X":
+                    if new_option_content.upper() == "X":
                         break
                     elif new_option_content == "":
                         error_output("empty_input")
@@ -872,9 +1017,6 @@ def selection_for_question_pool(input_string: str, index: int):
             elif confirm_change == "":
                 error_output("empty_input")
                 continue
-            elif not re.search(PATTERN, confirm_change):
-                error_output("special")
-                continue 
             elif confirm_change.upper() == "C":
                 input("\033[0;32;40mYour changes have been saved!\033[0;37;40m\nPress Enter to Continue\n")                                    
             else:
@@ -896,7 +1038,7 @@ def selection_for_question_pool(input_string: str, index: int):
             new_answer_content = input(f"{DIVIDER}\n\t\tEditing Question Answer\n{DIVIDER}\n{selected_question_display}\n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\n")
             
             # Check if the user wants to exit the menu
-            if new_answer_content.upper == "X":
+            if new_answer_content.upper() == "X":
                 local_loop = False
             elif new_answer_content == "":
                 error_output("empty_input")
@@ -919,11 +1061,7 @@ def selection_for_question_pool(input_string: str, index: int):
             if confirm_change.upper() == "X":
                 local_loop = False
             elif confirm_change == "":
-                error_output("empty_input")
-                continue            
-            elif "||" in confirm_change:
-                error_output("special")
-                continue     
+                error_output("empty_input")  
             elif confirm_change.upper() == "C":
                 input("\033[0;32;40mYour changes have been saved!\033[0;37;40m\nPress Enter to Continue\n")                       
                 break
@@ -937,19 +1075,6 @@ def selection_for_question_pool(input_string: str, index: int):
             writes_to_file(_QUIZ_QUESTION_TEXT, "edit_question")
     return
 
-# Checks if the user's selected option in inside the range of options 
-# For any question. Due to the flexibility of the number of options the admin can set.
-# 
-# "given_user_input" is the user input that will be checked to see if the input is within the range of the options
-# "question_data" is a list containing the question info, such as content, options and answer
-def check_user_input(userInput: str, question_data: list):
-    check_list = []
-    for i, option in enumerate(question_data):
-        check_list.extend(chr(97 + i))
-    for check in check_list:
-        if check == userInput.lower():
-            return True
-    return False
 
 # Deletes question from "question_pool"
 def delete_question():
@@ -1137,9 +1262,6 @@ def selection_for_edit_setting(input_string: str, index: int):
             elif confirm_change == "":
                 error_output("empty_input")
                 continue
-            elif not re.search(PATTERN, confirm_change):
-                error_output("special")
-                continue 
             elif confirm_change.upper() == "C":
                 input("\033[0;32;40mYour changes have been saved!\033[0;37;40m\nPress Enter to Continue\n")                                    
                 break
@@ -1174,10 +1296,7 @@ def selection_for_edit_setting(input_string: str, index: int):
                 continue
             elif confirm_change.upper() == "C":
                 input("\033[0;32;40mYour changes have been saved!\033[0;37;40m\nPress Enter to Continue\n")                       
-                break            
-            elif not re.search(PATTERN, confirm_change):
-                error_output("special")
-                continue    
+                break              
             else:
                 error_output("input")
                 continue
@@ -1240,7 +1359,63 @@ def selection_of_setting(title: str):
 
 # Logical system for generating report
 def generate_report_logic():
+    data = generate_report()
+    report_input = input(f"{DIVIDER}\n\t\tReport\n{DIVIDER}\n{data}\n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\n")
+    if report_input.upper() == "X":
+        global SUB_LOOP
+        SUB_LOOP = False
+        return
+    elif report_input == "":
+        error_output("empty_input")
+    else: 
+        error_output("input")
     return
+
+# Retrieving and generating a data report
+def generate_report():
+    # Initalize variables for calculation
+    string = ""
+    total_marks = 0
+    marks = []
+    students = []
+    question_correct = 0
+    question_wrong = 0
+    total_questions = 0
+
+    # Retrieves the data from the list
+    for attempt in csv_dict_list:
+        # Gets the total marks 
+        total_marks += int(attempt["Total Marks"])
+        marks.append(int(attempt["Total Marks"]))
+
+        total_questions += int(attempt["Total No. of Question"])
+
+        question_correct += int(attempt["No. Qn answered correct"])
+        question_wrong += int(attempt["No. Qn answered wrong"])
+
+        # Add users into the "student" list
+        if attempt["UserID"] not in students:
+            students.append(attempt["UserID"])
+    
+    # Gettings the values
+    total_attempts = len(csv_dict_list)
+    no_of_students = len(students)
+    percent_question_correct = question_correct / total_questions * 100
+    percent_question_wrong = question_wrong / total_questions * 100
+    average_marks = total_marks / total_attempts
+    min_marks = min(marks)
+    max_marks = max(marks)
+
+    # Adds data into the string
+    string += f"Total Number of Attempts:  \033[1;37;40m{total_attempts}\033[0;37;40m\n"
+    string += f"Number of Students attempted:  \033[1;37;40m{no_of_students}\033[0;37;40m\n"
+    string += f"Average Marks:  \033[1;37;40m{average_marks}\033[0;37;40m\n"
+    string += f"Percentage of Question Correct:  \033[1;37;40m{percent_question_correct}%\033[0;37;40m\n"
+    string += f"Percentage of Question Wrong:  \033[1;37;40m{percent_question_wrong}%\033[0;37;40m\n"
+    string += f"Min marks: \033[1;37;40m{min_marks}\033[0;37;40m\n"
+    string += f"Max marks:  \033[1;37;40m{max_marks}\033[0;37;40m\n"
+
+    return string
 
 # ========================================================================
 #   Sub Program Loops
@@ -1270,7 +1445,6 @@ def generate_report_subloop():
     while SUB_LOOP:
         os.system("cls")
         read_file_content(_QUIZ_RESULTS, option="csv")
-        input("Generate Report")
         generate_report_logic()
 
 # ========================================================================
