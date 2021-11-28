@@ -38,7 +38,7 @@
 # package/	
 # Module /      os, re, hashlib, csv, time
 #
-# Known issues:	eg. no validation of input value
+# Known issues:	Reset of password doesn't send the user any email for the new password
 #
 import os, hashlib, random, csv
 import time
@@ -213,15 +213,17 @@ def error_output(error_message: str):
     elif error_message == "range":              # Input value not within range
         string += "\033[1;37;41mPlease enter a value within the range.\033[0;37;40m"
 
-    # 
     elif error_message == "username":           # User not found in database    [Unique to user.py]
         string += f"\033[1;37;41mUsername could not be found.\033[0;37;40m"
+
+    elif error_message == "email":           # User not found in database    [Unique to user.py]
+        string += f"\033[1;37;41mEmail is not linked to userID\033[0;37;40m"
 
     elif error_message == "password":           # Password input was incorrect  [Unique to user.py]
         string += f"\033[1;37;41mPassword is incorrect.\033[0;37;40m"
 
-    elif error_message == "admin":              # Account locked when user enters wrong password 3 times [ISSUE] Doesn't lock account
-        string += f"\033[1;37;41mAccount has been locked\033[0;37;40m"
+    elif error_message == "admin":              # Occurs when user enters wrong password 3 times
+        string += f"\033[1;37;41mSession Timed Out. Restarting Program\033[0;37;40m"
 
     elif error_message == "previous":           # No more questions in front of selected question
         string += f"\033[1;37;41mYou are at the first question!!\033[0;37;40m"
@@ -301,7 +303,7 @@ def login_menu():
             error_output("empty_input")
         # Checks if the username input is inside the database
         elif check_username(user_username_input):
-            # Counter for number of attempts before a user's account is locked 
+            # Counter for number of attempts before a user's session is timed out 
             count = 3
             while count != 0:
                 os.system("cls")
@@ -316,9 +318,9 @@ def login_menu():
                     count -= 1
                     error_output("password")
                     continue
+            # Time out the user if he/she fails to input the correct password 
             if count == 0:
                 os.system("cls")
-                # [ISSUE] Need a way to lock the user's account
                 error_output("admin")
                 break
         else:
@@ -329,7 +331,15 @@ def login_menu():
 def check_username(username: str):
     read_file_content(_USERNAME_AND_PASSWORD, option="csv")
     for i in csv_dict_list:
-        if username == i["user"]:
+        if username == i["userID"]:
+            return True
+    return False
+
+# Check if email exist in the file
+def check_email(email: str):
+    read_file_content(_USERNAME_AND_PASSWORD, option="csv")
+    for i in csv_dict_list:
+        if email == i["email"]:
             return True
     return False
 
@@ -342,17 +352,74 @@ def user_password_hashing(given_input: str):
 def check_password(username: str, password: str):
     read_file_content(_USERNAME_AND_PASSWORD, option="csv")
     for i in csv_dict_list:
-        if username == i["user"]:
+        if username == i["userID"]:
             if user_password_hashing(password) == i["password"]:
                 return True
             else:
                 return False
 
-#  NOT IMPLEMENTED [ISSUE]
+# Resets the user password if they can provide their email
 def reset_password():
     read_file_content(_USERNAME_AND_PASSWORD, option="csv")
-    input("Reset Password")
-    return
+    input(csv_dict_list)
+    while True:
+        os.system("cls")
+        username_input = input(f"{DIVIDER}\n\t\tReset Password\n{DIVIDER}\nUsername:\nReset Email:\n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\n")
+        if username_input.upper() == "X":
+            global SUB_LOOP
+            SUB_LOOP = False
+            return
+        elif username_input == "":
+            error_output("empty_input")
+            continue
+        elif check_username(username_input):
+            while True:
+                os.system("cls")
+                email_input = input(f"{DIVIDER}\n\t\tReset Password\n{DIVIDER}\nUsername:\t{username_input}\nReset Email:\n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\n")
+                if email_input.upper() == "X":
+                    SUB_LOOP = False
+                    return
+                elif email_input == "":
+                    error_output("empty_input")
+                    continue
+                elif check_email(email_input):
+                    break
+                else:
+                    error_output("email")
+                    continue
+            while True:
+                os.system("cls")
+                confirm_change = input(f"{DIVIDER}\n\t\tReset Password\n{DIVIDER}\nUsername:\t{username_input}\nReset Email:\t{email_input}\n{DIVIDER}\n[ C ] Confirm Reset\n[ X ] Back to Menu\n{DIVIDER}\n")
+                if confirm_change.upper() == "X":
+                    SUB_LOOP = False
+                    return
+                elif confirm_change == "":
+                    error_output("empty_input")
+                    continue
+                elif confirm_change.upper() == "C":
+                    input("\033[0;32;40mYour password have been reset!\nPlease check your email for the new password.\033[0;37;40m\nPress Enter to Continue\n")
+                    password_change(username_input)
+                    return
+                else:
+                    error_output("input")
+                    continue
+        else:
+            error_output("username")
+
+# Proof of concept
+# Changes the password for the user
+def password_change(username: str):
+    for user in csv_dict_list:
+        if username == user["userID"]:
+            
+            # Default password once an account has been reset
+            # Password: 123456789
+            # User is adviced to change password upon re-enter his/her account
+            user["password"] = user_password_hashing("123456789")
+
+    # Writes the new password 
+    write_csv(_USERNAME_AND_PASSWORD, csv_dict_list)
+            
 
 # ========================================================================================================================
 #   Question Function
@@ -363,7 +430,7 @@ def reset_password():
 def quiz_menu(username: str):
     while True:
         os.system("cls")
-        user_input = input(f"{DIVIDER}\n\t\t\tQuiz Menu\n{DIVIDER}\nUser Logged In as: \033[1;37;40m{username}\033[0;37;40m\n\nNumber of Attempts Left: {remaining_attempt(username)}\nTime for the quiz: {check_amount_of_time()} mins\nNumber of Question: {check_number_of_question()}\n{DIVIDER}\n[ 1 ] Start Quiz\n[ X ] Back to Menu\n{DIVIDER}\n")
+        user_input = input(f"{DIVIDER}\n\t\t\tQuiz Menu\n{DIVIDER}\nLogged In as: \033[1;37;40m{username}\033[0;37;40m\n\nNumber of Attempts Left: {remaining_attempt(username)}\nTime for the quiz: {check_amount_of_time()} mins\nNumber of Question: {check_number_of_question()}\n{DIVIDER}\n[ 1 ] Start Quiz\n[ X ] Back to Menu\n{DIVIDER}\n")
         if user_input.upper() == "X":
             return
         elif user_input == "1":
@@ -381,7 +448,7 @@ def remaining_attempt(username: str):
     count = 0
     read_file_content(_QUIZ_RESULTS, option="csv")
     for i in csv_dict_list:
-        if i["User"] == username:
+        if i["UserID"] == username:
             count += 1
     if no_of_attempt_allowed - count < 0:
         return 0
@@ -498,6 +565,7 @@ def save_user_answer(input_list: list):
         # TypeError occurs when user didn't answer the question
         except TypeError: 
             question_data[4] = "Didn't Answer"
+            answered_wrong += 1
         else:
             if question_data[3] == question_data[2][index]:
                 answered_correct += 1
@@ -523,7 +591,9 @@ def save_user_answer(input_list: list):
 # 
 # username: the username that the user inputted
 # input_list[0]: questions_tested list
-# input_list[1]: total_marks
+# input_list[1]: quesiions answered correct
+# input_list[2]: questions answered wrong
+# input_list[3]: total number of question
 def push_result(username: str, input_list: list):
     read_file_content(_QUIZ_QUESTION_TEXT, option="question")
     question_pool = list(dictionary.values())
@@ -553,10 +623,11 @@ def format_into_dict(username: str, input_list: list):
     # input_list[0]: question_list
     # input_list[1]: total_mark
     result = {
-        "User": username,
+        "UserID": username,
         "No. Qn answered correct": input_list[1],
         "No. Qn answered wrong": input_list[2],
-        "Total Marks": input_list[3] * 2,
+        "Total No. of Question": input_list[3],
+        "Total Marks": (input_list[3] * 2) - (input_list[2] * 2), # Calculate total marks
         "Date of Attempt": time.ctime()
     }
     for i, element in enumerate(input_list[0]):
@@ -670,6 +741,11 @@ def login_subloop():
         read_file_content(_USERNAME_AND_PASSWORD, option="login")
         login_menu()
     
+def reset_subloop():
+    while SUB_LOOP:
+        read_file_content(_USERNAME_AND_PASSWORD, option="csv")
+        reset_password()
+
 # ==============================================================================================================================
 #   Main Program Loop
 # ==============================================================================================================================
