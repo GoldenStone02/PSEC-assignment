@@ -207,46 +207,46 @@ def error_output(error_message: str):
         string += "\033[1;37;41mPlease select a valid option.\033[0;37;40m"
 
     elif error_message == "empty_input":        # Empty input
-        string += f"\033[1;37;41mEmpty input, please try again\033[0;37;40m"
+        string += "\033[1;37;41mEmpty input, please try again\033[0;37;40m"
 
     elif error_message == "input":              # Invalid input
-        string += f"\033[1;37;41mPlease enter a valid input.\033[0;37;40m"
+        string += "\033[1;37;41mPlease enter a valid input.\033[0;37;40m"
 
     elif error_message == "range":              # Input value not within range
         string += "\033[1;37;41mPlease enter a value within the range.\033[0;37;40m"
 
     elif error_message == "username":           # User not found in database    [Unique to user.py]
-        string += f"\033[1;37;41mUsername could not be found.\033[0;37;40m"
+        string += "\033[1;37;41mUsername could not be found.\033[0;37;40m"
 
     elif error_message == "email":              # User not found in database    [Unique to user.py]
-        string += f"\033[1;37;41mEmail is not linked to userID\033[0;37;40m"
+        string += "\033[1;37;41mEmail is not linked to userID\033[0;37;40m"
 
     elif error_message == "password_incorrect": # Password input was incorrect  [Unique to user.py]
-        string += f"\033[1;37;41mPassword is incorrect.\033[0;37;40m"
+        string += "\033[1;37;41mPassword is incorrect.\033[0;37;40m"
 
     elif error_message == "short":              # Input value was too short
-        string += "\n\033[1;37;41mLength of input was too short\033[0;37;40m\n"
+        string += "\033[1;37;41mLength of input was too short\033[0;37;40m\n"
 
     elif error_message == "long":               # Input value was too long                      
-        string += "\n\033[1;37;41mLength of input was too long\033[0;37;40m\n"
+        string += "\033[1;37;41mLength of input was too long\033[0;37;40m\n"
 
     elif error_message == "password":           # Doesn't meet the password criteria  
-        string += "\n\033[1;37;41mMissing one of the criteria, please try again\033[0;37;40m\n"
+        string += "\033[1;37;41mMissing one of the criteria, please try again\033[0;37;40m\n"
 
     elif error_message == "admin":              # Occurs when user enters wrong password 3 times
-        string += f"\033[1;37;41mSession Timed Out. Restarting Program\033[0;37;40m"
+        string += "\033[1;37;41mSession Timed Out. Restarting Program\033[0;37;40m"
 
     elif error_message == "previous":           # No more questions in front of selected question
-        string += f"\033[1;37;41mYou are at the first question!!\033[0;37;40m"
+        string += "\033[1;37;41mYou are at the first question!!\033[0;37;40m"
     
     elif error_message == "next":               # No more questions after selected question
-        string += f"\033[1;37;41mYou are at the last question!!\033[0;37;40m"
+        string += "\033[1;37;41mYou are at the last question!!\033[0;37;40m"
     
     elif error_message == "no_attempts":        # No more attempts remaining  
-        string += f"\033[1;37;41mYou have no remaining attempt\033[0;37;40m"
+        string += "\033[1;37;41mYou have no remaining attempt\033[0;37;40m"
     
     elif error_message == "bad_input":          # Bad Input --> Refers to EOFERROR (Occurs only when CTRL+Z is inputted)
-        string += f"\033[1;37;41mBad Input, program restarted\033[0;37;40m"
+        string += "\033[1;37;41mBad Input, program restarted\033[0;37;40m"
     
     input(string)
 
