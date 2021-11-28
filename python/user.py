@@ -709,7 +709,7 @@ def show_result(username: str, input_list: list):
         string += "Good Work! You could be better."
     else:
         string += "Poor! Try harder next time."
-    string += f"\n{DIVIDER}\n Press enter to continue"
+    string += f"\n{DIVIDER}\nPress enter to continue"
     input(string)
     return
 
