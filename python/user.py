@@ -40,7 +40,7 @@
 #
 # Known issues:	Reset of password doesn't send the user any email for the new password
 #
-import os, hashlib, random, csv
+import os, re, hashlib, random, csv
 import time
 
 # ==============================================================================================================================
@@ -55,6 +55,8 @@ DIVIDER = f"{EMPTY:=^60}"
 
 MAIN_USER_MENU = ["Log In", "Reset Password"]
 START_MENU = ["Begin Quiz"]
+
+PASSWORD_PATTERN = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%]).+$'
 
 _USERNAME_AND_PASSWORD = "./admin/userid_pswd.csv"
 _QUIZ_SETTING_TEXT = "./admin/quiz_settings.txt"
@@ -216,11 +218,20 @@ def error_output(error_message: str):
     elif error_message == "username":           # User not found in database    [Unique to user.py]
         string += f"\033[1;37;41mUsername could not be found.\033[0;37;40m"
 
-    elif error_message == "email":           # User not found in database    [Unique to user.py]
+    elif error_message == "email":              # User not found in database    [Unique to user.py]
         string += f"\033[1;37;41mEmail is not linked to userID\033[0;37;40m"
 
-    elif error_message == "password":           # Password input was incorrect  [Unique to user.py]
+    elif error_message == "password_incorrect": # Password input was incorrect  [Unique to user.py]
         string += f"\033[1;37;41mPassword is incorrect.\033[0;37;40m"
+
+    elif error_message == "short":              # Input value was too short
+        string += "\n\033[1;37;41mLength of input was too short\033[0;37;40m\n"
+
+    elif error_message == "long":               # Input value was too long                      
+        string += "\n\033[1;37;41mLength of input was too long\033[0;37;40m\n"
+
+    elif error_message == "password":           # Doesn't meet the password criteria  
+        string += "\n\033[1;37;41mMissing one of the criteria, please try again\033[0;37;40m\n"
 
     elif error_message == "admin":              # Occurs when user enters wrong password 3 times
         string += f"\033[1;37;41mSession Timed Out. Restarting Program\033[0;37;40m"
@@ -294,7 +305,7 @@ def user_logic(userpage_list, content: str):
 def login_menu():
     while True:
         os.system("cls")
-        user_username_input = input(f"{DIVIDER}\n\t\t\tLog In\n{DIVIDER}\nUsername: \nPassword: \n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nEnter your username: ")
+        user_username_input = input(f"{DIVIDER}\n\t\t\tLog In\n{DIVIDER}\nUserID: \nPassword: \n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nEnter your userID: ")
         if user_username_input.upper() == "X":
             global SUB_LOOP
             SUB_LOOP = False
@@ -307,7 +318,7 @@ def login_menu():
             count = 3
             while count != 0:
                 os.system("cls")
-                password_input = input(f"{DIVIDER}\n\t\t\tLog In\n{DIVIDER}\nUsername: {user_username_input} \nPassword: \n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nEnter your password: ")
+                password_input = input(f"{DIVIDER}\n\t\t\tLog In\n{DIVIDER}\nUserID: {user_username_input} \nPassword: \n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nEnter your password: ")
                 if password_input.upper() == "X":
                     SUB_LOOP = False
                     return
@@ -316,7 +327,7 @@ def login_menu():
                     return
                 else:
                     count -= 1
-                    error_output("password")
+                    error_output("password_incorrect")
                     continue
             # Time out the user if he/she fails to input the correct password 
             if count == 0:
@@ -361,10 +372,9 @@ def check_password(username: str, password: str):
 # Resets the user password if they can provide their email
 def reset_password():
     read_file_content(_USERNAME_AND_PASSWORD, option="csv")
-    input(csv_dict_list)
     while True:
         os.system("cls")
-        username_input = input(f"{DIVIDER}\n\t\tReset Password\n{DIVIDER}\nUsername:\nReset Email:\n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\n")
+        username_input = input(f"{DIVIDER}\n\t\tReset Password\n{DIVIDER}\nUserID:\nReset Email:\n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\n")
         if username_input.upper() == "X":
             global SUB_LOOP
             SUB_LOOP = False
@@ -375,7 +385,7 @@ def reset_password():
         elif check_username(username_input):
             while True:
                 os.system("cls")
-                email_input = input(f"{DIVIDER}\n\t\tReset Password\n{DIVIDER}\nUsername:\t{username_input}\nReset Email:\n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\n")
+                email_input = input(f"{DIVIDER}\n\t\tReset Password\n{DIVIDER}\nUserID:\t{username_input}\nReset Email:\n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\n")
                 if email_input.upper() == "X":
                     SUB_LOOP = False
                     return
@@ -383,13 +393,54 @@ def reset_password():
                     error_output("empty_input")
                     continue
                 elif check_email(email_input):
-                    break
+                    password_change(username_input)
+                    return
                 else:
                     error_output("email")
                     continue
-            while True:
+        else:
+            error_output("username")
+
+# Changes the password for the user
+def password_change(username: str):
+    # Password check
+    while True:
+        os.system("cls")
+        password_input = input(f"{DIVIDER}\n\t\t\tReset Password\n{DIVIDER}\nPassword: \n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nAt least one number\nAt least one uppercase and one lowercase character\nAt least one special symbol !@#$%\nShould be 4 - 20 characters long\nPassword: ")
+        
+        # Check if the user wants to exit the menu
+        if password_input.upper() == "X":
+            return
+        elif password_input == "":
+            error_output("empty_input")
+            continue            
+        elif len(password_input) < 4:
+            error_output("short")
+            continue
+        elif len(password_input) > 20:
+            error_output("long")
+            continue
+        elif not re.search(PASSWORD_PATTERN, password_input):
+            error_output("password")
+            continue
+        break
+
+    # Password double check
+    while True:
+        os.system("cls")
+        password2 = input(f"{DIVIDER}\n\t\t\tRegistering User\n{DIVIDER}\nPassword: \n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nPlease re-enter your password: ")
+        
+        # Check if the user wants to exit the menu
+        if password2.upper() == "X":
+            return
+        elif password2 == "":
+            error_output("empty_input")
+            continue
+        elif password_input == password2:
+            # Check if the user wants to confirm the setting
+           while True:
                 os.system("cls")
-                confirm_change = input(f"{DIVIDER}\n\t\tReset Password\n{DIVIDER}\nUsername:\t{username_input}\nReset Email:\t{email_input}\n{DIVIDER}\n[ C ] Confirm Reset\n[ X ] Back to Menu\n{DIVIDER}\n")
+                confirm_change = input(f"{DIVIDER}\n\t\tReset Password\n{DIVIDER}\nPassword: {password_input}\n{DIVIDER}\n[ C ] Confirm Reset\n[ X ] Back to Menu\n{DIVIDER}\n")
                 if confirm_change.upper() == "X":
                     SUB_LOOP = False
                     return
@@ -398,27 +449,21 @@ def reset_password():
                     continue
                 elif confirm_change.upper() == "C":
                     input("\033[0;32;40mYour password have been reset!\nPlease check your email for the new password.\033[0;37;40m\nPress Enter to Continue\n")
-                    password_change(username_input)
+                    for user in csv_dict_list:
+                        if username == user["userID"]:
+                            
+                            # Default password once an account has been reset
+                            # Password: 123456789
+                            # User is adviced to change password upon re-enter his/her account
+                            user["password"] = user_password_hashing(password_input)
+
+                    # Writes the new password 
+                    write_csv(_USERNAME_AND_PASSWORD, csv_dict_list)
                     return
                 else:
                     error_output("input")
                     continue
-        else:
-            error_output("username")
-
-# Proof of concept
-# Changes the password for the user
-def password_change(username: str):
-    for user in csv_dict_list:
-        if username == user["userID"]:
-            
-            # Default password once an account has been reset
-            # Password: 123456789
-            # User is adviced to change password upon re-enter his/her account
-            user["password"] = user_password_hashing("123456789")
-
-    # Writes the new password 
-    write_csv(_USERNAME_AND_PASSWORD, csv_dict_list)
+ 
             
 
 # ========================================================================================================================
@@ -502,7 +547,7 @@ def start_quiz(username: str):
         if user_selection.upper() == "S" or (timer(starttime)[0] <= 0 and timer(starttime)[1] <= 0):
             value = save_user_answer(temp_list)
             push_result(username, value)
-            show_result(value)
+            show_result(username, value)
             return
         # Goes to the previous question
         elif user_selection.upper() == "P":
@@ -546,13 +591,14 @@ def check_user_input(userInput: str, question_data: list):
 
 # Save the user's selected answers into the quiz_result.csv
 # "input_list" is the list that stores the question data and the user's answer.
+# 
+# elements in "input_list" list
+# index 0: question identification value
+# index 1: question content
+# index 2: question options
+# index 3: question answer
+# index 4: user's answer
 def save_user_answer(input_list: list):
-    # elements in "question_data" list
-    # index 0: question identification value
-    # index 1: question content
-    # index 2: question options
-    # index 3: question answer
-    # index 4: user's answer
     questions_tested = []
     answered_correct = 0
     answered_wrong = 0
@@ -638,7 +684,13 @@ def format_into_dict(username: str, input_list: list):
     return result
 
 # Returns a string to display the user's result
-def show_result(input_list: list):
+# 
+# elements in "input_list" list
+# index 0: question_tested
+# index 1: answered_correct
+# index 2: answered_wrong
+# index 3: total_questions
+def show_result(username: str, input_list: list):
     string = ""
     
     # Get the amount of marks awarded for the quiz
@@ -647,12 +699,17 @@ def show_result(input_list: list):
     # Get the total possible marks
     total = input_list[3] * 2
     percentage = user_marks/total * 100
+
+    string += f"{DIVIDER}\nUserID: {username}\n"
+    string += f"Results: {percentage}%\n"
+    string += f"Time of Submission: {time.ctime()}\n\n"
     if percentage >= 80:
-        string += "well done"
+        string += "Well Done!"
     elif percentage > 40:
-        string += "good work, you could be better. fix yourself"
+        string += "Good Work! You could be better."
     else:
-        string += "poor, try harder next time"
+        string += "Poor! Try harder next time."
+    string += f"\n{DIVIDER}\n Press enter to continue"
     input(string)
     return
 
