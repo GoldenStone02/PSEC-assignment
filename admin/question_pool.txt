@@ -1,5 +1,5 @@
 question 1||option A||option B||option C||option D||option A
-question 2||option A||option B||option C||option D||option B
+x = "", what type is x?||integer||string||list||float||string
 question 3||option A||option B||option C||option D||option C
 question 4||option A||option B||option C||option D||option D
 question 5||option A||option B||option C||option D||option A
