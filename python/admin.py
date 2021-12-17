@@ -1408,9 +1408,9 @@ def generate_report():
     # Adds data into the string
     string += f"Total Number of Attempts:  \033[1;37;40m{total_attempts}\033[0;37;40m\n"
     string += f"Number of Students attempted:  \033[1;37;40m{no_of_students}\033[0;37;40m\n"
-    string += f"Average Marks:  \033[1;37;40m{average_marks}\033[0;37;40m\n"
-    string += f"Percentage of Question Correct:  \033[1;37;40m{percent_question_correct}%\033[0;37;40m\n"
-    string += f"Percentage of Question Wrong:  \033[1;37;40m{percent_question_wrong}%\033[0;37;40m\n"
+    string += f"Average Marks:  \033[1;37;40m{average_marks:.2f}\033[0;37;40m\n"
+    string += f"Percentage of Question Correct:  \033[1;37;40m{percent_question_correct:.2f}%\033[0;37;40m\n"
+    string += f"Percentage of Question Wrong:  \033[1;37;40m{percent_question_wrong:.2f}%\033[0;37;40m\n"
     string += f"Min marks: \033[1;37;40m{min_marks}\033[0;37;40m\n"
     string += f"Max marks:  \033[1;37;40m{max_marks}\033[0;37;40m\n"
 

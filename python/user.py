@@ -701,7 +701,7 @@ def show_result(username: str, input_list: list):
     percentage = user_marks/total * 100
 
     string += f"{DIVIDER}\nUserID: {username}\n"
-    string += f"Results: {percentage}%\n"
+    string += f"Results: {percentage:.2f}%\n"
     string += f"Time of Submission: {time.ctime()}\n\n"
     if percentage >= 80:
         string += "Well Done!"
