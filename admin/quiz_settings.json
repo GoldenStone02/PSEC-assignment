@@ -1,0 +1,6 @@
+{
+    "time_in_minutes": 1,
+    "number_of_questions": 5,
+    "maximum_number_of_attempts": 3,
+    "randomize_options": true
+}

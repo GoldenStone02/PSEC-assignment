@@ -1,0 +1,22 @@
+[
+    {
+        "userID": "testuser",
+        "email": "testing@gmail.com",
+        "password_SHA256": "",
+        "current_course": "Programming Language",
+        "eligible_modules": [
+            "Basic Python",
+            "Fundamentals of Javascript"
+        ]
+    },
+    {
+        "userID": "joshua",
+        "email": "joshua@gmail.com",
+        "password_SHA256": "",
+        "current_course":"Programming Language",
+        "eligible_modules": [
+            "Basic Python",
+            "Fundamentals of Javascript"
+        ]
+    }
+]
