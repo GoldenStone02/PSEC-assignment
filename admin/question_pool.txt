@@ -1,6 +1,0 @@
-x + 2 = 5. What is x?||x = 1||x = 3||x = 0||x = 7||x = 3
-x = "", what type is x?||integer||string||list||float||string
-x + y = 10, x = 5. What is y?||y = 6||y = 4||y = 5||y = Null||y = 5
-lst = [1,2,3,4], type(lst). What is the output?||string||tuple||dict||list||list
-number = "2" + 2, what is the output?||TypeError||22||4||"22"||TypeError
-What is NOT a primitive data type?||string||dict||integer||boolean||dict
