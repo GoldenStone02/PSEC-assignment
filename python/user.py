@@ -42,6 +42,7 @@
 #
 import os, re, hashlib, random, csv
 import time
+import json
 
 # ==============================================================================================================================
 #   Initialize variables
@@ -713,6 +714,8 @@ def show_result(username: str, input_list: list):
     input(string)
     return
 
+###   TO BE CHANGED into JSON for CONFIGURATION   ###
+
 # Returns the remaining time left in a tuple
 def timer(starting_time: float):
     endtime = time.time() - starting_time
@@ -755,6 +758,9 @@ def check_randomize_option():
             if i[2].lower() == "true":
                 return True
             return False
+
+
+###   END OF CONFIGURATION   ###
 
 # Randomly selects question from the question pool
 # Returns a nested list

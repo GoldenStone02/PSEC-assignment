@@ -42,8 +42,8 @@
 # Known issues:	UI gets bugged when a long string gets added.
 #
 
-import os, re, csv
-import hashlib, random
+import os, re, csv, hashlib, random
+import json
 
 # ==================================================================
 #   Initialize Variables
@@ -60,9 +60,9 @@ PASSWORD_PATTERN = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%]).+$'
 
 MAIN_MENU = ["Register User", "Question Pool", "Quiz Settings", "Generate Report"]
 
-_USERNAME_AND_PASSWORD = "./admin/userid_pswd.csv"
-_QUIZ_SETTING_TEXT = "./admin/quiz_settings.txt"
-_QUIZ_QUESTION_TEXT = "./admin/question_pool.txt"
+_USERNAME_AND_PASSWORD = "./admin/users.json"
+_QUIZ_SETTING = "./admin/quiz_settings.json"
+_COURSE_INFORMATION = "./admin/courses.json"
 _QUIZ_RESULTS = "./admin/quiz_results.csv"
 
 MAIN_LOOP = True
@@ -84,9 +84,6 @@ def read_file_content(file: str, option):
                     csv_dict_list.append(dict(line))
                 
         else:
-            # Ensures that the file has been formatted correctly
-            remove_linefeed(file)
-
             with open(file,"r") as f:
                 # This method of reading file removes newlines or "\n"
                 file_content = f.read().splitlines()
@@ -183,23 +180,25 @@ def writes_to_file(file: str, option: str, index=None):
                 f.write(f"{line[0]}||{line[1]}||{line[2]}\n")
 
 
-# Removes linefeed that is in between lines in the file
-def remove_linefeed(file: str):
-    temp = []
-    with open(file, "r") as f:
-        file_lines = f.readlines()
+### Not needed as JSON files are being used 
+
+# # Removes linefeed that is in between lines in the file
+# def remove_linefeed(file: str):
+#     temp = []
+#     with open(file, "r") as f:
+#         file_lines = f.readlines()
     
-    # Remove linefeed
-    # Ensures that if there is a linefeed in between variables
-    for line in file_lines:
-        if line == "\n":
-            continue
-        temp.append(line.strip())
+#     # Remove linefeed
+#     # Ensures that if there is a linefeed in between variables
+#     for line in file_lines:
+#         if line == "\n":
+#             continue
+#         temp.append(line.strip())
     
-    # Rewrites file
-    with open(file, "w") as f:
-        for line in temp:
-            f.write(line + "\n")
+#     # Rewrites file
+#     with open(file, "w") as f:
+#         for line in temp:
+#             f.write(line + "\n")
 
 
 # Returns the file content using "dictionary"
@@ -852,7 +851,7 @@ def add_question():
             string += f"{element}||"
         string += f"{answer}"
 
-        with open(_QUIZ_QUESTION_TEXT, "a") as f:
+        with open(_COURSE_INFORMATION, "a") as f:
             f.write(string)
         return
     
@@ -907,9 +906,9 @@ def question_display(selected_index: int):
     # Gets the values of the current dictionary
     value_list = list(dictionary.values())
     DIVIDER_2 = f"{EMPTY:-^60}"
-    
-    # Used to add information into the for loop
     string = f"\n{DIVIDER_2}\n"
+
+    # Formats the options
     for element in value_list[selected_index]:
         # Prints out the options using a for-loop
         if type(element) is list:
@@ -970,7 +969,7 @@ def selection_for_question_pool(input_string: str, index: int):
 
         if local_loop:
             value_list[index][0] = new_question_content
-            writes_to_file(_QUIZ_QUESTION_TEXT, "edit_question")
+            writes_to_file(_COURSE_INFORMATION, "edit_question")
 
     # Used to change the options
     if input_string == "2":
@@ -1028,7 +1027,7 @@ def selection_for_question_pool(input_string: str, index: int):
             if value_list[index][1][list_index] == value_list[index][2]:
                 value_list[index][2] = new_option_content
             value_list[index][1][list_index] = new_option_content
-            writes_to_file(_QUIZ_QUESTION_TEXT, "edit_question")
+            writes_to_file(_COURSE_INFORMATION, "edit_question")
 
     # Used to change the answer of the question
     if input_string == "3":
@@ -1071,7 +1070,7 @@ def selection_for_question_pool(input_string: str, index: int):
         if local_loop:
             # Saves the answer as the correct option text
             value_list[index][2] = value_list[index][1][list_index]
-            writes_to_file(_QUIZ_QUESTION_TEXT, "edit_question")
+            writes_to_file(_COURSE_INFORMATION, "edit_question")
     return
 
 
@@ -1100,7 +1099,7 @@ def delete_question():
             if delete_check.upper() == "X":
                 break
             elif delete_check.upper() == "C":
-                writes_to_file(_QUIZ_QUESTION_TEXT, "delete", deleting_index) 
+                writes_to_file(_COURSE_INFORMATION, "delete", deleting_index) 
                 input("\033[0;31;40mOption has been deleted!\033[0;37;40m\nPress Enter to Continue\n") 
                 break 
             else:
@@ -1196,7 +1195,7 @@ def add_setting():
             break
 
         # Checks if the program aborted at any point 
-        with open(_QUIZ_SETTING_TEXT, "a") as f:
+        with open(_QUIZ_SETTING, "a") as f:
             r = random.randint(1,1000000)
             f.write(f"{r}||{new_setting_name}||{new_setting_value}")
         return
@@ -1271,7 +1270,7 @@ def selection_for_edit_setting(input_string: str, index: int):
         if local_loop:
             # Change the name of item
             value_list[index][1] = new_name
-            writes_to_file(_QUIZ_SETTING_TEXT, "edit_setting")   
+            writes_to_file(_QUIZ_SETTING, "edit_setting")   
 
     # Used to change the setting value             
     elif input_string == "2":
@@ -1303,7 +1302,7 @@ def selection_for_edit_setting(input_string: str, index: int):
         if local_loop:
             # Changes the value of the item
             value_list[index][2] = new_value
-            writes_to_file(_QUIZ_SETTING_TEXT, "edit_setting") 
+            writes_to_file(_QUIZ_SETTING, "edit_setting") 
     else:
         error_output("option")     
 
@@ -1324,7 +1323,7 @@ def delete_setting():
             if delete_check.upper() == "X":
                 break
             elif delete_check.upper() == "C":
-                writes_to_file(_QUIZ_SETTING_TEXT, "delete", deleting_index) 
+                writes_to_file(_QUIZ_SETTING, "delete", deleting_index) 
                 input("\033[0;31;40mOption has been deleted!\033[0;37;40m\nPress Enter to Continue\n")  
                 break
             else:
@@ -1429,14 +1428,14 @@ def register_user_subloop():
 def question_pool_subloop():
     while SUB_LOOP:
         os.system("cls")
-        read_file_content(_QUIZ_QUESTION_TEXT, option="question")
+        read_file_content(_COURSE_INFORMATION, option="question")
         userInput = print_menu("Question")
         question_logic(userInput)
 
 def quiz_setting_subloop():
     while SUB_LOOP:
         os.system("cls")
-        read_file_content(_QUIZ_SETTING_TEXT, option="settings")
+        read_file_content(_QUIZ_SETTING, option="settings")
         userInput = print_menu("Quiz Settings")    
         setting_logic(userInput)
 
