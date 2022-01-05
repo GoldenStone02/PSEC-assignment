@@ -15,8 +15,7 @@
         "password_SHA256": "",
         "current_course":"Programming Language",
         "eligible_modules": [
-            "Basic Python",
-            "Fundamentals of Javascript"
+            "Basic Python"
         ]
     }
 ]
