@@ -93,5 +93,100 @@
                 ]
             }
         ]
+    },
+    {
+        "course": "Mathematics",
+        "modules": [
+            {
+                "module_name": "Advanced Mathematic",
+                "assessment_component": [
+                    {
+                        "quiz": "Quiz-1",
+                        "show_to_student": true,
+                        "has_the_quiz_expired?": false,
+                        "questions": [
+                            {
+                                "question_name": "question 1",
+                                "options": ["option 1", "option 2", "option 3", "option 4"]
+                            },
+                            {
+                                "question_name": "question 2",
+                                "options": ["option 1", "option 2", "option 3", "option 4"]
+                            },
+                            {
+                                "question_name": "question 3",
+                                "options": ["option 1", "option 2", "option 3", "option 4"]
+                            }
+                        ],
+                        "marks_for_each_question": 2
+                    },
+                    {
+                        "quiz": "Quiz-2",
+                        "show_to_student": false,
+                        "has_the_quiz_expired?": false,
+                        "questions": [
+                            {
+                                "question_name": "question 1",
+                                "options": ["option 1", "option 2", "option 3", "option 4"]
+                            },
+                            {
+                                "question_name": "question 2",
+                                "options": ["option 1", "option 2", "option 3", "option 4"]
+                            },
+                            {
+                                "question_name": "question 3",
+                                "options": ["option 1", "option 2", "option 3", "option 4"]
+                            }
+                        ],
+                        "marks_for_each_question": 2
+                    }
+                ]
+            },
+            {
+                "module_name": "Application of Mathematics",
+                "assessment_component": [
+                    {
+                        "quiz": "Quiz-1",
+                        "show_to_student": false,
+                        "has_the_quiz_expired?": true,
+                        "questions": [
+                            {
+                                "question_name": "question 1",
+                                "options": ["option 1", "option 2", "option 3", "option 4"]
+                            },
+                            {
+                                "question_name": "question 2",
+                                "options": ["option 1", "option 2", "option 3", "option 4"]
+                            },
+                            {
+                                "question_name": "question 3",
+                                "options": ["option 1", "option 2", "option 3", "option 4"]
+                            }
+                        ],
+                        "marks_for_each_question": 2
+                    },
+                    {
+                        "quiz": "Quiz-2",
+                        "show_to_student": false,
+                        "has_the_quiz_expired?": true,
+                        "questions": [
+                            {
+                                "question_name": "question 1",
+                                "options": ["option 1", "option 2", "option 3", "option 4"]
+                            },
+                            {
+                                "question_name": "question 2",
+                                "options": ["option 1", "option 2", "option 3", "option 4"]
+                            },
+                            {
+                                "question_name": "question 3",
+                                "options": ["option 1", "option 2", "option 3", "option 4"]
+                            }
+                        ],
+                        "marks_for_each_question": 2
+                    }
+                ]
+            }
+        ]
     }
 ]
