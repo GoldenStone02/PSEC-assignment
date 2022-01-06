@@ -1,12 +1,19 @@
 [
     {
         "userID": "testuser",
+        "admin": true,
         "email": "testing@gmail.com",
         "password_SHA256": "",
         "current_course": "Programming Language",
-        "eligible_modules": [
-            "Basic Python",
-            "Fundamentals of Javascript"
+        "modules": [
+            {
+                "module_name": "Basic Python",
+                "grade": null
+            },
+            {
+                "module_name": "Fundamentals of Javascript",
+                "grade": null
+            }
         ]
     },
     {
@@ -14,8 +21,15 @@
         "email": "joshua@gmail.com",
         "password_SHA256": "",
         "current_course":"Programming Language",
-        "eligible_modules": [
-            "Basic Python"
+        "modules": [
+            {
+                "module_name": "Basic Python",
+                "grade": null
+            },
+            {
+                "module_name": "Fundamentals of Javascript",
+                "grade": null
+            }
         ]
     }
 ]
