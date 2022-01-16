@@ -1,9 +1,8 @@
 [
     {
         "userID": "testuser",
-        "admin": true,
         "email": "testing@gmail.com",
-        "password_SHA256": "",
+        "password_SHA256": "3ed2ad36a8757684084872bd8df119ddce0848fc7dde129d4844664eb3cd5572",
         "current_course": "Programming Language",
         "modules": [
             {
@@ -20,7 +19,7 @@
         "userID": "joshua",
         "email": "joshua@gmail.com",
         "password_SHA256": "",
-        "current_course":"Programming Language",
+        "current_course": "Programming Language",
         "modules": [
             {
                 "module_name": "Basic Python",
