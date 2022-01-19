@@ -1,6 +1,27 @@
-{
-    "time_in_minutes": 1,
-    "number_of_questions": 5,
-    "maximum_number_of_attempts": 3,
-    "randomize_options": true
-}
+[
+    {
+        "course": "Programming Language",
+        "module_name": "Basic Python",
+        "quiz_name": "Quiz-1",
+        "assessment_component": [
+            "Control Flow"
+        ],
+        "time_in_minutes": 1,
+        "number_of_questions": 5,
+        "maximum_number_of_attempts": 3,
+        "randomize_options": true
+    },
+    {
+        "course": "Programming Language",
+        "module_name": "Basic Python",
+        "quiz_name": "Quiz-2",
+        "assessment_component": [
+            "Control Flow",
+            "Objects & Classes"
+        ],
+        "time_in_minutes": 1,
+        "number_of_questions": 5,
+        "maximum_number_of_attempts": 3,
+        "randomize_options": true
+    }
+]
