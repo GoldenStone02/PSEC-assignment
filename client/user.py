@@ -11,12 +11,9 @@
 #
 # Usage syntax:	Run with play button / command line, eg. py read-cmd-line 1 2 3
 # 
-# Input file:   C:\PSEC_project\question_pool.txt
-#               C:\PSEC_project\quiz_settings.txt
-#               C:\PSEC_project\userid_pswd.csv
-#               C:\PSEC_project\quiz_results.csv
+# Input file:   
 # 
-# Output file:  C:\PSEC_project\userid_pswd.csv
+# Output file:  C:\PSEC_project\users.json
 #               C:\PSEC_project\quiz_results.csv
 # 
 # Python ver:	Python 3
@@ -36,13 +33,16 @@
 #                   
 # Library/
 # package/	
-# Module /      os, re, hashlib, random, csv, time
+# Module /      sys, socket, os, traceback, threading, re, hashlib, random, csv, time, json, getpass
 #
-# Known issues:	Reset of password doesn't send the user any email for the new password
-#
-import os, re, hashlib, random, csv
+# Known issues:	N/A
+
+import sys, socket, os, traceback
+import threading
+import re, hashlib, random, csv
 import time
 import json
+import getpass
 
 # ==============================================================================================================================
 #   Initialize variables
@@ -52,20 +52,77 @@ dictionary = {}
 csv_dict_list = []
 
 EMPTY = ""
-DIVIDER = f"{EMPTY:=^60}"
 
-MAIN_USER_MENU = ["Log In", "Reset Password"]
+MAIN_USER_MENU = ["Register User", "Log In", "Reset Password"]
 START_MENU = ["Begin Quiz"]
 
 PASSWORD_PATTERN = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%]).+$'
 
-_USERNAME_AND_PASSWORD = "./admin/userid_pswd.csv"
-_QUIZ_SETTING_TEXT = "./admin/quiz_settings.txt"
-_QUIZ_QUESTION_TEXT = "./admin/question_pool.txt"
-_QUIZ_RESULTS = "./admin/quiz_results.csv"
+_USERNAME_AND_PASSWORD = "./server/users.json"
+_QUIZ_SETTING = "./server/quiz_settings.json"
+_COURSE_INFORMATION = "./server/question_pool.json"
+_QUIZ_RESULTS = "./server/quiz_results.csv"
 
-MAIN_LOOP = True
-SUB_LOOP = True
+# ==============================================================================================================================
+#   Socket Programming Functions
+# ==============================================================================================================================
+
+HOST = "127.0.0.1"
+PORT = 8181
+
+def server_process(packet_input: dict):
+    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  
+    connect_to_server(client)
+    server_response = send_to_server(packet_input, client)
+    exit_server(client)
+    processed_input = process_input(server_response)
+    return processed_input
+
+def connect_to_server(client):
+    try:
+        client.connect((HOST, PORT))
+    except:
+        print("Connection Error")
+        print(traceback.format_exc())
+        sys.exit()
+    print(f"[CONNECTION ESTABLISHED] Connected to {HOST}:{PORT}")
+
+def send_to_server(user_input, client):
+    connected = True
+    while connected:
+        if len(user_input) > 0:
+            client.sendall(json.dumps(user_input).encode("utf8"))
+        else:
+            print("Message can't be empty")
+            continue    # Skips the bottom commands
+        connected = False
+        received_message = json.loads(client.recv(5120))
+        print(f"[PROCESS] {HOST}:{PORT}, Packet type: {received_message['type']}")
+        return received_message
+
+def exit_server(client):
+    # Sends a quit packet to close the connection
+    quit_connection = {"type":"quit"}
+    client.sendall(json.dumps(quit_connection).encode("utf8"))
+    print(f"[EXITED] Connection to {HOST}:{PORT} Exited")
+
+# Processes the server_response 
+def process_input(server_response):
+    input(server_response)
+    match server_response['type']:
+        case "Login Failed":
+            return False
+        case "Login Success":
+            return True
+        case "Quiz Settings":
+            pass
+        case "Question Pool":
+            pass
+        case "Results":
+            pass
+        case _:
+            input("Error")
+    return server_response
 
 # ==============================================================================================================================
 #   General Functions
@@ -73,101 +130,19 @@ SUB_LOOP = True
 
 # Reads and empties value into "dictionary" variable
 # "option" parameter used to define what format it should print in
-def read_file_content(file: str, option):
-    try:
-        if option == "csv":
-            csv_dict_list.clear()
-            with open(file, 'r') as csvfile:
-                # Uses DictReader for easy storing of the value
-                for line in csv.DictReader(csvfile):
-                    csv_dict_list.append(dict(line))
-                
-        else:
-            # Ensures that the file has been formatted correctly
-            remove_linefeed(file)
-
-            with open(file,"r") as f:
-                # This method of reading file removes newlines or "\n"
-                file_content = f.read().splitlines()
-
-            # Clears to update the dictionary.
-            dictionary.clear()
-
-            # Format used for quiz settings dictionary
-            if option == "settings":
-                for i, line in enumerate(file_content):
-                    stripped_lines = line.strip()
-
-                    # Skips line if the line is empty
-                    if stripped_lines == "":
-                        continue
-
-                    current_line_list = stripped_lines.split("||")
-                    dictionary[f"option {i + 1}"] = [current_line_list[0],current_line_list[1],current_line_list[2]]
-            # Format used for question pool dictionary
-            elif option == "question":
-                for i, line in enumerate(file_content):
-                    stripped_lines = line.strip()
-                    if stripped_lines == "":
-                        continue
-                    
-                    current_line_list = stripped_lines.split("||")
-
-                    # Pushes each line into a dictionary
-                    dictionary[f"question {i+1}"] = [
-                        current_line_list[0],                               # Question Content
-                        current_line_list[1:len(current_line_list) - 1],    # Question Options
-                        current_line_list[len(current_line_list) - 1]       # Question Answer
-                    ]
-    except FileNotFoundError:
-        print("File Doesn't Exist")
-
-# Removes linefeed that is in between lines in the file
-def remove_linefeed(file: str):
-    temp = []
-    with open(file, "r") as f:
-        lines = f.readlines()
-    
-    # Remove linefeed
-    # Ensures that if there is a linefeed in between variables
-    # It will get removed, preventing any fatal errors in the system
-    for line in lines:
-        if line == "\n":
-            continue
-        temp.append(line.strip())
-    
-    # Rewrites file
-    with open(file, "w") as f:
-        for line in temp:
-            f.write(line + "\n")
-
-# Returns the file content using "dictionary"
-# "show_number" parameter is used to define the format of returning string.
-# "0" prints out file content without numbering
-# "1" prints out with sequence numbering
-def view_file_content(show_numbers: int, option: str):
-    content = ""
-
-    value_list = list(dictionary.values())
-
-    if show_numbers == 1:
-        if option == "question":
-            for i, item in enumerate(value_list): 
-                sample = ""
-                for j, option in enumerate(value_list[i][1]):
-                    sample += f"\n\t{chr(97 + j)}) {option}"
-                content += f"[ {i + 1} ] {value_list[i][0]}: {sample}\n\n"
-
-    elif show_numbers == 0:
-        if option == "question":
-            for item in value_list:
-                sample = ""
-                for j, option in enumerate(item[1]):
-                    sample += f"\n{chr(97 + j)}) {option}"
-                content += f"{item[0]}: {sample}\n\n"
-    
-    return content
-
+def read_file(file: str, option):
+    if option == "csv":
+        csv_dict_list = []
+        with open(file, 'r') as csvfile:
+            # Uses DictReader for easy storing of the value
+            for line in csv.DictReader(csvfile):
+                csv_dict_list.append(dict(line))
+    elif option == "json":
+        # Loading of JSON file into the program
+        with open(file,"r") as f:
+            file_content = json.load(f)
+        
+        return file_content
 
 # Writes into a csv file with the given inputs.
 def write_csv(file: str, dict_input: dict):
@@ -179,27 +154,6 @@ def write_csv(file: str, dict_input: dict):
         csvwriter = csv.DictWriter(csvfile, fieldnames=fields)
         csvwriter.writeheader()
         csvwriter.writerows(dict_input)
-
-
-# Returns content
-def print_file(name: str):
-    option_name = ""
-    content = f"{DIVIDER}\n\t\t\t\033[1;37;40m {name}\033[0;37;40m\n{DIVIDER}\n"
-
-    if name == "Log In":
-        option_name = "login"
-        content += f"Question\n{DIVIDER}\n[ P ] Previous Question\t[ N ] Next Question\n[ X ] Back to Menu\n{DIVIDER}\n"
-
-    return content
-
-# Checks whether the input is an integer or string
-# If the input is a digit, return True
-# if the input is a string, return False
-def check_if_digit(input):
-    if input.strip().isdigit():
-        return True
-    else:
-        return False
 
 # Used for easy maintainence of error outputs
 def error_output(error_message: str):
@@ -216,14 +170,11 @@ def error_output(error_message: str):
     elif error_message == "range":              # Input value not within range
         string += "\033[1;37;41mPlease enter a value within the range.\033[0;37;40m"
 
-    elif error_message == "username":           # User not found in database    [Unique to user.py]
-        string += "\033[1;37;41mUsername could not be found.\033[0;37;40m"
-
-    elif error_message == "email":              # User not found in database    [Unique to user.py]
+    elif error_message == "email":              # Email is not found in database        [Unique to user.py]
         string += "\033[1;37;41mEmail is not linked to userID\033[0;37;40m"
 
-    elif error_message == "password_incorrect": # Password input was incorrect  [Unique to user.py]
-        string += "\033[1;37;41mPassword is incorrect.\033[0;37;40m"
+    elif error_message == "incorrect":          # The userID or password is incorrect   [Unique to user.py]
+        string += "\033[1;37;41mUserID or password is incorrect. Please try again\033[0;37;40m"
 
     elif error_message == "short":              # Input value was too short
         string += "\033[1;37;41mLength of input was too short\033[0;37;40m\n"
@@ -251,107 +202,107 @@ def error_output(error_message: str):
     
     input(string)
 
+# Used to create a dynamic divider that changes size according to the size of the terminal
+def dynamic_divider():
+    column, row = os.get_terminal_size()
+    output = f"{EMPTY:=^{column}}"
+    return output
     
 # ===========================================================================================================================
 #   User Page Function
 # ===========================================================================================================================
 
-# User navigation menu
+# Returns user navigation menu
 def user_menu(inputList: list):
-    content = f"{DIVIDER}\n\t\t\t\033[1;37;40m Main \033[0;37;40m\n{DIVIDER}\n"
+    content = f"{dynamic_divider()}\n\t\t\t\033[1;37;40m Main \033[0;37;40m\n{dynamic_divider()}\n"
     for i, element in enumerate(inputList):
         content += f"[ {i+1} ] {element}\n"
-    content += f"[ X ] Exit Application\n{DIVIDER}\n"
+    content += f"[ X ] Exit Application\n{dynamic_divider()}\n"
     return content
 
 # Logicial Flow for user menu
-def user_logic(userpage_list, content: str):
+def user_logic():
+    sub_loop = True
     while True:
         os.system("cls")
-        global MAIN_LOOP, SUB_LOOP
-        SUB_LOOP = True
-        stored_value = input(content)
-        if check_if_digit(stored_value):
-            if int(stored_value) in range(1, len(userpage_list) + 1):
-                if stored_value == "1":
-                    login_subloop()
-                elif stored_value == "2":
-                    reset_password()
-            else:
-                error_output("range")
-        elif stored_value.upper() == "X":
-            while True:
-                os.system("cls")
-                userConfirm = input(f"{DIVIDER}\n\033[1;37;40m\t\tAre you sure want to quit?\033[0;37;40m\n{DIVIDER}\n[ Y ] Yes\t\t[ N ] No\n{DIVIDER}\n")
-                if userConfirm.upper() == "Y":
-                    print("\033[0;32;40mGoodbye\033[0;37;40m")
-                    MAIN_LOOP = False
-                    break
-                elif userConfirm.upper() == "N":
-                    break
-                else:
-                    error_output("option")
-            return
-        elif stored_value == "":
-            error_output("empty_input")
-        else:
-            error_output("option")
+        stored_value = input(user_menu(MAIN_USER_MENU))
+        match stored_value.upper():
+            case "X":
+                while True:
+                    os.system("cls")
+                    userConfirm = input(f"{dynamic_divider()}\n\033[1;37;40m\t\tAre you sure want to quit?\033[0;37;40m\n{dynamic_divider()}\n[ Y ] Yes\t\t[ N ] No\n{dynamic_divider()}\n")
+                    if userConfirm.upper() == "Y":
+                        print("\033[0;32;40mGoodbye\033[0;37;40m")
+                        return False
+                    elif userConfirm.upper() == "N":
+                        break
+                    else:
+                        error_output("option")
+            case "1":
+                register_user_subloop(sub_loop)
+            case "2":
+                login_subloop(sub_loop)
+            case "3":
+                reset_subloop(sub_loop)
+            case _:
+                error_output("option")
 
 
 # =========================================================================================================================
-#   Login Functions
+#   Menu Functions
 # =========================================================================================================================
+
+# Adds users to the backend server
+def register_user():
+    return False
 
 # Log In Logicial Flow
 def login_menu():
-    while True:
+    # Counter for number of attempts before a user's session is timed out 
+    count = 3
+    while count != 0:
         os.system("cls")
-        user_username_input = input(f"{DIVIDER}\n\t\t\tLog In\n{DIVIDER}\nUserID: \nPassword: \n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nEnter your userID: ")
-        if user_username_input.upper() == "X":
-            global SUB_LOOP
-            SUB_LOOP = False
-            return
-        elif user_username_input == "":
+        username_input = input(f"{dynamic_divider()}\n\t\t\tLog In\n{dynamic_divider()}\nUserID: \nPassword: \n{dynamic_divider()}\n[ X ] Back to Menu\n{dynamic_divider()}\nEnter your userID: ")
+        if username_input.upper() == "X":
+            return False
+        elif username_input == "":
             error_output("empty_input")
-        # Checks if the username input is inside the database
-        elif check_username(user_username_input):
-            # Counter for number of attempts before a user's session is timed out 
-            count = 3
-            while count != 0:
-                os.system("cls")
-                password_input = input(f"{DIVIDER}\n\t\t\tLog In\n{DIVIDER}\nUserID: {user_username_input} \nPassword: \n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nEnter your password: ")
-                if password_input.upper() == "X":
-                    SUB_LOOP = False
-                    return
-                elif check_password(user_username_input, password_input):
-                    quiz_menu(user_username_input) # Starting of the quiz
-                    SUB_LOOP = False
-                    return
-                else:
-                    count -= 1
-                    error_output("password_incorrect")
-                    continue
-            # Time out the user if he/she fails to input the correct password 
-            if count == 0:
-                os.system("cls")
-                error_output("admin")
-                break
-        else:
-            error_output("username")
             continue
 
-# Check if username exist in the file
-def check_username(username: str):
-    read_file_content(_USERNAME_AND_PASSWORD, option="csv")
-    for i in csv_dict_list:
-        if username == i["userID"]:
-            return True
-    return False
+        os.system("cls")
+        password_input = getpass.getpass(f"{dynamic_divider()}\n\t\t\tLog In\n{dynamic_divider()}\nUserID: {username_input} \nPassword: \n{dynamic_divider()}\n[ X ] Back to Menu\n{dynamic_divider()}\nEnter your password: ")
+        if password_input.upper() == "X":
+            return False
+        elif password_input == "":
+            error_output("empty_input")
+            continue
+        
+        packet = {
+            "type": "user_login",
+            "userID": username_input,
+            "password": user_password_hashing(password_input)
+        }
+    
+        server_response = server_process(packet)
+        if server_response == True:     # Enter quiz menu after successful login
+            input("SUCCESS")
+        else:
+            error_output("incorrect")
+            count -= 1
+
+    # Time out the user if he/she fails to input the correct password 
+    if count == 0:
+        os.system("cls")
+        error_output("admin")
+        return False
+
+def check_username():
+    # placeholder function before removing it
+    pass
 
 # Check if email exist in the file
-def check_email(email: str):
-    read_file_content(_USERNAME_AND_PASSWORD, option="csv")
-    for i in csv_dict_list:
+def check_email(email: str, input_dict: dict):
+    for i in input_dict:
         if email == i["email"]:
             return True
     return False
@@ -361,36 +312,24 @@ def user_password_hashing(given_input: str):
     output = hashlib.sha256(given_input.encode())
     return output.hexdigest()
 
-# Checks if the hashed matches the password
-def check_password(username: str, password: str):
-    read_file_content(_USERNAME_AND_PASSWORD, option="csv")
-    for i in csv_dict_list:
-        if username == i["userID"]:
-            if user_password_hashing(password) == i["password"]:
-                return True
-            else:
-                return False
 
 # Resets the user password if they can provide their email
 def reset_password():
-    read_file_content(_USERNAME_AND_PASSWORD, option="csv")
+    read_file(_USERNAME_AND_PASSWORD, option="json")
     while True:
         os.system("cls")
-        username_input = input(f"{DIVIDER}\n\t\tReset Password\n{DIVIDER}\nUserID:\nReset Email:\n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\n")
+        username_input = input(f"{dynamic_divider()}\n\t\tReset Password\n{dynamic_divider()}\nUserID:\nReset Email:\n{dynamic_divider()}\n[ X ] Back to Menu\n{dynamic_divider()}\n")
         if username_input.upper() == "X":
-            global SUB_LOOP
-            SUB_LOOP = False
-            return
+            return False
         elif username_input == "":
             error_output("empty_input")
             continue
         elif check_username(username_input):
             while True:
                 os.system("cls")
-                email_input = input(f"{DIVIDER}\n\t\tReset Password\n{DIVIDER}\nUserID:\t{username_input}\nReset Email:\n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\n")
+                email_input = input(f"{dynamic_divider()}\n\t\tReset Password\n{dynamic_divider()}\nUserID:\t{username_input}\nReset Email:\n{dynamic_divider()}\n[ X ] Back to Menu\n{dynamic_divider()}\n")
                 if email_input.upper() == "X":
-                    SUB_LOOP = False
-                    return
+                    return False
                 elif email_input == "":
                     error_output("empty_input")
                     continue
@@ -409,7 +348,7 @@ def password_change(username: str):
     # Password check
     while True:
         os.system("cls")
-        password_input = input(f"{DIVIDER}\n\t\t\tReset Password\n{DIVIDER}\nPassword: \n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nAt least one number\nAt least one uppercase and one lowercase character\nAt least one special symbol !@#$%\nShould be 4 - 20 characters long\nPassword: ")
+        password_input = input(f"{dynamic_divider()}\n\t\t\tReset Password\n{dynamic_divider()}\nPassword: \n{dynamic_divider()}\n[ X ] Back to Menu\n{dynamic_divider()}\nAt least one number\nAt least one uppercase and one lowercase character\nAt least one special symbol !@#$%\nShould be 4 - 20 characters long\nPassword: ")
         
         # Check if the user wants to exit the menu
         if password_input.upper() == "X":
@@ -431,7 +370,7 @@ def password_change(username: str):
     # Password double check
     while True:
         os.system("cls")
-        password2 = input(f"{DIVIDER}\n\t\t\tReset Password\n{DIVIDER}\nPassword: \n{DIVIDER}\n[ X ] Back to Menu\n{DIVIDER}\nPlease re-enter your password: ")
+        password2 = input(f"{dynamic_divider()}\n\t\t\tReset Password\n{dynamic_divider()}\nPassword: \n{dynamic_divider()}\n[ X ] Back to Menu\n{dynamic_divider()}\nPlease re-enter your password: ")
         
         # Check if the user wants to exit the menu
         if password2.upper() == "X":
@@ -443,7 +382,7 @@ def password_change(username: str):
             # Check if the user wants to confirm the setting
            while True:
                 os.system("cls")
-                confirm_change = input(f"{DIVIDER}\n\t\tReset Password\n{DIVIDER}\nPassword: {password_input}\n{DIVIDER}\n[ C ] Confirm Reset\n[ X ] Back to Menu\n{DIVIDER}\n")
+                confirm_change = input(f"{dynamic_divider()}\n\t\tReset Password\n{dynamic_divider()}\nPassword: {password_input}\n{dynamic_divider()}\n[ C ] Confirm Reset\n[ X ] Back to Menu\n{dynamic_divider()}\n")
                 if confirm_change.upper() == "X":
                     SUB_LOOP = False
                     return
@@ -468,37 +407,30 @@ def password_change(username: str):
             
 
 # ========================================================================================================================
-#   Question Function
+#   Quiz Functions
 # ========================================================================================================================
+
+# Show all the available quizzes
+def show_quizzes(username: str):
+    server_process({"type": "quiz_settings"})
+    pass
 
 # Display the quiz menu for the user.
 # "username" is a string to identify the user
 def quiz_menu(username: str):
     while True:
         os.system("cls")
-        user_input = input(f"{DIVIDER}\n\t\t\tQuiz Menu\n{DIVIDER}\nLogged In as: \033[1;37;40m{username}\033[0;37;40m\n\nNumber of Attempts Left: {remaining_attempt(username)}\nTime for the quiz: {check_amount_of_time()} mins\nNumber of Question: {check_number_of_question()}\n{DIVIDER}\n[ 1 ] Start Quiz\n[ X ] Back to Menu\n{DIVIDER}\n")
+        user_input = input(f"{dynamic_divider()}\n\t\t\tQuiz Menu\n{dynamic_divider()}\nLogged In as: \033[1;37;40m{username}\033[0;37;40m\n\nNumber of Attempts Left: 9999\nTime for the quiz: 9999 mins\nNumber of Question: 9999\n{dynamic_divider()}\n[ 1 ] Start Quiz\n[ X ] Back to Menu\n{dynamic_divider()}\n")
         if user_input.upper() == "X":
             return
         elif user_input == "1":
-            if remaining_attempt(username) == 0:
-                error_output("no_attempts")
-                continue
+            # Check if the remaining no of attempt is zero.
+            # if remaining_attempt(username) == 0:
+            #     error_output("no_attempts")
+            #     continue
             start_quiz(username) # Starts the quiz once the user confirms
         else:
             error_output("option")
-
-
-# Gets the remaining amount of attempt the current user can do.
-def remaining_attempt(username: str):
-    no_of_attempt_allowed =  check_number_of_attempts() 
-    count = 0
-    read_file_content(_QUIZ_RESULTS, option="csv")
-    for i in csv_dict_list:
-        if i["UserID"] == username:
-            count += 1
-    if no_of_attempt_allowed - count < 0:
-        return 0
-    return no_of_attempt_allowed - count
 
 
 # Need to add some kind of notification to show what answers the user selected
@@ -540,7 +472,7 @@ def start_quiz(username: str):
         selected_question = f"q{selected_question_index + 1}) {question[selected_question_index][1]}: {sample}\n\n"
 
         os.system("cls")
-        user_selection = input(f"{DIVIDER}\n\t\t\tQuiz\n{DIVIDER}\nTime left: {timer(starttime)[0]} min {timer(starttime)[1]} sec\n{DIVIDER}\n{selected_question}Your Answer: {temp_list[selected_question_index][4]}\n{DIVIDER}\n[ P ] Previous Question\t\t[ N ] Next Question\n[ S ] Save & Submit\n{DIVIDER}\n")
+        user_selection = input(f"{dynamic_divider()}\n\t\t\tQuiz\n{dynamic_divider()}\nTime left: {timer(starttime)[0]} min {timer(starttime)[1]} sec\n{dynamic_divider()}\n{selected_question}Your Answer: {temp_list[selected_question_index][4]}\n{dynamic_divider()}\n[ P ] Previous Question\t\t[ N ] Next Question\n[ S ] Save & Submit\n{dynamic_divider()}\n")
         
         # If time is up, save and submit the users answer
         # OR
@@ -605,10 +537,10 @@ def save_user_answer(input_list: list):
     answered_wrong = 0
     total_questions = 0
     for question_data in input_list:
+        # [ISSUE] Might have to relook the saving of data
         try:
             total_questions += 1
             index = ord(question_data[4]) - 97
-
         # TypeError occurs when user didn't answer the question
         except TypeError: 
             question_data[4] = "Didn't Answer"
@@ -642,7 +574,7 @@ def save_user_answer(input_list: list):
 # input_list[2]: questions answered wrong
 # input_list[3]: total number of question
 def push_result(username: str, input_list: list):
-    read_file_content(_QUIZ_QUESTION_TEXT, option="question")
+    read_file(_COURSE_INFORMATION, option="question")
     question_pool = list(dictionary.values())
     # Iterates over the entire question_pool to ensure that all question are being tracked
     for i, element in enumerate(question_pool):
@@ -658,7 +590,7 @@ def push_result(username: str, input_list: list):
             input_list[0].insert(i, formatted_missing_question)
 
     # Reads the file to ensure that all values in the file has been stored.
-    read_file_content(_QUIZ_RESULTS, option="csv")
+    read_file(_QUIZ_RESULTS, option="csv")
 
     # Pushes all the elements into a dictionary for printing
     new_dict = format_into_dict(username, input_list)
@@ -701,7 +633,7 @@ def show_result(username: str, input_list: list):
     total = input_list[3] * 2
     percentage = user_marks/total * 100
 
-    string += f"{DIVIDER}\nUserID: {username}\n"
+    string += f"{dynamic_divider()}\nUserID: {username}\n"
     string += f"Results: {percentage:.2f}%\n"
     string += f"Time of Submission: {time.ctime()}\n\n"
     if percentage >= 80:
@@ -710,54 +642,65 @@ def show_result(username: str, input_list: list):
         string += "Good Work! You could be better."
     else:
         string += "Poor! Try harder next time."
-    string += f"\n{DIVIDER}\nPress enter to continue"
+    string += f"\n{dynamic_divider()}\nPress enter to continue"
     input(string)
     return
 
 ###   TO BE CHANGED into JSON for CONFIGURATION   ###
 
-# Returns the remaining time left in a tuple
-def timer(starting_time: float):
-    endtime = time.time() - starting_time
-    total_allowed_time = float(check_amount_of_time()) * 60
-    time_left_min = int((total_allowed_time - endtime)/60)
-    time_left_sec = int((((total_allowed_time - endtime)/60) - time_left_min) * 60)
-    return time_left_min, time_left_sec
+# [NOTE] All the function below that are commented are retrieving quiz setting and doing calculations
 
+# Placeholder functions, to be removed later on
+def timer():
+    pass
 
-# Returns the amount of time set within the settings
-def check_amount_of_time():
-    read_file_content(_QUIZ_SETTING_TEXT, option="settings")
-    value_list = list(dictionary.values())
-    for i in value_list:
-        if i[0] == "1": # ID of "time"
-            return i[2]
-
-# Number of question to be used in the quiz
 def check_number_of_question():
-    read_file_content(_QUIZ_SETTING_TEXT, option="settings")
-    value_list = list(dictionary.values())
-    for i in value_list:
-        if i[0] == "2": # ID of "no_of_question"
-            return i[2]
+    pass
 
-# Checks the number of attempts set for the quiz
-def check_number_of_attempts():
-    read_file_content(_QUIZ_SETTING_TEXT, option="settings")
-    value_list = list(dictionary.values())
-    for i in value_list:
-        if i[0] == "3": # ID of "no_of_attempt"
-            return int(i[2])
-
-# Checks if the admin set the answers to appear randomly
 def check_randomize_option():
-    read_file_content(_QUIZ_SETTING_TEXT, option="settings")
-    value_list = list(dictionary.values())
-    for i in value_list:
-        if i[0] == "4": # ID of "randomize_answer"
-            if i[2].lower() == "true":
-                return True
-            return False
+    pass
+
+# # Returns the remaining time left in a tuple
+# def timer(starting_time: float):
+#     endtime = time.time() - starting_time
+#     total_allowed_time = float(check_amount_of_time()) * 60
+#     time_left_min = int((total_allowed_time - endtime)/60)
+#     time_left_sec = int((((total_allowed_time - endtime)/60) - time_left_min) * 60)
+#     return time_left_min, time_left_sec
+
+# # Returns the amount of time set within the settings
+# def check_amount_of_time():
+#     read_file(_QUIZ_SETTING, option="json")
+#     value_list = list(dictionary.values())
+#     for i in value_list:
+#         if i[0] == "1": # ID of "time"
+#             return i[2]
+
+# # Number of question to be used in the quiz
+# def check_number_of_question():
+#     read_file(_QUIZ_SETTING, option="settings")
+#     value_list = list(dictionary.values())
+#     for i in value_list:
+#         if i[0] == "2": # ID of "no_of_question"
+#             return i[2]
+
+# # Checks the number of attempts set for the quiz
+# def check_number_of_attempts():
+#     read_file(_QUIZ_SETTING, option="settings")
+#     value_list = list(dictionary.values())
+#     for i in value_list:
+#         if i[0] == "3": # ID of "no_of_attempt"
+#             return int(i[2])
+
+# # Checks if the admin set the answers to appear randomly
+# def check_randomize_option():
+#     read_file(_QUIZ_SETTING, option="settings")
+#     value_list = list(dictionary.values())
+#     for i in value_list:
+#         if i[0] == "4": # ID of "randomize_answer"
+#             if i[2].lower() == "true":
+#                 return True
+#             return False
 
 
 ###   END OF CONFIGURATION   ###
@@ -770,7 +713,7 @@ def check_randomize_option():
 # ask_question_list[2]: options for the question
 # ask_question_list[3]: correct answer to the question
 def selection_random_question():
-    read_file_content(_QUIZ_QUESTION_TEXT, option="question")
+    read_file(_COURSE_INFORMATION, option="question")
     question_list = list(dictionary.values())
     ask_question_list = []
 
@@ -799,24 +742,36 @@ def selection_random_question():
 # ==============================================================================================================================
 #   Sub Program Loop
 # ==============================================================================================================================
-def login_subloop():
-    while SUB_LOOP:
-        read_file_content(_USERNAME_AND_PASSWORD, option="login")
-        login_menu()
+def register_user_subloop(subloop: bool):
+    while subloop:
+        check = register_user()
+        if check == False:
+            subloop = False
+
+def login_subloop(sub_loop: bool):
+    while sub_loop:
+        check = login_menu()
+        if check == False:
+            sub_loop = False
     
-def reset_subloop():
-    while SUB_LOOP:
-        read_file_content(_USERNAME_AND_PASSWORD, option="csv")
-        reset_password()
+def reset_subloop(sub_loop: bool):
+    while sub_loop:
+        read_file(_USERNAME_AND_PASSWORD, option="csv")
+        check = reset_password()
+        if check == False:
+            sub_loop = False
 
 # ==============================================================================================================================
 #   Main Program Loop
 # ==============================================================================================================================
 # Try loop is used in order to catch any bad inputs the user might have done within the stack
-while MAIN_LOOP:
-    try:
-        while MAIN_LOOP:
-            string = user_menu(MAIN_USER_MENU)
-            user_logic(MAIN_USER_MENU, string)
-    except:
-        error_output("bad_input")
+def main():
+    main_loop = True
+    while main_loop:
+        check = user_logic()
+        if check == False:
+            main_loop = False
+
+
+if __name__ == "__main__":
+    main()
