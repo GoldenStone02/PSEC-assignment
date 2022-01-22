@@ -1,7 +1,7 @@
 [
     {
-        "course": "Programming Language",
-        "module_name": "Basic Python",
+        "course": "DISM",
+        "module_name": "PSEC",
         "quiz_name": "Quiz-1",
         "assessment_component": [
             "Control Flow"
@@ -12,8 +12,8 @@
         "randomize_options": true
     },
     {
-        "course": "Programming Language",
-        "module_name": "Basic Python",
+        "course": "DISM",
+        "module_name": "PSEC",
         "quiz_name": "Quiz-2",
         "assessment_component": [
             "Control Flow",

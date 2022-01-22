@@ -1,27 +1,27 @@
 [
     {
-        "course": "Programming Language",
+        "course": "DISM",
         "modules": [
             {
-                "module_name": "Basic Python",
+                "module_name": "PSEC",
                 "topics": [
                     {
                         "topic_name": "Control Flow",
                         "questions": [
                             {
                                 "question_name": "question 1",
-                                "correct_option": "option 1",
-                                "options": ["option 2", "option 3", "option 4"]
+                                "correct_option": "option 1", 
+                                "options": ["option 1", "option 2", "option 3", "option 4"]
                             },
                             {
                                 "question_name": "question 2",
                                 "correct_option": "option 1",
-                                "options": ["option 2", "option 3", "option 4"]
+                                "options": ["option 1", "option 2", "option 3", "option 4"]
                             },
                             {
                                 "question_name": "question 3",
                                 "correct_option": "option 1",
-                                "options": ["option 2", "option 3", "option 4"]
+                                "options": ["option 1", "option 2", "option 3", "option 4"]
                             }
                         ],
                         "marks_for_each_question": 2
@@ -32,17 +32,38 @@
                             {
                                 "question_name": "question 1",
                                 "correct_option": "option 1",
-                                "options": ["option 2", "option 3", "option 4"]
+                                "options": ["option 1", "option 2", "option 3", "option 4"]
                             },
                             {
                                 "question_name": "question 2",
                                 "correct_option": "option 1",
-                                "options": ["option 2", "option 3", "option 4"]
+                                "options": ["option 1", "option 2", "option 3", "option 4"]
                             },
                             {
                                 "question_name": "question 3",
                                 "correct_option": "option 1",
-                                "options": ["option 2", "option 3", "option 4"]
+                                "options": ["option 1", "option 2", "option 3", "option 4"]
+                            }
+                        ],
+                        "marks_for_each_question": 2
+                    },
+                    {
+                        "topic_name": "Socket Programming",
+                        "questions": [
+                            {
+                                "question_name": "question 1",
+                                "correct_option": "option 1",
+                                "options": ["option 1", "option 2", "option 3", "option 4"]
+                            },
+                            {
+                                "question_name": "question 2",
+                                "correct_option": "option 1",
+                                "options": ["option 1", "option 2", "option 3", "option 4"]
+                            },
+                            {
+                                "question_name": "question 3",
+                                "correct_option": "option 1",
+                                "options": ["option 1", "option 2", "option 3", "option 4"]
                             }
                         ],
                         "marks_for_each_question": 2
@@ -50,46 +71,46 @@
                 ]
             },
             {
-                "module_name": "Fundamentals of Javascript",
+                "module_name": "ISEC",
                 "topics": [
                     {
-                        "topic_name": "If-Else Statements",
+                        "topic_name": "Malware and Social Engineering",
                         "questions": [
                             {
                                 "question_name": "question 1",
                                 "correct_option": "option 1",
-                                "options": ["option 2", "option 3", "option 4"]
+                                "options": ["option 1", "option 2", "option 3", "option 4"]
                             },
                             {
                                 "question_name": "question 2",
                                 "correct_option": "option 1",
-                                "options": ["option 2", "option 3", "option 4"]
+                                "options": ["option 1", "option 2", "option 3", "option 4"]
                             },
                             {
                                 "question_name": "question 3",
                                 "correct_option": "option 1",
-                                "options": ["option 2", "option 3", "option 4"]
+                                "options": ["option 1", "option 2", "option 3", "option 4"]
                             }
                         ],
                         "marks_for_each_question": 2
                     },
                     {
-                        "topic_name": "Object Oriented Programming",
+                        "topic_name": "System Security",
                         "questions": [
                             {
                                 "question_name": "question 1",
                                 "correct_option": "option 1",
-                                "options": ["option 2", "option 3", "option 4"]
+                                "options": ["option 1", "option 2", "option 3", "option 4"]
                             },
                             {
                                 "question_name": "question 2",
                                 "correct_option": "option 1",
-                                "options": ["option 2", "option 3", "option 4"]
+                                "options": ["option 1", "option 2", "option 3", "option 4"]
                             },
                             {
                                 "question_name": "question 3",
                                 "correct_option": "option 1",
-                                "options": ["option 2", "option 3", "option 4"]
+                                "options": ["option 1", "option 2", "option 3", "option 4"]
                             }
                         ],
                         "marks_for_each_question": 2
@@ -99,49 +120,49 @@
         ]
     },
     {
-        "course": "Mathematics",
+        "course": "DIT",
         "modules": [
             {
-                "module_name": "Advanced Mathematic",
+                "module_name": "BED",
                 "topics": [
                     {
-                        "topic_name": "Division",
+                        "topic_name": "Handling with Databases",
                         "questions": [
                             {
                                 "question_name": "question 1",
                                 "correct_option": "option 1",
-                                "options": ["option 2", "option 3", "option 4"]
+                                "options": ["option 1", "option 2", "option 3", "option 4"]
                             },
                             {
                                 "question_name": "question 2",
                                 "correct_option": "option 1",
-                                "options": ["option 2", "option 3", "option 4"]
+                                "options": ["option 1", "option 2", "option 3", "option 4"]
                             },
                             {
                                 "question_name": "question 3",
                                 "correct_option": "option 1",
-                                "options": ["option 2", "option 3", "option 4"]
+                                "options": ["option 1", "option 2", "option 3", "option 4"]
                             }
                         ],
                         "marks_for_each_question": 2
                     },
                     {
-                        "topic_name": "Trigonometry",
+                        "topic_name": "MySQL",
                         "questions": [
                             {
                                 "question_name": "question 1",
                                 "correct_option": "option 1",
-                                "options": ["option 2", "option 3", "option 4"]
+                                "options": ["option 1", "option 2", "option 3", "option 4"]
                             },
                             {
                                 "question_name": "question 2",
                                 "correct_option": "option 1",
-                                "options": ["option 2", "option 3", "option 4"]
+                                "options": ["option 1", "option 2", "option 3", "option 4"]
                             },
                             {
                                 "question_name": "question 3",
                                 "correct_option": "option 1",
-                                "options": ["option 2", "option 3", "option 4"]
+                                "options": ["option 1", "option 2", "option 3", "option 4"]
                             }
                         ],
                         "marks_for_each_question": 2
@@ -149,46 +170,46 @@
                 ]
             },
             {
-                "module_name": "Application of Mathematics",
+                "module_name": "FED",
                 "topics": [
                     {
-                        "topic_name": "Mathematics in the Real World",
+                        "topic_name": "HTML5 & CSS3",
                         "questions": [
                             {
                                 "question_name": "question 1",
                                 "correct_option": "option 1",
-                                "options": ["option 2", "option 3", "option 4"]
+                                "options": ["option 1", "option 2", "option 3", "option 4"]
                             },
                             {
                                 "question_name": "question 2",
                                 "correct_option": "option 1",
-                                "options": ["option 2", "option 3", "option 4"]
+                                "options": ["option 1", "option 2", "option 3", "option 4"]
                             },
                             {
                                 "question_name": "question 3",
                                 "correct_option": "option 1",
-                                "options": ["option 2", "option 3", "option 4"]
+                                "options": ["option 1", "option 2", "option 3", "option 4"]
                             }
                         ],
                         "marks_for_each_question": 2
                     },
                     {
-                        "topic_name": "Speed, Distance & Time",
+                        "topic_name": "Javascript",
                         "questions": [
                             {
                                 "question_name": "question 1",
                                 "correct_option": "option 1",
-                                "options": ["option 2", "option 3", "option 4"]
+                                "options": ["option 1", "option 2", "option 3", "option 4"]
                             },
                             {
                                 "question_name": "question 2",
                                 "correct_option": "option 1",
-                                "options": ["option 2", "option 3", "option 4"]
+                                "options": ["option 1", "option 2", "option 3", "option 4"]
                             },
                             {
                                 "question_name": "question 3",
                                 "correct_option": "option 1",
-                                "options": ["option 2", "option 3", "option 4"]
+                                "options": ["option 1", "option 2", "option 3", "option 4"]
                             }
                         ],
                         "marks_for_each_question": 2
