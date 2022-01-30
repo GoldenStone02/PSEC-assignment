@@ -6,64 +6,94 @@
                 "module_name": "PSEC",
                 "topics": [
                     {
-                        "topic_name": "Control Flow",
+                        "topic_name": "string",
                         "questions": [
                             {
-                                "question_name": "question 1",
-                                "correct_option": "option 1", 
-                                "options": ["option 1", "option 2", "option 3", "option 4"]
+                                "question_name": "string-question-1",
+                                "correct_option": "string-question-1-ans-a", 
+                                "options": ["string-question-1-ans-a", "string-question-1-ans-b", "string-question-1-ans-c", "string-question-1-ans-d"]
                             },
                             {
-                                "question_name": "question 2",
-                                "correct_option": "option 1",
-                                "options": ["option 1", "option 2", "option 3", "option 4"]
+                                "question_name": "string-question-2",
+                                "correct_option": "string-question-2-ans-b",
+                                "options": ["string-question-2-ans-a", "string-question-2-ans-b", "string-question-2-ans-c", "string-question-2-ans-d"]
                             },
                             {
-                                "question_name": "question 3",
-                                "correct_option": "option 1",
-                                "options": ["option 1", "option 2", "option 3", "option 4"]
+                                "question_name": "string-question-3",
+                                "correct_option": "string-question-3-ans-c",
+                                "options": ["string-question-3-ans-a", "string-question-3-ans-b", "string-question-3-ans-c", "string-question-3-ans-d"]
+                            },
+                            {
+                                "question_name": "string-question-4",
+                                "correct_option": "string-question-4-ans-d",
+                                "options": ["string-question-4-ans-a", "string-question-4-ans-b", "string-question-4-ans-c", "string-question-4-ans-d"]
+                            },
+                            {
+                                "question_name": "string-question-5",
+                                "correct_option": "string-question-5-ans-a",
+                                "options": ["string-question-5-ans-a", "string-question-5-ans-b", "string-question-5-ans-c", "string-question-5-ans-d"]
+                            }
+                        ],
+                        "marks_for_each_question": 3
+                    },
+                    {
+                        "topic_name": "list",
+                        "questions": [
+                            {
+                                "question_name": "list-question-1",
+                                "correct_option": "list-question-1-ans-a",
+                                "options": ["list-question-1-ans-a", "list-question-1-ans-b", "list-question-1-ans-c", "list-question-1-ans-d"]
+                            },
+                            {
+                                "question_name": "list-question-2",
+                                "correct_option": "list-question-2-ans-b",
+                                "options": ["list-question-2-ans-a", "list-question-2-ans-b", "list-question-2-ans-c", "list-question-2-ans-d"]
+                            },
+                            {
+                                "question_name": "list-question-3",
+                                "correct_option": "list-question-3-ans-c",
+                                "options": ["list-question-3-ans-a", "list-question-3-ans-b", "list-question-3-ans-c", "list-question-3-ans-d"]
+                            },
+                            {
+                                "question_name": "list-question-4",
+                                "correct_option": "list-question-4-ans-d",
+                                "options": ["list-question-4-ans-a", "list-question-4-ans-b", "list-question-4-ans-c", "list-question-4-ans-d"]
+                            },
+                            {
+                                "question_name": "list-question-5",
+                                "correct_option": "list-question-5-ans-a",
+                                "options": ["list-question-5-ans-a", "list-question-5-ans-b", "list-question-5-ans-c", "list-question-5-ans-d"]
                             }
                         ],
                         "marks_for_each_question": 2
                     },
                     {
-                        "topic_name": "Objects & Classes",
+                        "topic_name": "socket",
                         "questions": [
                             {
-                                "question_name": "question 1",
-                                "correct_option": "option 1",
-                                "options": ["option 1", "option 2", "option 3", "option 4"]
+                                "question_name": "socket-question-1",
+                                "correct_option": "socket-question-1-ans-a",
+                                "options": ["socket-question-1-ans-a", "socket-question-1-ans-b", "socket-question-1-ans-c", "socket-question-1-ans-d"]
                             },
                             {
-                                "question_name": "question 2",
-                                "correct_option": "option 1",
-                                "options": ["option 1", "option 2", "option 3", "option 4"]
+                                "question_name": "socket-question-2",
+                                "correct_option": "socket-question-2-ans-b",
+                                "options": ["socket-question-2-ans-a", "socket-question-2-ans-b", "socket-question-2-ans-c", "socket-question-2-ans-d"]
                             },
                             {
-                                "question_name": "question 3",
-                                "correct_option": "option 1",
-                                "options": ["option 1", "option 2", "option 3", "option 4"]
-                            }
-                        ],
-                        "marks_for_each_question": 2
-                    },
-                    {
-                        "topic_name": "Socket Programming",
-                        "questions": [
-                            {
-                                "question_name": "question 1",
-                                "correct_option": "option 1",
-                                "options": ["option 1", "option 2", "option 3", "option 4"]
+                                "question_name": "socket-question-3",
+                                "correct_option": "socket-question-3-ans-c",
+                                "options": ["socket-question-3-ans-a", "socket-question-3-ans-b", "socket-question-3-ans-c", "socket-question-3-ans-d"]
                             },
                             {
-                                "question_name": "question 2",
-                                "correct_option": "option 1",
-                                "options": ["option 1", "option 2", "option 3", "option 4"]
+                                "question_name": "socket-question-4",
+                                "correct_option": "socket-question-4-ans-d",
+                                "options": ["socket-question-4-ans-a", "socket-question-4-ans-b", "socket-question-4-ans-c", "socket-question-4-ans-d"]
                             },
                             {
-                                "question_name": "question 3",
-                                "correct_option": "option 1",
-                                "options": ["option 1", "option 2", "option 3", "option 4"]
+                                "question_name": "socket-question-5",
+                                "correct_option": "socket-question-5-ans-a",
+                                "options": ["socket-question-5-ans-a", "socket-question-5-ans-b", "socket-question-5-ans-c", "socket-question-5-ans-d"]
                             }
                         ],
                         "marks_for_each_question": 2
@@ -74,43 +104,63 @@
                 "module_name": "ISEC",
                 "topics": [
                     {
-                        "topic_name": "Malware and Social Engineering",
+                        "topic_name": "malware",
                         "questions": [
                             {
-                                "question_name": "question 1",
-                                "correct_option": "option 1",
-                                "options": ["option 1", "option 2", "option 3", "option 4"]
+                                "question_name": "malware-question-1",
+                                "correct_option": "malware-question-1-ans-a",
+                                "options": ["malware-question-1-ans-a", "malware-question-1-ans-b", "malware-question-1-ans-c", "malware-question-1-ans-d"]
                             },
                             {
-                                "question_name": "question 2",
-                                "correct_option": "option 1",
-                                "options": ["option 1", "option 2", "option 3", "option 4"]
+                                "question_name": "malware-question-2",
+                                "correct_option": "malware-question-2-ans-b",
+                                "options": ["malware-question-2-ans-a", "malware-question-2-ans-b", "malware-question-2-ans-c", "malware-question-2-ans-d"]
                             },
                             {
-                                "question_name": "question 3",
-                                "correct_option": "option 1",
-                                "options": ["option 1", "option 2", "option 3", "option 4"]
+                                "question_name": "malware-question-3",
+                                "correct_option": "malware-question-3-ans-c",
+                                "options": ["malware-question-3-ans-a", "malware-question-3-ans-b", "malware-question-3-ans-c", "malware-question-3-ans-d"]
+                            },
+                            {
+                                "question_name": "malware-question-4",
+                                "correct_option": "malware-question-4-ans-d",
+                                "options": ["malware-question-4-ans-a", "malware-question-4-ans-b", "malware-question-4-ans-c", "malware-question-4-ans-d"]
+                            },
+                            {
+                                "question_name": "malware-question-5",
+                                "correct_option": "malware-question-5-ans-a",
+                                "options": ["malware-question-5-ans-a", "malware-question-5-ans-b", "malware-question-5-ans-c", "malware-question-5-ans-d"]
                             }
                         ],
                         "marks_for_each_question": 2
                     },
                     {
-                        "topic_name": "System Security",
+                        "topic_name": "sys-security",
                         "questions": [
                             {
-                                "question_name": "question 1",
-                                "correct_option": "option 1",
-                                "options": ["option 1", "option 2", "option 3", "option 4"]
+                                "question_name": "sys-security-question-1",
+                                "correct_option": "sys-security-question-1-ans-a",
+                                "options": ["sys-security-question-1-ans-a", "sys-security-question-1-ans-b", "sys-security-question-1-ans-c", "sys-security-question-1-ans-d"]
                             },
                             {
-                                "question_name": "question 2",
-                                "correct_option": "option 1",
-                                "options": ["option 1", "option 2", "option 3", "option 4"]
+                                "question_name": "sys-security-question-2",
+                                "correct_option": "sys-security-question-2-ans-b",
+                                "options": ["sys-security-question-2-ans-a", "sys-security-question-2-ans-b", "sys-security-question-2-ans-c", "sys-security-question-2-ans-d"]
                             },
                             {
-                                "question_name": "question 3",
-                                "correct_option": "option 1",
-                                "options": ["option 1", "option 2", "option 3", "option 4"]
+                                "question_name": "sys-security-question-3",
+                                "correct_option": "sys-security-question-3-ans-c",
+                                "options": ["sys-security-question-3-ans-a", "sys-security-question-3-ans-b", "sys-security-question-3-ans-c", "sys-security-question-3-ans-d"]
+                            },
+                            {
+                                "question_name": "sys-security-question-4",
+                                "correct_option": "sys-security-question-4-ans-d",
+                                "options": ["sys-security-question-4-ans-a", "sys-security-question-4-ans-b", "sys-security-question-4-ans-c", "sys-security-question-4-ans-d"]
+                            },
+                            {
+                                "question_name": "sys-security-question-5",
+                                "correct_option": "sys-security-question-5-ans-a",
+                                "options": ["sys-security-question-5-ans-a", "sys-security-question-5-ans-b", "sys-security-question-5-ans-c", "sys-security-question-5-ans-d"]
                             }
                         ],
                         "marks_for_each_question": 2
@@ -126,43 +176,63 @@
                 "module_name": "BED",
                 "topics": [
                     {
-                        "topic_name": "Handling with Databases",
+                        "topic_name": "database",
                         "questions": [
                             {
-                                "question_name": "question 1",
-                                "correct_option": "option 1",
-                                "options": ["option 1", "option 2", "option 3", "option 4"]
+                                "question_name": "database-question-1",
+                                "correct_option": "database-question-1-ans-a",
+                                "options": ["database-question-1-ans-a", "database-question-1-ans-b", "database-question-1-ans-c", "database-question-1-ans-d"]
                             },
                             {
-                                "question_name": "question 2",
-                                "correct_option": "option 1",
-                                "options": ["option 1", "option 2", "option 3", "option 4"]
+                                "question_name": "database-question-2",
+                                "correct_option": "database-question-2-ans-b",
+                                "options": ["database-question-2-ans-a", "database-question-2-ans-b", "database-question-2-ans-c", "database-question-2-ans-d"]
                             },
                             {
-                                "question_name": "question 3",
-                                "correct_option": "option 1",
-                                "options": ["option 1", "option 2", "option 3", "option 4"]
+                                "question_name": "database-question-3",
+                                "correct_option": "database-question-3-ans-c",
+                                "options": ["database-question-3-ans-a", "database-question-3-ans-b", "database-question-3-ans-c", "database-question-3-ans-d"]
+                            },
+                            {
+                                "question_name": "database-question-4",
+                                "correct_option": "database-question-4-ans-d",
+                                "options": ["database-question-4-ans-a", "database-question-4-ans-b", "database-question-4-ans-c", "database-question-4-ans-d"]
+                            },
+                            {
+                                "question_name": "database-question-5",
+                                "correct_option": "database-question-5-ans-a",
+                                "options": ["database-question-5-ans-a", "database-question-5-ans-b", "database-question-5-ans-c", "database-question-5-ans-d"]
                             }
                         ],
                         "marks_for_each_question": 2
                     },
                     {
-                        "topic_name": "MySQL",
+                        "topic_name": "mysql",
                         "questions": [
                             {
-                                "question_name": "question 1",
-                                "correct_option": "option 1",
-                                "options": ["option 1", "option 2", "option 3", "option 4"]
+                                "question_name": "mysql-question-1",
+                                "correct_option": "mysql-question-1-ans-a",
+                                "options": ["mysql-question-1-ans-a", "mysql-question-1-ans-b", "mysql-question-1-ans-c", "mysql-question-1-ans-d"]
                             },
                             {
-                                "question_name": "question 2",
-                                "correct_option": "option 1",
-                                "options": ["option 1", "option 2", "option 3", "option 4"]
+                                "question_name": "mysql-question-2",
+                                "correct_option": "mysql-question-2-ans-b",
+                                "options": ["mysql-question-2-ans-a", "mysql-question-2-ans-b", "mysql-question-2-ans-c", "mysql-question-2-ans-d"]
                             },
                             {
-                                "question_name": "question 3",
-                                "correct_option": "option 1",
-                                "options": ["option 1", "option 2", "option 3", "option 4"]
+                                "question_name": "mysql-question-3",
+                                "correct_option": "mysql-question-3-ans-c",
+                                "options": ["mysql-question-3-ans-a", "mysql-question-3-ans-b", "mysql-question-3-ans-c", "mysql-question-3-ans-d"]
+                            },
+                            {
+                                "question_name": "mysql-question-4",
+                                "correct_option": "mysql-question-4-ans-d",
+                                "options": ["mysql-question-4-ans-a", "mysql-question-4-ans-b", "mysql-question-4-ans-c", "mysql-question-4-ans-d"]
+                            },
+                            {
+                                "question_name": "mysql-question-5",
+                                "correct_option": "mysql-question-5-ans-a",
+                                "options": ["mysql-question-5-ans-a", "mysql-question-5-ans-b", "mysql-question-5-ans-c", "mysql-question-5-ans-d"]
                             }
                         ],
                         "marks_for_each_question": 2
@@ -173,43 +243,63 @@
                 "module_name": "FED",
                 "topics": [
                     {
-                        "topic_name": "HTML5 & CSS3",
+                        "topic_name": "html5-css3",
                         "questions": [
                             {
-                                "question_name": "question 1",
-                                "correct_option": "option 1",
-                                "options": ["option 1", "option 2", "option 3", "option 4"]
+                                "question_name": "html5-css3-question-1",
+                                "correct_option": "html5-css3-question-1-ans-a",
+                                "options": ["html5-css3-question-1-ans-a", "html5-css3-question-1-ans-b", "html5-css3-question-1-ans-c", "html5-css3-question-1-ans-d"]
                             },
                             {
-                                "question_name": "question 2",
-                                "correct_option": "option 1",
-                                "options": ["option 1", "option 2", "option 3", "option 4"]
+                                "question_name": "html5-css3-question-2",
+                                "correct_option": "html5-css3-question-2-ans-b",
+                                "options": ["html5-css3-question-2-ans-a", "html5-css3-question-2-ans-b", "html5-css3-question-2-ans-c", "html5-css3-question-2-ans-d"]
                             },
                             {
-                                "question_name": "question 3",
-                                "correct_option": "option 1",
-                                "options": ["option 1", "option 2", "option 3", "option 4"]
+                                "question_name": "html5-css3-question-3",
+                                "correct_option": "html5-css3-question-3-ans-c",
+                                "options": ["html5-css3-question-3-ans-a", "html5-css3-question-3-ans-b", "html5-css3-question-3-ans-c", "html5-css3-question-3-ans-d"]
+                            },
+                            {
+                                "question_name": "html5-css3-question-4",
+                                "correct_option": "html5-css3-question-4-ans-d",
+                                "options": ["html5-css3-question-4-ans-a", "html5-css3-question-4-ans-b", "html5-css3-question-4-ans-c", "html5-css3-question-4-ans-d"]
+                            },
+                            {
+                                "question_name": "html5-css3-question-5",
+                                "correct_option": "html5-css3-question-5-ans-a",
+                                "options": ["html5-css3-question-5-ans-a", "html5-css3-question-5-ans-b", "html5-css3-question-5-ans-c", "html5-css3-question-5-ans-d"]
                             }
                         ],
                         "marks_for_each_question": 2
                     },
                     {
-                        "topic_name": "Javascript",
+                        "topic_name": "javascript",
                         "questions": [
                             {
-                                "question_name": "question 1",
-                                "correct_option": "option 1",
-                                "options": ["option 1", "option 2", "option 3", "option 4"]
+                                "question_name": "javascript-question-1",
+                                "correct_option": "javascript-question-1-ans-a",
+                                "options": ["javascript-question-1-ans-a", "javascript-question-1-ans-b", "javascript-question-1-ans-c", "javascript-question-1-ans-d"]
                             },
                             {
-                                "question_name": "question 2",
-                                "correct_option": "option 1",
-                                "options": ["option 1", "option 2", "option 3", "option 4"]
+                                "question_name": "javascript-question-2",
+                                "correct_option": "javascript-question-2-ans-b",
+                                "options": ["javascript-question-2-ans-a", "javascript-question-2-ans-b", "javascript-question-2-ans-c", "javascript-question-2-ans-d"]
                             },
                             {
-                                "question_name": "question 3",
-                                "correct_option": "option 1",
-                                "options": ["option 1", "option 2", "option 3", "option 4"]
+                                "question_name": "javascript-question-3",
+                                "correct_option": "javascript-question-3-ans-c",
+                                "options": ["javascript-question-3-ans-a", "javascript-question-3-ans-b", "javascript-question-3-ans-c", "javascript-question-3-ans-d"]
+                            },
+                            {
+                                "question_name": "javascript-question-4",
+                                "correct_option": "javascript-question-4-ans-d",
+                                "options": ["javascript-question-4-ans-a", "javascript-question-4-ans-b", "javascript-question-4-ans-c", "javascript-question-4-ans-d"]
+                            },
+                            {
+                                "question_name": "javascript-question-5",
+                                "correct_option": "javascript-question-5-ans-a",
+                                "options": ["javascript-question-5-ans-a", "javascript-question-5-ans-b", "javascript-question-5-ans-c", "javascript-question-5-ans-d"]
                             }
                         ],
                         "marks_for_each_question": 2

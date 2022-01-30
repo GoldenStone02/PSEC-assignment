@@ -4,24 +4,79 @@
         "module_name": "PSEC",
         "quiz_name": "Quiz-1",
         "assessment_component": [
-            "Control Flow"
+            {
+                "topic_name": "string",
+                "number_of_question": 3
+            },
+            {
+                "topic_name": "list",
+                "number_of_question": 2
+            }
         ],
         "time_in_minutes": 1,
-        "number_of_questions": 5,
-        "maximum_number_of_attempts": 3,
-        "randomize_options": true
+        "maximum_number_of_attempts": "unlimited",
+        "randomize_options": true,
+        "show_quiz": true
     },
     {
         "course": "DISM",
         "module_name": "PSEC",
         "quiz_name": "Quiz-2",
         "assessment_component": [
-            "Control Flow",
-            "Objects & Classes"
+            {
+                "topic_name": "string",
+                "number_of_question": 1 
+            },
+            {
+                "topic_name": "list",
+                "number_of_question": 2
+            },
+            {
+                "topic_name": "socket",
+                "number_of_question": 2
+            }
         ],
         "time_in_minutes": 1,
-        "number_of_questions": 5,
         "maximum_number_of_attempts": 3,
-        "randomize_options": true
+        "randomize_options": true,
+        "show_quiz": true
+    },
+    {
+        "course": "DISM",
+        "module_name": "ISEC",
+        "quiz_name": "Quiz-1",
+        "assessment_component": [
+            {
+                "topic_name": "malware",
+                "number_of_question": 3
+            },
+            {
+                "topic_name": "sys-security",
+                "number_of_question": 2
+            }
+        ],
+        "time_in_minutes": 1,
+        "maximum_number_of_attempts": 3,
+        "randomize_options": true,
+        "show_quiz": true
+    },
+    {
+        "course": "DIT",
+        "module_name": "FED",
+        "quiz_name": "Quiz-1",
+        "assessment_component": [
+            {
+                "topic_name": "html5-css3",
+                "number_of_question": 3
+            },
+            {
+                "topic_name": "javascript",
+                "number_of_question": 2
+            }
+        ],
+        "time_in_minutes": 1,
+        "maximum_number_of_attempts": 3,
+        "randomize_options": true,
+        "show_quiz": true
     }
 ]
