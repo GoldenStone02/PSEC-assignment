@@ -325,15 +325,27 @@ def divider():
 # ===========================================================================================================================
 
 # Returns user navigation menu
-def user_menu(inputList: list):
+def user_menu(input_list: list):
+    '''
+    This function prints out the main menu after logging in.
+
+    Args: 
+        input_list (list) : Main menu list.
+
+    Returns:
+        content (str) : Returns main menu UI.
+    '''
     content = f"{divider()}\n\t\t\t\033[1;37;40m Main \033[0;37;40m\n{divider()}\n"
-    for i, element in enumerate(inputList):
+    for i, element in enumerate(input_list):
         content += f"[ {i+1} ] {element}\n"
     content += f"[ X ] Exit Application\n{divider()}\n"
     return content
 
 # Logicial Flow for user menu
 def user_logic():
+    '''
+    This function is the selection page for each of the other sub menus.
+    '''
     sub_loop = True
     while True:
         stored_value = get_input(user_menu(MAIN_USER_MENU))
@@ -363,6 +375,9 @@ def user_logic():
 
 # Adds users to the backend server
 def register_user():
+    '''
+    This function registers a new user into the server's database.
+    '''
     course_list = server_process({"type": "get_courses"})
     available_courses = ""
     for i, element in enumerate(course_list):
@@ -417,6 +432,9 @@ def register_user():
 
 # Logging in to account
 def login_menu():
+    '''
+    This function is used for account login. User be kicked out of the session after 3 failed attempts.
+    '''
     # Counter for number of attempts before a user's session is timed out 
     count = 3
     while count != 0:
@@ -454,11 +472,23 @@ def login_menu():
 
 # Hashes the password for safe keeping in the .csv file
 def user_password_hashing(given_input: str): 
+    '''
+    This function hashes the given_input with SHA256.
+
+    Args:
+        given_input (str) : Input that will be hashed.
+    
+    Returns:
+        output (str) : Output will be hashed using SHA256.
+    '''
     output = hashlib.sha256(given_input.encode())
     return output.hexdigest()
 
 # Resets the user password if they can provide their email
 def reset_password():
+    '''
+    This function resets the password of a user, given the account userID and email address.
+    '''
     while True:
         userID_input = get_input(f"{divider()}\n\t\tReset Password\n{divider()}\nuserID: _\nReset Email:\nPassword:\n{divider()}\n[ X ] Back to Menu\n{divider()}\n")
         if userID_input.upper() == "X":
@@ -531,6 +561,13 @@ def show_quizzes(userID: str) -> dict:
 
 # Display the quiz menu for the user before starting.
 def quiz_selection_menu(userID: str, quiz_setting: dict | bool):
+    '''
+    This function shows the brief information of the quiz before the user starts.
+
+    Args:
+        userID (str) : userID that is going to take the quiz.
+        quiz_setting (dict | bool) : Used to either to exit the function, or as the quiz setting list.
+    '''
     if quiz_setting == False:   # Exit function if the previous function returned an exit 
         return False
     components = ""
@@ -552,10 +589,17 @@ def quiz_selection_menu(userID: str, quiz_setting: dict | bool):
         elif user_input == "2":
             view_previous_attempts(userID, quiz_setting)
         else:
-            input("what")
+            error_output("input")
 
 # Checks if the user has sufficient attempts
 def check_attempts(userID: str, quiz_setting: dict) -> int:
+    '''
+    This function checks the number of attempts left for the given userID.
+
+    Args:
+        userID (str) : userID that is going to take the quiz.
+        quiz_setting (dict) : Used to find the attempts within the backend server.
+    '''
     server_response = server_process({"type": "show_attempts", "userID": userID, "quiz_setting": quiz_setting})
     return server_response
 
@@ -599,9 +643,9 @@ def quiz_menu(userID: str, quiz_setting: dict, question_pool: list):
     This functions shows the quiz menu, where the user engages with the quiz.
 
     Args:
-        userID (str) : Used as user submission details
-        quiz_setting (dict) : Used as quiz submission details
-        question_pool (list) : Used for storing of user's answers and submission 
+        userID (str) : Used as user submission details.
+        quiz_setting (dict) : Used as quiz submission details.
+        question_pool (list) : Used for storing of user's answers and submission.
 
     Returns:
         (bool) : If quiz was successfully submitted, return True. Else, return False
@@ -610,7 +654,7 @@ def quiz_menu(userID: str, quiz_setting: dict, question_pool: list):
     last_question = len(question_pool) - 1      # index for last question
     start_time = time.time()
     while True:
-        timer = start_timer(start_time, quiz_setting['time_in_minutes'])
+        timer = check_timer(start_time, quiz_setting['time_in_minutes'])
         if timer[0] <= 0 and timer[1] <= 0:
             # Automatically exits and submit the quiz answers.
             get_input("Time's up", False)
@@ -708,6 +752,13 @@ def submit(userID: str, quiz_setting: dict, question_pool: list, time_up: bool =
 
 # Starts the quiz for the signed user.
 def start_quiz(userID: str, quiz_setting: dict):
+    '''
+    This function starts the quiz for the given userID.
+
+    Args:
+        userID (str) : userID that is going to take the quiz.
+        quiz_setting (dict) : Used to know the configuration of the quiz.
+    '''
     # Fetch the server for a list of random question that matches the quiz criteria
     question_pool = server_process({"type": "question_pool", "data": quiz_setting})
     quiz_menu(userID, quiz_setting, question_pool)
@@ -756,7 +807,14 @@ def show_results(userID: str, quiz_setting: dict, server_response: dict):
     get_input(f"{divider()}\n\t\tResults\n{divider()}\nLogged In as: \033[1;37;40m{userID}\033[0;37;40m\nModule: \033[1;37;40m{quiz_setting['module_name']}\033[0;37;40m\nQuiz: \033[1;37;40m{quiz_setting['quiz_name']}\033[0;37;40m\n\nGrade: {grade:.2f}\nScore: {server_response[2]}/{server_response[3]}\n{divider()}\nPress Enter to Continue\n", False)
 
 # Returns the remaining time left in a tuple
-def start_timer(starting_time: float, allowed_in_minutes: int):
+def check_timer(starting_time: float, allowed_in_minutes: int):
+    '''
+    This function is used as a pseudo-timer, where it checks for the time left.
+
+    Args:
+        starting_time (float) : time.time() variable that starts before the function.
+        allowed_in_minutes (int) : Total amount of time allowed in minutes.
+    '''
     endtime = time.time() - starting_time
     total_allowed_time_in_sec = float(allowed_in_minutes) * 60
     time_left_min = int((total_allowed_time_in_sec - endtime)/60)
