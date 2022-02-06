@@ -292,11 +292,11 @@ def view_file_content(show_numbers: int, option: str, check=None):
         if check != None:
             packet.update(check)
         file_dictionary = server_process(packet)
+        # Uses the data portion of the packet
+        file_dictionary = file_dictionary['data']
     else:
         file_dictionary = server_process({"type": "admin_read_file", "file": option})
 
-    # Uses the data portion of the packet
-    file_dictionary = file_dictionary['data']
     if show_numbers == 1:
         match option:
             # Formats dictionary for settings with numbering
@@ -2269,8 +2269,9 @@ def selection_of_setting(title: str, input_list: list, input_index: int):
 
 # Logical system for generating report
 def generate_report_logic():
-    generate_report()
-    return
+    data = generate_report()
+    if data == False:
+        return False
 
 # Retrieving and generating a data report
 def generate_report():
@@ -2399,7 +2400,7 @@ def login_menu():
                 if userConfirm.upper() == "Y":
                     print("\033[0;32;40mGoodbye\033[0;37;40m")
                     loop = False
-                    return
+                    return False
                 elif userConfirm.upper() == "N":
                     return
                 else:
@@ -2430,8 +2431,10 @@ def main():
             loop = login_menu()
             main_menu(loop)
         except:
-            print(traceback)
+            input(traceback)
             error_output("bad_input")
+        if loop == False:
+            break 
 
 if __name__ == "__main__":
     main()
