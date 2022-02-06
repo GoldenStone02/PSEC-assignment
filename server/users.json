@@ -1,66 +1,20 @@
 [
     {
         "userID": "testuser",
-        "email": "testing@gmail.com",
+        "email": "testing1@gmail.com",
         "password_SHA256": "3ed2ad36a8757684084872bd8df119ddce0848fc7dde129d4844664eb3cd5572",
-        "current_course": "DISM",
-        "modules": [
-            {
-                "module_name": "PSEC",
-                "grade": null
-            },
-            {
-                "module_name": "ISEC",
-                "grade": null
-            }
-        ]
+        "current_course": "DISM"
     },
     {
         "userID": "joshua",
         "email": "joshua@gmail.com",
         "password_SHA256": "3ed2ad36a8757684084872bd8df119ddce0848fc7dde129d4844664eb3cd5572",
-        "current_course": "DISM",
-        "modules": [
-            {
-                "module_name": "PSEC",
-                "grade": null
-            },
-            {
-                "module_name": "ISEC",
-                "grade": null
-            }
-        ]
+        "current_course": "DISM"
     },
     {
         "userID": "p12345678",
         "email": "somestudent@yahoo.com",
         "password_SHA256": "3ed2ad36a8757684084872bd8df119ddce0848fc7dde129d4844664eb3cd5572",
-        "current_course": "DIT",
-        "modules": [
-            {
-                "module_name": "BED",
-                "grade": null
-            },
-            {
-                "module_name": "FED",
-                "grade": null
-            }
-        ]
-    },
-    {
-        "userID": "somethingelseyt",
-        "email": "sumtingwong@gg.com",
-        "password_SHA256": "3ed2ad36a8757684084872bd8df119ddce0848fc7dde129d4844664eb3cd5572",
-        "current_course": "DIT",
-        "modules": [
-            {
-                "module_name": "BED",
-                "grade": null
-            },
-            {
-                "module_name": "FED",
-                "grade": null
-            }
-        ]
+        "current_course": "DISM"
     }
 ]

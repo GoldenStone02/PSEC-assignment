@@ -25,7 +25,7 @@
         "assessment_component": [
             {
                 "topic_name": "string",
-                "number_of_question": 1 
+                "number_of_question": 1
             },
             {
                 "topic_name": "list",
@@ -71,7 +71,7 @@
             },
             {
                 "topic_name": "javascript",
-                "number_of_question": 2
+                "number_of_question": 4
             }
         ],
         "time_in_minutes": 1,
