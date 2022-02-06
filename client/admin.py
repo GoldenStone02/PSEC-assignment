@@ -509,7 +509,7 @@ def error_output(error_type: str, optional=None):
     
         case "login_failed":         # Login failed/password incorrect
             string = "\033[1;37;41mLogin failed, please try again.\033[0;37;40m\n"
-    get_input(string, False)
+    getpass.getpass(string)
 
 # Used to create a dynamic divider that changes size according to the size of the terminal
 def divider():
@@ -2388,8 +2388,8 @@ def generate_report_subloop(input_loop: bool):
 
 # Prompts a Admin login upon loading of the program
 def login_menu():
-    # plaintext is "1qwer$#@!" w/o quotations. [For Reference purposes]
-    password_hashed = "9153cae78e7f43377a079644f24ff39ebb82ce481e08f09732d1009bd01ad159" 
+    # plaintext is "1Qwer$#@!" w/o quotations. [For Reference purposes]
+    password_hashed = "cf1274bedc756b5335653619ecd82fc16171ccecf5e687c7aeafae41e750d768" 
 
     loop = True
     while loop:
@@ -2430,11 +2430,11 @@ def main():
         try:
             loop = login_menu()
             main_menu(loop)
+            if loop == False:
+                break 
         except:
             input(traceback)
             error_output("bad_input")
-        if loop == False:
-            break 
 
 if __name__ == "__main__":
     main()

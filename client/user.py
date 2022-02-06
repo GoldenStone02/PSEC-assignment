@@ -147,8 +147,15 @@ def process_input(server_response: dict) -> any:
     '''
     output = None
     match server_response['type']:
+        case "user_successfully_added":
+            output = True
+
+        case "user_already_exists":
+            output = False
+
         case "available_courses":
             output = server_response['data']
+
         case "reset_pw_status":
             if server_response['data'] == "success":
                 output = True
@@ -161,14 +168,19 @@ def process_input(server_response: dict) -> any:
                 output = False
         case "returned_quiz_settings":
             output = server_response['data']
+            
         case "returned_question_pool":
             output = server_response['data'] 
+
         case "returned_no_of_attempts":
             output = server_response['data']
+
         case "user_results":
             output = server_response['data']
+
         case "previous_attempts":
             output = server_response['data']
+
         case _:
             input("Error")
     return output
