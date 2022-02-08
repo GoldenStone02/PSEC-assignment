@@ -7,10 +7,10 @@ Documentation of the project will be uploaded into the repository on completion 
 
 ## Table of Content
 * clients
-   * [admin.py](https://github.com/GoldenStone02/PSEC-assignment/blob/main/client/admin.py)
+   * [admin.py](https://github.com/GoldenStone02/PSEC-assignment/blob/main/client/admin.py) 
    * [user.py](https://github.com/GoldenStone02/PSEC-assignment/blob/main/client/user.py)
 * server
-   * server.py
+   * [server.py](https://github.com/GoldenStone02/PSEC-assignment/blob/main/server/server.py)
    * users.json
    * quiz_settings.json
    * question_pool.json
