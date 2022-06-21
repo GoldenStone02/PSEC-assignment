@@ -11,7 +11,7 @@ Documentation of the project will be uploaded into the repository on completion 
    * [user.py](https://github.com/GoldenStone02/PSEC-assignment/blob/main/client/user.py)
 * server
    * [server.py](https://github.com/GoldenStone02/PSEC-assignment/blob/main/server/server.py)
-   * users.json
-   * quiz_settings.json
-   * question_pool.json
-   * quiz_result.csv
+   * [users.json](https://github.com/GoldenStone02/PSEC-assignment/blob/main/server/users.json)
+   * [quiz_settings.json](https://github.com/GoldenStone02/PSEC-assignment/blob/main/server/quiz_settings.json)
+   * [question_pool.json](https://github.com/GoldenStone02/PSEC-assignment/blob/main/server/question_pool.json)
+   * [quiz_result.csv](https://github.com/GoldenStone02/PSEC-assignment/blob/main/server/quiz_result.csv)
