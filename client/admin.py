@@ -1,6 +1,6 @@
-# StudentID:	p2008493
-# Name:	        Ng Jun Han
-# Class:		DISM/FT/1B/05   
+# StudentID:	-
+# Name:	        -
+# Class:		-  
 # Assessment:	CA1 
 # 
 # Script name:	admin.py
